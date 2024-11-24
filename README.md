@@ -32,7 +32,7 @@ Le but de notre application est d’améliorer l’efficacité dans la gestion d
 
 ### L'administrateur 🛡️
 - Visualise l'ensemble des budgets des commissions.
-- Gère les comptes utilisateurs en attribuant les commissions et les rôles de chacun.
+- Gère les comptes utilisateurs en attribuant les commissions et le(s) rôle(s) de chacun.
 - Gère les commissions
 - Visualise l'ensemble des fatures et peut créer une nouvelle facture.
 - Gère le budget global en le répartissant par commission.
@@ -57,8 +57,8 @@ Le but de notre application est d’améliorer l’efficacité dans la gestion d
 ![Typescript](https://img.shields.io/badge/typescript-178C6.svg?style=for-the-badge&logo=typescript&logoColor=blue&color=%233178c6)
 ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![MATERIAL UI](https://img.shields.io/badge/https%3A%2F%2Fimg.shields.io%2Fbadge%2Fmaterial-ui](https://camo.githubusercontent.com/07b911021fd7d66a0db67c20e25ed6b3dc51916affd1a7b51d16c4a9520756e5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d6174657269616c25323055492d3030374646463f7374796c653d666f722d7468652d6261646765266c6f676f3d6d7569266c6f676f436f6c6f723d7768697465)
-)
+![MATERIAL UI](https://camo.githubusercontent.com/07b911021fd7d66a0db67c20e25ed6b3dc51916affd1a7b51d16c4a9520756e5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d6174657269616c25323055492d3030374646463f7374796c653d666f722d7468652d6261646765266c6f676f3d6d7569266c6f676f436f6c6f723d7768697465))
+
 
 ### Côté Backend
 ![Graphql](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white&color=%23E10098)
