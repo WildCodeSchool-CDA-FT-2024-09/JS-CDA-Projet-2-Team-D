@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint '*/**/*.{js,jsx,ts,tsx}'",
-    "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'"
+    "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'",
+    "compile": "tsc",
+    "dev": "ts-node-dev ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,11 +16,18 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.15.0",
+    "@types/node": "^22.10.0",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "prettier": "^3.4.1"
+    "prettier": "^3.4.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.11.2",
+    "graphql": "^16.9.0",
+    "ts-node-dev": "^2.0.0"
   }
 }
