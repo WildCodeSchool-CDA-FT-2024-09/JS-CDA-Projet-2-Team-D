@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "husky": "^9.1.7",
+    "it": "^1.1.1",
+    "lint-staged": "^15.2.10"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "lint-staged"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.1"
+  }
+}
