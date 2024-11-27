@@ -1,13 +1,16 @@
 {
-  "dependencies": {
-    "husky": "^9.1.7",
-    "it": "^1.1.1",
-    "lint-staged": "^15.2.10"
-  },
+  "name": "api_email",
+  "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
-    "prepare": "husky",
-    "lint": "lint-staged"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint '*/**/*.{js,jsx,ts,tsx}'",
+    "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.15.0",
