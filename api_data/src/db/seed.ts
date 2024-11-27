@@ -15,10 +15,16 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query("DELETE FROM user_roles_role CASCADE");
     await queryRunner.query(`DELETE FROM "user" CASCADE`);
     await queryRunner.query(`DELETE FROM "role" CASCADE`);
+    await queryRunner.query(`DELETE FROM "bank_account" CASCADE`);
+    await queryRunner.query(`DELETE FROM "bank" CASCADE`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE user_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE bank_id_seq RESTART WITH 1;`);
+    await queryRunner.query(
+      `ALTER SEQUENCE bank_account_id_seq RESTART WITH 1;`
+    );
 
     // insert roles
     await queryRunner.query(`
@@ -48,6 +54,24 @@ import { AppDataSource } from "./data-source";
         (4,	1),
         (4,	2);
     `);
+
+    // insert banks
+    await queryRunner.query(`
+          INSERT INTO "bank" ("id", "label") VALUES
+            (1, 'Bank A'),
+            (2, 'Bank B');
+        `);
+
+    // insert bank accounts
+    await queryRunner.query(`
+          INSERT INTO "bank_account" ("id", "name", "account_number", "balance", "bankId") VALUES
+            (1, 'Compte courant', 'FR7612345678900000001234564', '10000.00', 1),
+            (2, 'Livret A', 'FR7612345678900000001234562', '5000.00', 1),
+            (3, 'Livret Développement Durable', 'FR7612345678900000001234566', '15000.00', 1),
+            (4, 'Livret A', 'FR7612345678900000001234565', '25000.00', 2),
+            (5, 'Livret Développement Durable', 'FR7612345678900000001234563', '12000.00', 2),
+            (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
+        `);
 
     await queryRunner.commitTransaction();
 
