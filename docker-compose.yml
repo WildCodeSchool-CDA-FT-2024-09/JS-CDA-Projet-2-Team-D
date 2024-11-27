@@ -21,7 +21,7 @@ services:
 
   api_data:
     build: ./api_data
-    command: npm run dev
+    command: npm run devseed
     restart: always
     env_file: .env
     volumes:
