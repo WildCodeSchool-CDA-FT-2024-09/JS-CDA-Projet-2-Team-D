@@ -1,47 +1,29 @@
 import * as dotenv from "dotenv";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import { buildSchema } from "type-graphql";
+import "reflect-metadata";
+import { AppDataSource } from "./db/data-source";
+import UserResolver from "./user/user.resolver";
 
 dotenv.config();
 const { PORT } = process.env;
 
-const typeDefs = `#graphql
-  type Book {
-    title: String
-    author: String
-  }
-
-  type Query {
-    books: [Book]
-  }
-`;
-
-const books = [
-  {
-    title: "The Awakening",
-    author: "Kate Chopin",
-  },
-  {
-    title: "City of Glass",
-    author: "Paul Auster",
-  },
-];
-
-const resolvers = {
-  Query: {
-    books: () => books,
-  },
-};
-
 (async () => {
+  await AppDataSource.initialize();
+
+  const schema = await buildSchema({
+    resolvers: [UserResolver],
+    validate: true,
+  });
+
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
   });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { /*host: "0.0.0.0",*/ port: Number(PORT) },
+    listen: { port: Number(PORT) },
   });
 
-  console.info(`🚀  Server ready at: ${url}`);
+  console.info(`🚀 Server ready at: ${url}`);
 })();
