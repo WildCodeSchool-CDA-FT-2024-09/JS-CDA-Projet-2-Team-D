@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {
   BaseEntity,
-  ManyToMany,
+  OneToMany,
   Column,
   Entity,
   PrimaryGeneratedColumn,
@@ -21,9 +21,6 @@ export class Bank extends BaseEntity {
   label: string;
 
   @Field(() => [BankAccount])
-  @ManyToMany(
-    () => BankAccount,
-    (BankAccount: BankAccount) => BankAccount.account_number
-  )
-  BankAccounts: BankAccount[];
+  @OneToMany(() => BankAccount, (bankAccount) => bankAccount.bank)
+  bankAccounts: BankAccount[];
 }
