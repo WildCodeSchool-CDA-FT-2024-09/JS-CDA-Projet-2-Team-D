@@ -8,6 +8,16 @@
     "prepare": "husky",
     "lint": "lint-staged"
   },
+  "lint-staged": {
+    "api_data/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --prefix api_data",
+      "npm run format --prefix api_data"
+    ],
+    "client/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --prefix client",
+      "npm run format --prefix client"
+    ]
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.15.0",
