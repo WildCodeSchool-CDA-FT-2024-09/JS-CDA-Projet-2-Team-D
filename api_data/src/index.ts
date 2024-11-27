@@ -6,6 +6,7 @@ import "reflect-metadata";
 import { AppDataSource } from "./db/data-source";
 import UserResolver from "./user/user.resolver";
 import { CreditDebit } from "./creditDebit/creditDebit.entity";
+import { Vat } from "./vat/vat.entity";
 
 dotenv.config();
 const { PORT } = process.env;
@@ -14,7 +15,7 @@ const { PORT } = process.env;
   await AppDataSource.initialize();
 
   const schema = await buildSchema({
-    resolvers: [UserResolver, CreditDebit],
+    resolvers: [UserResolver, CreditDebit, Vat],
     validate: true,
   });
 
