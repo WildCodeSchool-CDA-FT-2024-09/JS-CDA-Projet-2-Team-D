@@ -17,25 +17,22 @@ export class Subcategory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @Field(() => Number)
   @IsNumber()
   @Column({ nullable: false, type: "int" })
   category_id: number;
 
-  @Field()
+  @Field(() => String)
   @IsString()
-  @IsNotEmpty({ message: "Le code de la sous-catégorie est obligatoire" })
-  @Column({ nullable: false, type: "varchar", width: 30 })
+  @IsNotEmpty()
+  @Column({ nullable: false, type: "varchar", length: 30 })
   code: string;
 
-  @Field()
+  @Field(() => String)
   @IsString()
-  @IsNotEmpty({ message: "Le nom de la sous-catégorie est obligatoire" })
-  @Length(1, 30, {
-    message:
-      "Le nom de la sous-catégorie doit contenir entre 1 et 30 caractères",
-  })
-  @Column({ nullable: false, unique: true, type: "varchar", width: 30 })
+  @IsNotEmpty()
+  @Length(1, 30)
+  @Column({ nullable: false, unique: true, type: "varchar", length: 30 })
   label: string;
 
   @Field(() => Category)

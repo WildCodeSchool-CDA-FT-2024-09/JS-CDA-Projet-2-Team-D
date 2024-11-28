@@ -17,13 +17,11 @@ export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @Field(() => String)
   @IsString()
-  @IsNotEmpty({ message: "Le nom de la catégorie est obligatoire" })
-  @Length(1, 30, {
-    message: "Le nom de la catégorie doit contenir entre 1 et 30 caractères",
-  })
-  @Column({ nullable: false, unique: true, type: "varchar", width: 30 })
+  @IsNotEmpty()
+  @Length(1, 30)
+  @Column({ nullable: false, unique: true, type: "varchar", length: 30 })
   label: string;
 
   @Field(() => [Subcategory])
