@@ -17,6 +17,8 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "role" CASCADE`);
     await queryRunner.query(`DELETE FROM "bank_account" CASCADE`);
     await queryRunner.query(`DELETE FROM "bank" CASCADE`);
+    await queryRunner.query(`DELETE FROM "subcategory" CASCADE`);
+    await queryRunner.query(`DELETE FROM "category" CASCADE`);
     await queryRunner.query(`DELETE FROM "budget" CASCADE`);
     await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
     await queryRunner.query(`DELETE FROM "vat" CASCADE`);
@@ -27,6 +29,10 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`ALTER SEQUENCE bank_id_seq RESTART WITH 1;`);
     await queryRunner.query(
       `ALTER SEQUENCE bank_account_id_seq RESTART WITH 1;`
+    );
+    await queryRunner.query(`ALTER SEQUENCE category_id_seq RESTART WITH 1;`);
+    await queryRunner.query(
+      `ALTER SEQUENCE subcategory_id_seq RESTART WITH 1;`
     );
     await queryRunner.query(`ALTER SEQUENCE budget_id_seq RESTART WITH 1;`);
     await queryRunner.query(
@@ -79,6 +85,36 @@ import { AppDataSource } from "./data-source";
         (4, 'Livret A', 'FR7612345678900000001234565', '25000.00', 2),
         (5, 'Livret Développement Durable', 'FR7612345678900000001234563', '12000.00', 2),
         (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
+    `);
+
+    // insert categories
+    await queryRunner.query(`
+      INSERT INTO "category" ("id", "label") VALUES
+        (1, 'Vente de marchandises'),
+        (2, 'Dons'),
+        (3, 'Bancaire'),
+        (4, 'Cotisations'),
+        (5, 'Prestation'),
+        (6, 'Subventions'),
+        (7, 'Véhicule'),
+        (8, 'Partenariat'),
+        (9, 'Location'),
+        (10, 'Opérationnel');
+    `);
+
+    // insert subcategories
+    await queryRunner.query(`
+      INSERT INTO "subcategory" ("id", "category_id", "code", "label", "categoryId") VALUES
+        (1, 1, 'DIV365', 'Divers', 1),
+        (2, 2, 'ANN232', 'Annuel', 2),
+        (3, 1, 'GOO209', 'Goodies', 1),
+        (4, 3, 'INT124', 'Intérêt', 3),
+        (5, 4, 'FAM511', 'Famille', 4),
+        (6, 4, 'JEU704', 'Jeunesse', 4),
+        (7, 9, 'FAM452', 'Famille', 9),
+        (8, 9, 'MAT138', 'Matériel', 9),
+        (9, 8, 'EVE967', 'Événement', 8),
+        (10, 3, 'INT424', 'Intérêt', 3);
     `);
 
     // insert budget
