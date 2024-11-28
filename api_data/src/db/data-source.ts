@@ -7,6 +7,7 @@ import { BankAccount } from "../bankAccount/bank_account.entity";
 import { Category } from "../category/category.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { CreditDebit } from "../creditDebit/creditDebit.entity";
+import { Budget } from "../budget/budget.entity";
 
 dotenv.config();
 const { POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_HOST } =
@@ -19,6 +20,15 @@ export const AppDataSource = new DataSource({
   username: POSTGRES_USER,
   password: POSTGRES_PASSWORD,
   database: POSTGRES_DB,
-  entities: [Role, User, Bank, BankAccount, Category, Subcategory, CreditDebit],
+  entities: [
+    Role,
+    User,
+    Bank,
+    BankAccount,
+    Category,
+    Subcategory,
+    CreditDebit,
+    Budget,
+  ],
   synchronize: true, // /!\ only in dev
 });
