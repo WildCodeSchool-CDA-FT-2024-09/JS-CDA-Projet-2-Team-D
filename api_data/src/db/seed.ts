@@ -17,6 +17,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "role" CASCADE`);
     await queryRunner.query(`DELETE FROM "bank_account" CASCADE`);
     await queryRunner.query(`DELETE FROM "bank" CASCADE`);
+    await queryRunner.query(`DELETE FROM "budget" CASCADE`);
     await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
     await queryRunner.query(`DELETE FROM "vat" CASCADE`);
 
@@ -27,6 +28,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(
       `ALTER SEQUENCE bank_account_id_seq RESTART WITH 1;`
     );
+    await queryRunner.query(`ALTER SEQUENCE budget_id_seq RESTART WITH 1;`);
     await queryRunner.query(
       `ALTER SEQUENCE credit_debit_id_seq RESTART WITH 1;`
     );
@@ -77,6 +79,13 @@ import { AppDataSource } from "./data-source";
         (4, 'Livret A', 'FR7612345678900000001234565', '25000.00', 2),
         (5, 'Livret Développement Durable', 'FR7612345678900000001234563', '12000.00', 2),
         (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
+    `);
+
+    // insert budget
+    await queryRunner.query(`
+      INSERT INTO "budget" ("id", "label", "start_date", "end_date") VALUES
+        (1,	'Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
+        (2,	'Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
 
     // insert TVA
