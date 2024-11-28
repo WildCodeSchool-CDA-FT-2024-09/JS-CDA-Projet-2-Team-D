@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
 } from "typeorm";
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 import { Bank } from "../bank/bank.entity";
 
 @ObjectType()
@@ -24,8 +24,8 @@ export class BankAccount extends BaseEntity {
   @Column({ nullable: false, unique: true, type: "varchar", length: 50 })
   account_number: string;
 
-  @Field(() => Int)
-  @Column({ nullable: false, unique: true, type: "varchar", length: 50 })
+  @Field(() => Float)
+  @Column({ nullable: false, unique: true, type: "float", length: 50 })
   balance: number;
 
   @Field(() => Bank)
