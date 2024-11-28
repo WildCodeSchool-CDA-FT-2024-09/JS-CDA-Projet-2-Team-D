@@ -8,7 +8,6 @@ import { CreditDebit } from "../creditDebit/creditDebit.entity";
 import { Vat } from "../vat/vat.entity";
 import { Category } from "../category/category.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
-import { CreditDebit } from "../creditDebit/creditDebit.entity";
 import { Budget } from "../budget/budget.entity";
 
 dotenv.config();
