@@ -8,6 +8,9 @@ import UserResolver from "./user/user.resolver";
 import CreditDebitResolver from "./creditDebit/creditDebit.resolver";
 import CategoryResolver from "./category/category.resolver";
 import SubcategoryResolver from "./subcategory/subcategory.resolver";
+import BankResolver from "./bank/bank.resolver";
+import BankAccountResolver from "./bankAccount/bank_account.resolver";
+
 
 dotenv.config();
 const { PORT } = process.env;
