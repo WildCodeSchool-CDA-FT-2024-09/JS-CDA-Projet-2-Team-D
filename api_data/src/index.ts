@@ -5,8 +5,11 @@ import { buildSchema } from "type-graphql";
 import "reflect-metadata";
 import { AppDataSource } from "./db/data-source";
 import UserResolver from "./user/user.resolver";
-import { CreditDebit } from "./creditDebit/creditDebit.entity";
-import { Vat } from "./vat/vat.entity";
+import CreditDebitResolver from "./creditDebit/creditDebit.resolver";
+import CategoryResolver from "./category/category.resolver";
+import SubcategoryResolver from "./subcategory/subcategory.resolver";
+import BankResolver from "./bank/bank.resolver";
+import BankAccountResolver from "./bankAccount/bank_account.resolver";
 
 dotenv.config();
 const { PORT } = process.env;
@@ -15,7 +18,14 @@ const { PORT } = process.env;
   await AppDataSource.initialize();
 
   const schema = await buildSchema({
-    resolvers: [UserResolver, CreditDebit, Vat],
+    resolvers: [
+      UserResolver,
+      CreditDebitResolver,
+      CategoryResolver,
+      SubcategoryResolver,
+      BankResolver,
+      BankAccountResolver,
+    ],
     validate: true,
   });
 

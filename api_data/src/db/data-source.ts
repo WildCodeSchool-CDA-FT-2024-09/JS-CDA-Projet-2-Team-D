@@ -2,6 +2,8 @@ import * as dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { Role } from "../role/role.entity";
 import { User } from "../user/user.entity";
+import { Bank } from "../bank/bank.entity";
+import { BankAccount } from "../bankAccount/bank_account.entity";
 import { CreditDebit } from "@/creditDebit/creditDebit.entity";
 import { Vat } from "@/vat/vat.entity";
 
@@ -16,6 +18,6 @@ export const AppDataSource = new DataSource({
   username: POSTGRES_USER,
   password: POSTGRES_PASSWORD,
   database: POSTGRES_DB,
-  entities: [Role, User, CreditDebit, Vat],
+  entities: [Role, User, Bank, BankAccount, CreditDebit, Vat],
   synchronize: true, // /!\ only in dev
 });
