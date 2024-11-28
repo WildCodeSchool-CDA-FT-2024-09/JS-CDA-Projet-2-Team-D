@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
-import { Category } from "@/category/category.entity";
+import { Category } from "../category/category.entity";
 
 @ObjectType()
 @Entity()
