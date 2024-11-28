@@ -11,6 +11,7 @@ import SubcategoryResolver from "./subcategory/subcategory.resolver";
 import BankResolver from "./bank/bank.resolver";
 import BankAccountResolver from "./bankAccount/bank_account.resolver";
 import VatResolver from "./vat/vat.resolver";
+import StatusResolver from "./status/status.resolver";
 
 dotenv.config();
 const { PORT } = process.env;
@@ -27,6 +28,7 @@ const { PORT } = process.env;
       BankResolver,
       BankAccountResolver,
       VatResolver,
+      StatusResolver,
     ],
     validate: true,
   });
