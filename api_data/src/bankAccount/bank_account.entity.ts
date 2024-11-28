@@ -17,7 +17,7 @@ export class BankAccount extends BaseEntity {
   id: number;
 
   @Field(() => String)
-  @Column({ nullable: false, unique: true, type: "varchar", length: 50 })
+  @Column({ nullable: false, type: "varchar", length: 50 })
   name: string;
 
   @Field(() => String)
@@ -25,7 +25,7 @@ export class BankAccount extends BaseEntity {
   account_number: string;
 
   @Field(() => Float)
-  @Column({ nullable: false, unique: true, type: "float" })
+  @Column({ nullable: false, type: "float" })
   balance: number;
 
   @Field(() => Bank)
