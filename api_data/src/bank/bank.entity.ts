@@ -17,7 +17,7 @@ export class Bank extends BaseEntity {
   id: number;
 
   @Field(() => String)
-  @Column({ nullable: false, unique: true, type: "varchar", length: 50 })
+  @Column({ nullable: false, type: "varchar", length: 50 })
   label: string;
 
   @Field(() => [BankAccount])
