@@ -22,19 +22,19 @@ export class User extends BaseEntity {
   @IsEmail()
   @IsNotEmpty()
   @Length(5, 150)
-  @Column({ nullable: false, unique: true, type: "varchar", width: 150 })
+  @Column({ nullable: false, unique: true, type: "varchar", length: 150 })
   email: string;
 
   @Field(() => String)
   @IsString()
   @Length(1, 50)
-  @Column({ nullable: true, type: "varchar", width: 50 })
+  @Column({ nullable: true, type: "varchar", length: 50 })
   firstname: string;
 
   @Field(() => String)
   @IsString()
   @Length(1, 50)
-  @Column({ nullable: true, type: "varchar", width: 50 })
+  @Column({ nullable: true, type: "varchar", length: 50 })
   lastname: string;
 
   @Field(() => String)
