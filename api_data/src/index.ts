@@ -11,7 +11,6 @@ import SubcategoryResolver from "./subcategory/subcategory.resolver";
 import BankResolver from "./bank/bank.resolver";
 import BankAccountResolver from "./bankAccount/bank_account.resolver";
 
-
 dotenv.config();
 const { PORT } = process.env;
 
@@ -24,6 +23,8 @@ const { PORT } = process.env;
       CreditDebitResolver,
       CategoryResolver,
       SubcategoryResolver,
+      BankResolver,
+      BankAccountResolver,
     ],
     validate: true,
   });
