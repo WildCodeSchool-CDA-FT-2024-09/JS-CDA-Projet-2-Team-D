@@ -25,7 +25,7 @@ export class BankAccount extends BaseEntity {
   account_number: string;
 
   @Field(() => Float)
-  @Column({ nullable: false, unique: true, type: "float", length: 50 })
+  @Column({ nullable: false, unique: true, type: "float" })
   balance: number;
 
   @Field(() => Bank)
