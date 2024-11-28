@@ -16,7 +16,7 @@ export class CreditDebit extends BaseEntity {
   id: number;
 
   @Field(() => String)
-  @Column({ nullable: false, unique: true, type: "varchar", width: 30 })
+  @Column({ nullable: false, unique: true, type: "varchar", length: 30 })
   @IsString()
   @IsNotEmpty()
   @Length(1, 30)
