@@ -1,5 +1,12 @@
-import { IsNotEmpty, IsString, Length } from "class-validator";
-import { Field, ObjectType } from "type-graphql";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+  Max,
+  Min,
+} from "class-validator";
+import { Field, ObjectType, Float } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -10,7 +17,7 @@ import {
 
 @ObjectType()
 @Entity()
-export class CreditDebit extends BaseEntity {
+export class Vat extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,6 +28,13 @@ export class CreditDebit extends BaseEntity {
   @IsNotEmpty()
   @Length(1, 30)
   label: string;
+
+  @Field(() => Float)
+  @Column({ nullable: false, type: "float" })
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  rate: number;
 
   // @Field(() => [Invoice])
   // @OneToMany(() => Invoice, (invoice) => invoice.creditDebit)
