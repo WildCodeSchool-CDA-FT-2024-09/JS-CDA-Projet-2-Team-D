@@ -4,10 +4,10 @@ import { Role } from "../role/role.entity";
 import { User } from "../user/user.entity";
 import { Bank } from "../bank/bank.entity";
 import { BankAccount } from "../bankAccount/bank_account.entity";
-import { CreditDebit } from "@/creditDebit/creditDebit.entity";
-import { Vat } from "@/vat/vat.entity";
-import { Category } from "@/category/category.entity";
-import { Subcategory } from "@/subcategory/subcategory.entity";
+import { CreditDebit } from "../creditDebit/creditDebit.entity";
+import { Vat } from "../vat/vat.entity";
+import { Category } from "../category/category.entity";
+import { Subcategory } from "../subcategory/subcategory.entity";
 
 dotenv.config();
 const { POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_HOST } =
