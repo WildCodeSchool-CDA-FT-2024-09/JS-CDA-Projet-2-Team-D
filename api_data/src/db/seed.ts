@@ -22,6 +22,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "budget" CASCADE`);
     await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
     await queryRunner.query(`DELETE FROM "vat" CASCADE`);
+    await queryRunner.query(`DELETE FROM "status" CASCADE`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
@@ -39,6 +40,7 @@ import { AppDataSource } from "./data-source";
       `ALTER SEQUENCE credit_debit_id_seq RESTART WITH 1;`
     );
     await queryRunner.query(`ALTER SEQUENCE vat_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE status_id_seq RESTART WITH 1;`);
 
     // insert roles
     await queryRunner.query(`
@@ -138,6 +140,14 @@ import { AppDataSource } from "./data-source";
           INSERT INTO "credit_debit" ("id", "label") VALUES
             (1, 'crédit'),
             (2, 'débit');
+        `);
+
+    // insert roles
+    await queryRunner.query(`
+          INSERT INTO "status" ("id", "label") VALUES
+            (1,	'Validé'),
+            (2,	'En attente'),
+            (3,	'Refusé');
         `);
 
     await queryRunner.commitTransaction();
