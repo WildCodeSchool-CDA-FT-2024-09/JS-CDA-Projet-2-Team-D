@@ -19,6 +19,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "bank" CASCADE`);
     await queryRunner.query(`DELETE FROM "subcategory" CASCADE`);
     await queryRunner.query(`DELETE FROM "category" CASCADE`);
+    await queryRunner.query(`DELETE FROM "commission" CASCADE`);
     await queryRunner.query(`DELETE FROM "budget" CASCADE`);
     await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
     await queryRunner.query(`DELETE FROM "vat" CASCADE`);
@@ -41,6 +42,7 @@ import { AppDataSource } from "./data-source";
     );
     await queryRunner.query(`ALTER SEQUENCE vat_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE status_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE commission_id_seq RESTART WITH 1;`);
 
     // insert roles
     await queryRunner.query(`
@@ -126,6 +128,17 @@ import { AppDataSource } from "./data-source";
         (2,	'Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
 
+    // insert commission
+    await queryRunner.query(`
+      INSERT INTO "commission" ("id", "name") VALUES
+        (1,	'Equipement'),
+        (2,  'Communication'),
+        (3,	'Événementiel'),
+        (4,	'Formation'),
+        (5,	'Animation'),
+        (6,	'Opérationnel');
+        
+    `);
     // insert TVA
     await queryRunner.query(`
       INSERT INTO "vat" ("id", "label", "rate") VALUES
