@@ -82,10 +82,10 @@ import { AppDataSource } from "./data-source";
     // insert TVA
     await queryRunner.query(`
       INSERT INTO "vat" ("id", "label", "rate") VALUES
-        (1,	'TVA 0%', '0'),
-        (2,	'TVA 5.5%', '5.5'),
-        (3,	'TVA 10%', '10'),
-        (4,	'TVA 20%', '20');
+        (1,	'TVA 0%', 0),
+        (2,	'TVA 5.5%', 5.5),
+        (3,	'TVA 10%', 10),
+        (4,	'TVA 20%', 20);
     `);
 
     // insert credit_debit
