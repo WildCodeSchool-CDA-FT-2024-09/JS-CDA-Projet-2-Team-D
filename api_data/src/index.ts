@@ -5,7 +5,9 @@ import { buildSchema } from "type-graphql";
 import "reflect-metadata";
 import { AppDataSource } from "./db/data-source";
 import UserResolver from "./user/user.resolver";
-import { CreditDebit } from "./creditDebit/creditDebit.entity";
+import BankResolver from "./bank/bank.resolver";
+import BankAccountResolver from "./bankAccount/bank_account.resolver";
+import CreditDebit from "./creditDebit/creditDebit.resolver";
 
 dotenv.config();
 const { PORT } = process.env;
@@ -14,7 +16,7 @@ const { PORT } = process.env;
   await AppDataSource.initialize();
 
   const schema = await buildSchema({
-    resolvers: [UserResolver, CreditDebit],
+    resolvers: [UserResolver, CreditDebit, BankResolver, BankAccountResolver],
     validate: true,
   });
 
