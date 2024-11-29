@@ -13,6 +13,7 @@ import BankAccountResolver from "./bankAccount/bank_account.resolver";
 import VatResolver from "./vat/vat.resolver";
 import StatusResolver from "./status/status.resolver";
 import CommissionResolver from "./commission/commission.resolver";
+import InvoiceResolver from "./invoice/invoice.resolver";
 
 dotenv.config();
 const { PORT } = process.env;
@@ -31,6 +32,7 @@ const { PORT } = process.env;
       VatResolver,
       StatusResolver,
       CommissionResolver,
+      InvoiceResolver,
     ],
     validate: true,
   });

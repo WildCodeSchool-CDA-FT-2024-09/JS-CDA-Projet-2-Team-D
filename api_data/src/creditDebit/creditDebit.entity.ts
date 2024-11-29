@@ -4,9 +4,11 @@ import {
   BaseEntity,
   Column,
   Entity,
-  // OneToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Invoice } from "../invoice/invoice.entity";
+import { Category } from "../category/category.entity";
 
 @ObjectType()
 @Entity()
@@ -22,7 +24,11 @@ export class CreditDebit extends BaseEntity {
   @Length(1, 30)
   label: string;
 
-  // @Field(() => [Invoice])
-  // @OneToMany(() => Invoice, (invoice) => invoice.creditDebit)
-  // invoices: Invoice[];
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.id)
+  invoices: Invoice[];
+
+  @Field(() => Category)
+  @OneToMany(() => Category, (category) => category.id)
+  categories: Category[];
 }

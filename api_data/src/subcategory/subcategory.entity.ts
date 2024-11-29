@@ -5,10 +5,12 @@ import {
   Column,
   BaseEntity,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
 import { Category } from "../category/category.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -36,6 +38,10 @@ export class Subcategory extends BaseEntity {
   label: string;
 
   @Field(() => Category)
-  @ManyToOne(() => Category, (category) => category.subcategories)
+  @ManyToOne(() => Category, (category) => category.id)
   category: Category;
+
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.subcategory)
+  invoices: Invoice[];
 }

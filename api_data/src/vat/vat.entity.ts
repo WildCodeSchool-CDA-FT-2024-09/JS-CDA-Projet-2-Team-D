@@ -11,9 +11,10 @@ import {
   BaseEntity,
   Column,
   Entity,
-  // OneToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -36,7 +37,7 @@ export class Vat extends BaseEntity {
   @Max(100)
   rate: number;
 
-  // @Field(() => [Invoice])
-  // @OneToMany(() => Invoice, (invoice) => invoice.vat)
-  // invoices: Invoice[];
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.vat)
+  invoices: Invoice[];
 }

@@ -1,4 +1,5 @@
 import { AppDataSource } from "./data-source";
+console.info("test seed");
 
 (async () => {
   // initializing data source
@@ -24,6 +25,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
     await queryRunner.query(`DELETE FROM "vat" CASCADE`);
     await queryRunner.query(`DELETE FROM "status" CASCADE`);
+    await queryRunner.query(`DELETE FROM "invoice" CASCADE`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
@@ -43,6 +45,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`ALTER SEQUENCE vat_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE status_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE commission_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE invoice_id_seq RESTART WITH 1;`);
 
     // insert roles
     await queryRunner.query(`
@@ -162,6 +165,23 @@ import { AppDataSource } from "./data-source";
             (2,	'En attente'),
             (3,	'Refusé');
         `);
+
+    // // insert invoice accounts
+    // await queryRunner.query(`
+    //   INSERT INTO "invoice" ("id", "invoice_date", "status", "price_without_vat", "vat", "label", "receipt", "credit_debit", "info", "paid") VALUES
+    //     (1, "2019-11-15", 1 , 400,  ),
+    //     (2, "2019-11-27", 1, ),
+    //     (3, "2019-12-12", 1, ),
+    //     (4, "2019-12-12),
+    //     (5, ),
+    //     (6, ),
+    //     (7, "2019-11-15", , ),
+    //     (8, "2019-11-27", ),
+    //     (9, "2019-12-12", ),
+    //     (10, ),
+    //     (11, ),
+    //     (12, );
+    // `);
 
     await queryRunner.commitTransaction();
 
