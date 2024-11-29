@@ -10,6 +10,7 @@ import { Category } from "../category/category.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Budget } from "../budget/budget.entity";
 import { Status } from "../status/status.entity";
+import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "../commission/commission.entity";
 
 dotenv.config();
@@ -34,6 +35,7 @@ export const AppDataSource = new DataSource({
     Budget,
     Vat,
     Status,
+    Invoice,
     Commission,
   ],
   synchronize: true, // /!\ only in dev

@@ -5,7 +5,7 @@ import { Bank } from "./bank.entity";
 export default class BankResolver {
   // Methode GET pour toutes les banques
   @Query(() => [Bank])
-  async getfullbanks() {
+  async getBanks() {
     const banks = await Bank.find({});
     return banks;
   }

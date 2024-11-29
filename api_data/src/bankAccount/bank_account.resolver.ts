@@ -3,9 +3,8 @@ import { BankAccount } from "./bank_account.entity";
 
 @Resolver(BankAccount)
 export default class BankAccountResolver {
-  // Methode GET pour toutes les banques
   @Query(() => [BankAccount])
-  async getfullbankAccounts() {
+  async getBankAccounts() {
     const bankAccounts = await BankAccount.find({});
     return bankAccounts;
   }

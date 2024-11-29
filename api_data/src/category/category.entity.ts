@@ -5,10 +5,12 @@ import {
   Column,
   BaseEntity,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { IsNotEmpty, IsString, Length } from "class-validator";
 import { Subcategory } from "../subcategory/subcategory.entity";
+import { CreditDebit } from "../creditDebit/creditDebit.entity";
 
 @ObjectType()
 @Entity()
@@ -28,7 +30,7 @@ export class Category extends BaseEntity {
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories: Subcategory[];
 
-  // @Field()
-  // @Column()
-  // credit_debit_id: number;
+  @Field(() => CreditDebit)
+  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
+  creditDebit: CreditDebit;
 }

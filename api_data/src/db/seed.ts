@@ -1,4 +1,5 @@
 import { AppDataSource } from "./data-source";
+console.info("test seed");
 
 (async () => {
   // initializing data source
@@ -15,15 +16,16 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query("DELETE FROM user_roles_role CASCADE");
     await queryRunner.query(`DELETE FROM "user" CASCADE`);
     await queryRunner.query(`DELETE FROM "role" CASCADE`);
-    await queryRunner.query(`DELETE FROM "bank_account" CASCADE`);
+    await queryRunner.query(`DELETE FROM "bank_account"`);
     await queryRunner.query(`DELETE FROM "bank" CASCADE`);
-    await queryRunner.query(`DELETE FROM "subcategory" CASCADE`);
+    await queryRunner.query(`DELETE FROM "subcategory"`);
     await queryRunner.query(`DELETE FROM "category" CASCADE`);
-    await queryRunner.query(`DELETE FROM "commission" CASCADE`);
+    await queryRunner.query(`DELETE FROM "commission"`);
     await queryRunner.query(`DELETE FROM "budget" CASCADE`);
-    await queryRunner.query(`DELETE FROM "credit_debit" CASCADE`);
-    await queryRunner.query(`DELETE FROM "vat" CASCADE`);
-    await queryRunner.query(`DELETE FROM "status" CASCADE`);
+    await queryRunner.query(`DELETE FROM "credit_debit"`);
+    await queryRunner.query(`DELETE FROM "vat"`);
+    await queryRunner.query(`DELETE FROM "status"`);
+    await queryRunner.query(`DELETE FROM "invoice"`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
@@ -43,6 +45,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`ALTER SEQUENCE vat_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE status_id_seq RESTART WITH 1;`);
     await queryRunner.query(`ALTER SEQUENCE commission_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE invoice_id_seq RESTART WITH 1;`);
 
     // insert roles
     await queryRunner.query(`
@@ -150,22 +153,31 @@ import { AppDataSource } from "./data-source";
 
     // insert credit_debit
     await queryRunner.query(`
-          INSERT INTO "credit_debit" ("id", "label") VALUES
-            (1, 'crédit'),
-            (2, 'débit');
-        `);
+      INSERT INTO "credit_debit" ("id", "label") VALUES
+        (1, 'crédit'),
+        (2, 'débit');
+    `);
 
     // insert roles
     await queryRunner.query(`
-          INSERT INTO "status" ("id", "label") VALUES
-            (1,	'Validé'),
-            (2,	'En attente'),
-            (3,	'Refusé');
-        `);
+        INSERT INTO "status" ("id", "label") VALUES
+         (1,	'Validé'),
+         (2,	'En attente'),
+         (3,	'Refusé');
+    `);
+
+    // insert invoice accounts
+    await queryRunner.query(`
+      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId") VALUES
+        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1),
+        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2),
+        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3),
+        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4),
+        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5),
+        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6);
+    `);
 
     await queryRunner.commitTransaction();
-
-    console.info("Seeding Done.");
   } catch (error) {
     console.error(error);
     await queryRunner.rollbackTransaction();

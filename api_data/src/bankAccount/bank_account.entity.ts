@@ -5,9 +5,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { Field, Float, Int, ObjectType } from "type-graphql";
 import { Bank } from "../bank/bank.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -31,4 +33,8 @@ export class BankAccount extends BaseEntity {
   @Field(() => Bank)
   @ManyToOne(() => Bank, (bank) => bank.bankAccounts)
   bank: Bank;
+
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.bankAccount)
+  invoices: Invoice[];
 }

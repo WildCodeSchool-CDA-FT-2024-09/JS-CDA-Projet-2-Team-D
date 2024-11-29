@@ -4,9 +4,10 @@ import {
   BaseEntity,
   Column,
   Entity,
-  // OneToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -22,7 +23,7 @@ export class Status extends BaseEntity {
   @Length(1, 30)
   label: string;
 
-  // @Field(() => [Invoice])
-  // @OneToMany(() => Invoice, (invoice) => invoice.status)
-  // invoices: Invoice[];
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.status)
+  invoices: Invoice[];
 }
