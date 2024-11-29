@@ -4,7 +4,7 @@ import { Resolver, Query } from "type-graphql";
 @Resolver(Commission)
 export default class CommissionResolver {
   @Query(() => [Commission])
-  async commissions() {
+  async getCommissions() {
     return Commission.find();
   }
 }

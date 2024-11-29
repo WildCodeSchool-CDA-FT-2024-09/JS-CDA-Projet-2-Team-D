@@ -1,4 +1,4 @@
-export type Category = {
+export type Commission = {
   id: number;
   label: string;
 };
