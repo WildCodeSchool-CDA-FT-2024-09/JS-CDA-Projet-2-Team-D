@@ -30,6 +30,14 @@ services:
       db:
         condition: service_healthy
 
+  api_email:
+    build: ./api_email
+    command: npm run dev
+    restart: always
+    env_file: .env
+    volumes:
+      - ./api_email:/app/
+
   reverse_proxy:
     image: nginx
     ports:
@@ -38,4 +46,5 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - api_data
+      - api_email
       # - client

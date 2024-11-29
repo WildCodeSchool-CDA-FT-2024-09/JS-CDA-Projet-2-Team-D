@@ -1,11 +1,14 @@
+import * as dotenv from "dotenv";
 import express from "express";
 const app = express();
-const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello, Express!");
+dotenv.config();
+const { PORT } = process.env;
+
+app.get("/email", (req, res) => {
+  res.send("Hello Email!");
 });
 
-app.listen(port, () => {
-  console.info(`Serveur en cours d'exécution sur http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.info(`🚀 API email server ready at http://localhost:${PORT}`);
 });
