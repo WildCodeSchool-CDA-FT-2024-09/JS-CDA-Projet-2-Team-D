@@ -1,5 +1,4 @@
 import { AppDataSource } from "./data-source";
-console.info("test seed");
 
 (async () => {
   // initializing data source
@@ -13,6 +12,7 @@ console.info("test seed");
     await queryRunner.startTransaction();
 
     // big cleanup
+    await queryRunner.query(`DELETE FROM "invoice"`);
     await queryRunner.query("DELETE FROM user_roles_role CASCADE");
     await queryRunner.query(`DELETE FROM "user" CASCADE`);
     await queryRunner.query(`DELETE FROM "role" CASCADE`);
@@ -25,7 +25,6 @@ console.info("test seed");
     await queryRunner.query(`DELETE FROM "credit_debit"`);
     await queryRunner.query(`DELETE FROM "vat"`);
     await queryRunner.query(`DELETE FROM "status"`);
-    await queryRunner.query(`DELETE FROM "invoice"`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
@@ -140,7 +139,6 @@ console.info("test seed");
         (4,	'Formation'),
         (5,	'Animation'),
         (6,	'Opérationnel');
-        
     `);
     // insert TVA
     await queryRunner.query(`
@@ -178,6 +176,8 @@ console.info("test seed");
     `);
 
     await queryRunner.commitTransaction();
+
+    console.info("Finished Seeding.");
   } catch (error) {
     console.error(error);
     await queryRunner.rollbackTransaction();
