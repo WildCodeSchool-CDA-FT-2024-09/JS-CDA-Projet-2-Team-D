@@ -1,7 +1,14 @@
 import "reflect-metadata";
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  ManyToMany,
+} from "typeorm";
 import { Field, ObjectType, Int, GraphQLISODateTime } from "type-graphql";
 import { IsNotEmpty, IsString, Length } from "class-validator";
+import { Commission } from "../commission/commission.entity";
 
 @ObjectType()
 @Entity()
@@ -24,4 +31,8 @@ export class Budget extends BaseEntity {
   @Field(() => GraphQLISODateTime) // Expose as a GraphQL ISO 8601 DateTime
   @Column({ type: "timestamp" })
   end_date: Date;
+
+  @Field(() => [Commission])
+  @ManyToMany(() => Commission, (commission) => commission.budgets)
+  commissions: Commission[];
 }
