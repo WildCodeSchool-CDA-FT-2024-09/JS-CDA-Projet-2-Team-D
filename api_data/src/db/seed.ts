@@ -1,4 +1,5 @@
 import { AppDataSource } from "./data-source";
+
 console.info("test seed");
 
 (async () => {
@@ -13,19 +14,21 @@ console.info("test seed");
     await queryRunner.startTransaction();
 
     // big cleanup
-    await queryRunner.query("DELETE FROM user_roles_role CASCADE");
-    await queryRunner.query(`DELETE FROM "user" CASCADE`);
-    await queryRunner.query(`DELETE FROM "role" CASCADE`);
+    await queryRunner.query("DELETE FROM user_roles_role");
+    await queryRunner.query(`DELETE FROM "user"`);
+    await queryRunner.query(`DELETE FROM "role"`);
     await queryRunner.query(`DELETE FROM "bank_account"`);
-    await queryRunner.query(`DELETE FROM "bank" CASCADE`);
+    await queryRunner.query(`DELETE FROM "bank"`);
     await queryRunner.query(`DELETE FROM "subcategory"`);
-    await queryRunner.query(`DELETE FROM "category" CASCADE`);
+    await queryRunner.query(`DELETE FROM "category"`);
     await queryRunner.query(`DELETE FROM "commission"`);
-    await queryRunner.query(`DELETE FROM "budget" CASCADE`);
+    await queryRunner.query(`DELETE FROM "budget"`);
     await queryRunner.query(`DELETE FROM "credit_debit"`);
     await queryRunner.query(`DELETE FROM "vat"`);
     await queryRunner.query(`DELETE FROM "status"`);
     await queryRunner.query(`DELETE FROM "invoice"`);
+    await queryRunner.query(`DELETE FROM "budget_commissions_commission"`);
+    await queryRunner.query(`DELETE FROM "user_commissions_commission"`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);

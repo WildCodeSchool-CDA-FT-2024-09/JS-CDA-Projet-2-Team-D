@@ -10,6 +10,7 @@ import {
 import { Field, ObjectType, Int } from "type-graphql";
 import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
 import { Role } from "../role/role.entity";
+import { Commission } from "../commission/commission.entity";
 
 @ObjectType()
 @Entity()
@@ -47,4 +48,9 @@ export class User extends BaseEntity {
   @ManyToMany(() => Role, (role: Role) => role.users)
   @JoinTable()
   roles: Role[];
+
+  @Field(() => [Commission])
+  @ManyToMany(() => Commission, (commission: Commission) => commission.users)
+  @JoinTable()
+  commissions: Commission[];
 }
