@@ -181,5 +181,8 @@ import { AppDataSource } from "./data-source";
   } catch (error) {
     console.error(error);
     await queryRunner.rollbackTransaction();
+  } finally {
+    console.info("Seeding Done.");
+    await AppDataSource.destroy();
   }
 })();
