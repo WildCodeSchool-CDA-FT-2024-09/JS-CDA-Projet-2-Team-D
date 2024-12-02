@@ -4,6 +4,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   BaseEntity,
+  OneToMany,
   ManyToMany,
   JoinTable,
 } from "typeorm";
@@ -11,6 +12,7 @@ import { Field, ObjectType, Int } from "type-graphql";
 import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -53,4 +55,8 @@ export class User extends BaseEntity {
   @ManyToMany(() => Commission, (commission: Commission) => commission.users)
   @JoinTable()
   commissions: Commission[];
+
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice: Invoice) => invoice.id)
+  invoices: Invoice[];
 }

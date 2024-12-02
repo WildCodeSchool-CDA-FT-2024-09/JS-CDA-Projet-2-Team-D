@@ -14,9 +14,6 @@ console.info("test seed");
     await queryRunner.startTransaction();
 
     // big cleanup
-    await queryRunner.query("DELETE FROM user_roles_role");
-    await queryRunner.query(`DELETE FROM "user"`);
-    await queryRunner.query(`DELETE FROM "role"`);
     await queryRunner.query(`DELETE FROM "bank_account"`);
     await queryRunner.query(`DELETE FROM "bank"`);
     await queryRunner.query(`DELETE FROM "subcategory"`);
@@ -27,8 +24,11 @@ console.info("test seed");
     await queryRunner.query(`DELETE FROM "vat"`);
     await queryRunner.query(`DELETE FROM "status"`);
     await queryRunner.query(`DELETE FROM "invoice"`);
-    await queryRunner.query(`DELETE FROM "budget_commissions_commission"`);
+    await queryRunner.query(`DELETE FROM "budget_commission"`);
     await queryRunner.query(`DELETE FROM "user_commissions_commission"`);
+    await queryRunner.query("DELETE FROM user_roles_role");
+    await queryRunner.query(`DELETE FROM "user"`);
+    await queryRunner.query(`DELETE FROM "role"`);
 
     // init sequences
     await queryRunner.query(`ALTER SEQUENCE role_id_seq RESTART WITH 1;`);
@@ -143,7 +143,6 @@ console.info("test seed");
         (4,	'Formation'),
         (5,	'Animation'),
         (6,	'Opérationnel');
-        
     `);
     // insert TVA
     await queryRunner.query(`
@@ -169,20 +168,36 @@ console.info("test seed");
          (3,	'Refusé');
     `);
 
-    // insert invoice accounts
+    // insert invoice
     await queryRunner.query(`
-      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId") VALUES
-        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1),
-        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2),
-        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3),
-        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4),
-        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5),
-        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6);
+      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId") VALUES
+        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2),
+        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4),
+        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1),
+        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4),
+        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1),
+        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2);
     `);
 
+    //Insert budget_commission
+    await queryRunner.query(`
+      INSERT INTO "budget_commission" ("budgetId", "commissionId", "amount") VALUES
+        (1,	1,	50500),
+        (2,	2,	12600),
+        (1,	3,	15000),
+        (1,	4,	9000),
+        (2,	5,	8000),
+        (2,	6,	3000);
+ `);
+
     await queryRunner.commitTransaction();
+
+    console.info("Finished Seeding.");
   } catch (error) {
     console.error(error);
     await queryRunner.rollbackTransaction();
+  } finally {
+    console.info("Seeding Done.");
+    await AppDataSource.destroy();
   }
 })();

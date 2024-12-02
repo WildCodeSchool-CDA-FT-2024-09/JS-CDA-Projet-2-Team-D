@@ -13,6 +13,7 @@ import { CreditDebit } from "../creditDebit/creditDebit.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Commission } from "../commission/commission.entity";
 import { BankAccount } from "../bankAccount/bank_account.entity";
+import { User } from "../user/user.entity";
 
 @ObjectType()
 @Entity()
@@ -76,4 +77,8 @@ export class Invoice extends BaseEntity {
   @Field(() => BankAccount)
   @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id)
   bankAccount: BankAccount;
+
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.id)
+  user: User;
 }
