@@ -22,10 +22,10 @@ services:
   api_data:
     build: ./api_data
     entrypoint: ["/bin/sh", "-c"]
-    command: 
+    command:
       - |
-          npm run seed
-          npm run test
+        npm run seed
+        npm run test
     restart: always
     env_file: .env
     volumes:
@@ -42,6 +42,15 @@ services:
     volumes:
       - ./api_email:/app/
 
+  client:
+    build: ./client
+    command: npm run test
+    restart: always
+    environment:
+      - VITE_API_URL=http://localhost:7000/graph
+    volumes:
+      - ./client:/app/
+
   reverse_proxy:
     image: nginx
     ports:
@@ -51,4 +60,4 @@ services:
     depends_on:
       - api_data
       - api_email
-      # - client
+      - client
