@@ -12,6 +12,7 @@ import { Budget } from "../budget/budget.entity";
 import { Status } from "../status/status.entity";
 import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "../commission/commission.entity";
+import { BudgetCommission } from "../budgetCommission/budgetCommission.entity";
 
 dotenv.config();
 const { POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_HOST } =
@@ -37,6 +38,7 @@ export const AppDataSource = new DataSource({
     Status,
     Invoice,
     Commission,
+    BudgetCommission,
   ],
   synchronize: true, // /!\ only in dev
 });
