@@ -1,4 +1,5 @@
-import Header from "./components/Header/Header";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
 
 const App: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const App: React.FC = () => {
         logoUrl="/Logo.svg"
         avatarColor="#6EBF8B"
       />
-      {/* Autres composants */}
+      <Footer />
     </div>
   );
 };
