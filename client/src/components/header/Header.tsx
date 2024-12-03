@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
+import { useTheme } from "@mui/material/styles";
 import "./Header.css";
 
 interface HeaderProps {
@@ -20,10 +21,21 @@ const Header: React.FC<HeaderProps> = ({
   subtitle,
   userType,
   logoUrl,
-  avatarColor,
 }) => {
+  const theme = useTheme();
+
+  // Mapping des couleurs en fonction du type d'utilisateur
+  const roleColorMapping: { [key: string]: string } = {
+    Administrateur: theme.palette.error.main, // Rouge
+    Comptable: theme.palette.secondary.main, // Jaune
+    Responsable: theme.palette.success.main, // Vert
+  };
+
+  const avatarColor = roleColorMapping[userType || "default"];
+  const backgroundColor = theme.palette.primary.main;
+
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: "#D9D9D9" }}>
+    <AppBar position="fixed" sx={{ backgroundColor }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
