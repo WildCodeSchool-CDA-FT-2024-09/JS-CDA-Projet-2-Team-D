@@ -9,6 +9,7 @@ import Avatar from "../avatar/Avatar";
 interface HeaderProps {
   title: string;
   subtitle?: string;
+  userType?: string;
   logoUrl: string;
   avatarColor: string;
 }
@@ -16,6 +17,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   title,
   subtitle,
+  userType,
   logoUrl,
   avatarColor,
 }) => {
@@ -44,9 +46,9 @@ const Header: React.FC<HeaderProps> = ({
               >
                 {title}
               </Typography>
-              {subtitle && (
+              {(subtitle || userType) && (
                 <Typography variant="subtitle2" sx={{ color: "black" }}>
-                  {subtitle}
+                  {subtitle} {userType && `- ${userType}`}
                 </Typography>
               )}
             </Box>
