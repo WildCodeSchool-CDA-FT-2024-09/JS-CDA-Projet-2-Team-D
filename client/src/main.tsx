@@ -5,6 +5,7 @@ import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
 import App from "./App.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
+import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +48,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <h1>Responsable de commission</h1>,
+            element: <HomePageCommission />,
           },
         ],
       },
