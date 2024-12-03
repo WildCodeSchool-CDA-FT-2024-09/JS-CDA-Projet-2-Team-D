@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
+import "./Header.css";
 
 interface HeaderProps {
   title: string;
@@ -42,16 +43,15 @@ const Header: React.FC<HeaderProps> = ({
               <Typography
                 variant="h1"
                 component="div"
+                className="header-title"
                 sx={{
-                  color: "black",
-                  textAlign: "left",
                   display: { xs: "none", sm: "block" }, // Masquer sur mobile (xs) et afficher sur sm et plus
                 }}
               >
                 {title}
               </Typography>
               {(subtitle || userType) && (
-                <Typography variant="h2" sx={{ color: "black" }}>
+                <Typography variant="h2" className="header-subtitle">
                   {subtitle} {userType && `- ${userType}`}
                 </Typography>
               )}
