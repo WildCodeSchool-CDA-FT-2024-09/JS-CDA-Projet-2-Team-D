@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { ApolloProvider } from "@apollo/client";
+import connection from "./services/connection";
 import App from "./App.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 
@@ -55,6 +57,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ApolloProvider client={connection}>
+      <RouterProvider router={router} />
+    </ApolloProvider>
   </StrictMode>,
 );
