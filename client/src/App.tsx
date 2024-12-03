@@ -19,13 +19,21 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#6EBF8B",
+      main: "#D9D9D9", // Gris
       // light: will be calculated from palette.primary.main,
       // dark: will be calculated from palette.primary.main,
       contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#393939",
+      main: "#FFDD83", //Jaune
+      contrastText: "#FFFFFF",
+    },
+    success: {
+      main: "#6EBF8B", // Vert
+      contrastText: "#FFFFFF",
+    },
+    error: {
+      main: "#E21818", // Rouge
       contrastText: "#FFFFFF",
     },
   },
@@ -38,7 +46,7 @@ function App() {
         <Header
           title="ClubCompta"
           subtitle="Budget 2024/2025"
-          userType="Comptable"
+          userType="Responsable"
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
