@@ -1,0 +1,21 @@
+#fade-button {
+  font-size: 1.5rem;
+  text-transform: none;
+  color: black;
+  font-family: "Montserrat", sans-serif;
+  margin-left: 2vh;
+  margin-top: 7vh;
+}
+
+.menuSideBar {
+  font-size: 1.5rem;
+  font-family: "Montserrat", sans-serif;
+}
+
+.desktopText {
+  display: block;
+}
+
+.mobileIcon {
+  display: none;
+}

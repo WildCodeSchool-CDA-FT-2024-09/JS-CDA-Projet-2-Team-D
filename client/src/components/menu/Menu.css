@@ -1,0 +1,11 @@
+.sideBar {
+  background-color: #f3f3f3;
+  width: 20%;
+  height: 100vh;
+}
+
+@media screen and (max-width: 768px) {
+  .sideBar {
+    background-color: transparent;
+  }
+}
