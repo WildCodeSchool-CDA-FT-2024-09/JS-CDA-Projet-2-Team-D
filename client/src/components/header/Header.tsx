@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
   const backgroundColor = theme.palette.primary.main;
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor }}>
+    <AppBar position="static" sx={{ backgroundColor }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters

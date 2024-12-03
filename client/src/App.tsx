@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-
+import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./global.css";
 
@@ -50,7 +50,9 @@ function App() {
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
-        <Outlet />
+        <Container fixed sx={{ flexGrow: 1 }}>
+          <Outlet />
+        </Container>
         <Footer />
       </ThemeProvider>
     </>
