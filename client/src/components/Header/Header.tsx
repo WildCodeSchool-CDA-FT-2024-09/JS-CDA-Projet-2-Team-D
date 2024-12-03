@@ -40,14 +40,18 @@ const Header: React.FC<HeaderProps> = ({
             />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography
-                variant="h6"
+                variant="h1"
                 component="div"
-                sx={{ color: "black", textAlign: "left" }}
+                sx={{
+                  color: "black",
+                  textAlign: "left",
+                  display: { xs: "none", sm: "block" }, // Masquer sur mobile (xs) et afficher sur sm et plus
+                }}
               >
                 {title}
               </Typography>
               {(subtitle || userType) && (
-                <Typography variant="subtitle2" sx={{ color: "black" }}>
+                <Typography variant="h2" sx={{ color: "black" }}>
                   {subtitle} {userType && `- ${userType}`}
                 </Typography>
               )}
