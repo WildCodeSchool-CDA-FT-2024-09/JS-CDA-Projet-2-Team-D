@@ -46,7 +46,7 @@ function App() {
         <Header
           title="ClubCompta"
           subtitle="Budget 2024/2025"
-          userType="Comptable"
+          userType="Responsable"
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
