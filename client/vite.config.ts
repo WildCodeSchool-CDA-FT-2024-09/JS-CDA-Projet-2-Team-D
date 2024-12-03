@@ -2,6 +2,10 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+  },
   plugins: [react()],
   test: {
     globals: true, // means global variables will be available during tests like 'describe, it, expect' so we don't have to import it in every test file
