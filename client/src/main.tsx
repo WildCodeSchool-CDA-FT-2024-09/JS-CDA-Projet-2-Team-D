@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import App from "./App.tsx";
+import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 
 const router = createBrowserRouter([
   {
@@ -17,8 +18,14 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            index: true,
-            element: <h1>Administrateur</h1>,
+            path: "user",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <ManageUser />,
+              },
+            ],
           },
         ],
       },
