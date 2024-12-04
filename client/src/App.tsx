@@ -1,9 +1,11 @@
 import { Outlet } from "react-router";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import Container from "@mui/material/Container";
 import MenuSideBar from "./components/menuSideBar/MenuSideBar";
-
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Toolbar } from "@mui/material";
+import { Grid2 } from "@mui/material";
 import "./global.css";
 
 const theme = createTheme({
@@ -20,21 +22,21 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#D9D9D9", // Gris
+      main: "#D9D9D9", // Gray
       // light: will be calculated from palette.primary.main,
       // dark: will be calculated from palette.primary.main,
       contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#FFDD83", //Jaune
+      main: "#FFDD83", // Yellow
       contrastText: "#FFFFFF",
     },
     success: {
-      main: "#6EBF8B", // Vert
+      main: "#6EBF8B", // Green
       contrastText: "#FFFFFF",
     },
     error: {
-      main: "#E21818", // Rouge
+      main: "#E21818", // Red
       contrastText: "#FFFFFF",
     },
   },
@@ -51,9 +53,18 @@ function App() {
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
-        <MenuSideBar />
-        <Outlet />
-        <Footer />
+        <Toolbar />
+        <Container maxWidth="xl">
+          <Grid2 container spacing={2}>
+            <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
+              <MenuSideBar />
+            </Grid2>
+            <Grid2 size={10}>
+              <Outlet />
+            </Grid2>
+          </Grid2>
+          <Footer />
+        </Container>
       </ThemeProvider>
     </>
   );
