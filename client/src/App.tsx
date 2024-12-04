@@ -1,10 +1,10 @@
 import { Outlet } from "react-router";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import MenuSideBar from "./components/menuSideBar/MenuSideBar";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./global.css";
-import Menu from "./components/menu/Menu";
 
 const theme = createTheme({
   typography: {
@@ -43,7 +43,7 @@ function App() {
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
-        <Menu />
+        <MenuSideBar />
         <Outlet />
         <Footer />
       </ThemeProvider>
