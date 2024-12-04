@@ -24,15 +24,14 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const theme = useTheme();
 
-  // Mapping des couleurs en fonction du type d'utilisateur
+  // Color mapping depending on user role
   const roleColorMapping: { [key: string]: string } = {
-    Administrateur: theme.palette.error.main, // Rouge
-    Comptable: theme.palette.secondary.main, // Jaune
-    Responsable: theme.palette.success.main, // Vert
+    Administrateur: theme.palette.error.main, // Red
+    Comptable: theme.palette.secondary.main, // Yellow
+    Responsable: theme.palette.success.main, // Green
   };
 
   const avatarColor = roleColorMapping[userType || "default"];
-  // const backgroundColor = theme.palette.primary.main;
 
   return (
     <AppBar position="fixed">
@@ -57,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({
                 component="div"
                 className="header-title"
                 sx={{
-                  display: { xs: "none", sm: "block" }, // Masquer sur mobile (xs) et afficher sur sm et plus
+                  display: { xs: "none", sm: "block" }, // Masked on mobile (xs) and displayed for sm +
                 }}
               >
                 {title}
