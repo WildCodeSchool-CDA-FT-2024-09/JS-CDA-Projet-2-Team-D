@@ -78,6 +78,14 @@ export class Invoice extends BaseEntity {
   @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id)
   bankAccount: BankAccount;
 
+  @Field(() => Date)
+  @Column({ nullable: false, type: "timestamp" })
+  date: Date;
+
+  @Field(() => String)
+  @Column({ nullable: false, type: "varchar" })
+  invoiceNumber: string;
+
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.id)
   user: User;

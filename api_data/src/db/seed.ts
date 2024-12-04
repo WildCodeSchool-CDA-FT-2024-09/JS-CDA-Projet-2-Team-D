@@ -97,19 +97,26 @@ console.info("test seed");
         (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
     `);
 
+    // insert credit_debit
+    await queryRunner.query(`
+      INSERT INTO "credit_debit" ("id", "label") VALUES
+        (1, 'crédit'),
+        (2, 'débit');
+    `);
+
     // insert categories
     await queryRunner.query(`
-      INSERT INTO "category" ("id", "label") VALUES
-        (1, 'Vente de marchandises'),
-        (2, 'Dons'),
-        (3, 'Bancaire'),
-        (4, 'Cotisations'),
-        (5, 'Prestation'),
-        (6, 'Subventions'),
-        (7, 'Véhicule'),
-        (8, 'Partenariat'),
-        (9, 'Location'),
-        (10, 'Opérationnel');
+      INSERT INTO "category" ("id", "label", "creditDebitId") VALUES
+        (1, 'Vente de marchandises', 1),
+        (2, 'Dons', 1),
+        (3, 'Bancaire', 1),
+        (4, 'Cotisations', 2),
+        (5, 'Prestation', 2),
+        (6, 'Subventions', 1),
+        (7, 'Véhicule', 2),
+        (8, 'Partenariat', 2),
+        (9, 'Location', 1),
+        (10, 'Opérationnel', 2);
     `);
 
     // insert subcategories
@@ -153,13 +160,6 @@ console.info("test seed");
         (4,	'TVA 20%', 20);
     `);
 
-    // insert credit_debit
-    await queryRunner.query(`
-      INSERT INTO "credit_debit" ("id", "label") VALUES
-        (1, 'crédit'),
-        (2, 'débit');
-    `);
-
     // insert roles
     await queryRunner.query(`
         INSERT INTO "status" ("id", "label") VALUES
@@ -170,13 +170,13 @@ console.info("test seed");
 
     // insert invoice
     await queryRunner.query(`
-      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId") VALUES
-        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2),
-        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4),
-        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1),
-        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4),
-        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1),
-        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2);
+      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
+        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
+        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
+        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
+        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
+        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
+        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6');
     `);
 
     //Insert budget_commission
