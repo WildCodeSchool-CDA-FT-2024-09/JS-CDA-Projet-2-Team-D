@@ -32,10 +32,10 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const avatarColor = roleColorMapping[userType || "default"];
-  const backgroundColor = theme.palette.primary.main;
+  // const backgroundColor = theme.palette.primary.main;
 
   return (
-    <AppBar position="static" sx={{ backgroundColor }}>
+    <AppBar position="fixed">
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
