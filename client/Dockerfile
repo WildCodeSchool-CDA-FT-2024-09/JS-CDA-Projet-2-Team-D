@@ -2,8 +2,9 @@ FROM node:lts-alpine AS dev
 
 WORKDIR /app
 COPY *.json ./
+RUN npm ping
 RUN npm install
 COPY . .
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--host"]
+CMD ["npm", "run", "dev"]

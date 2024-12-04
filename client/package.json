@@ -9,14 +9,22 @@
     "lint": "eslint '*/**/*.{js,jsx,ts,tsx}'",
     "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "codegen": "graphql-codegen --config codegen-config.ts"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.10",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/named-operations-object": "^3.1.0",
+    "@graphql-codegen/typescript-graphql-request": "^6.2.0",
+    "@graphql-codegen/typescript-operations": "^4.4.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@mui/icons-material": "^6.1.9",
     "@mui/material": "^6.1.9",
     "@types/react-router-dom": "^5.3.3",
+    "graphql": "^16.9.0",
     "i": "^0.3.7",
     "npm": "^10.9.1",
     "react": "^18.3.1",

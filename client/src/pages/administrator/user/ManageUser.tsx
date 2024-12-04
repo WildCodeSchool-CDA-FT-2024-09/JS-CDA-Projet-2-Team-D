@@ -1,3 +1,4 @@
+import { useGetUsersQuery } from "../../../types/graphql-types";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,24 +9,12 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import BtnCrud from "../../../components/BtnCrud";
 
-function createData(
-  id: number,
-  firstname: string,
-  lastname: string,
-  email: string,
-) {
-  return { id, firstname, lastname, email };
-}
-
-const rows = [
-  createData(1, "Toto", "Tata", "toto@tata.org"),
-  createData(2, "Jean-Claude", "Octave", "jean@claude.net"),
-  createData(3, "Eclair", "Chocolat", "eclair@chocolat.net"),
-  createData(4, "Ashitaka", "Ghibli", "ashitaka@ghibli.net"),
-  createData(5, "Severus", "Snape", "severus@snape.net"),
-];
-
 export default function ManageUser() {
+  const { loading, error, data } = useGetUsersQuery();
+
+  if (loading) return <p>🥁 Chargement...</p>;
+  if (error) return <p>☠️ Erreur: {error.message}</p>;
+
   return (
     <div>
       <h1>Gestion des utilisateurs</h1>
@@ -42,33 +31,34 @@ export default function ManageUser() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.id}
-                </TableCell>
-                <TableCell align="left">{row.firstname}</TableCell>
-                <TableCell align="left">{row.lastname}</TableCell>
-                <TableCell align="left">{row.email}</TableCell>
-                <TableCell align="left">
-                  <Stack spacing={2} direction="row">
-                    <BtnCrud
-                      disabled={false}
-                      handleClick={() => null}
-                      type={"edit"}
-                    />
-                    <BtnCrud
-                      disabled={false}
-                      handleClick={() => null}
-                      type={"delete"}
-                    />
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
+            {data &&
+              data.getUsers.map((user) => (
+                <TableRow
+                  key={user.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {user.id}
+                  </TableCell>
+                  <TableCell align="left">{user.firstname}</TableCell>
+                  <TableCell align="left">{user.lastname}</TableCell>
+                  <TableCell align="left">{user.email}</TableCell>
+                  <TableCell align="left">
+                    <Stack spacing={2} direction="row">
+                      <BtnCrud
+                        disabled={false}
+                        handleClick={() => null}
+                        type={"edit"}
+                      />
+                      <BtnCrud
+                        disabled={false}
+                        handleClick={() => null}
+                        type={"delete"}
+                      />
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
