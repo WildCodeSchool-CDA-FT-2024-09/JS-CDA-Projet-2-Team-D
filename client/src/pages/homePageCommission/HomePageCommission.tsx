@@ -71,8 +71,8 @@ const data = [
 ];
 
 const HomePageCommission = () => {
-  const isMobile = useMediaQuery("(max-width: 600px)");
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const budgetActuel = data.reduce((sum, row) => sum + row.ttc, 0);
   const budgetGlobal = 2500;
@@ -111,10 +111,12 @@ const HomePageCommission = () => {
       </Typography>
       <BudgetGauge budgetGlobal={budgetGlobal} budgetActuel={budgetActuel} />
       <TableContainer component={Paper}>
-        <Table>
+        <Table sx={{ tableLayout: "auto" }}>
           <TableHead>
             <TableRow>
-              <TableCell>Numéro de facture</TableCell>
+              <TableCell>
+                {isMobile ? "N° de fact." : "Numéro de facture"}
+              </TableCell>{" "}
               <TableCell>Date</TableCell>
               <TableCell>Libellé</TableCell>
               {!isMobile && <TableCell>Prix HT</TableCell>}
@@ -129,9 +131,17 @@ const HomePageCommission = () => {
                 <TableCell>{row.id}</TableCell>
                 <TableCell>{row.date}</TableCell>
                 <TableCell>{row.label}</TableCell>
-                {!isMobile && <TableCell>{row.price_without_vat} €</TableCell>}
-                {!isMobile && <TableCell>{row.vatRate}%</TableCell>}
-                <TableCell>{row.ttc} €</TableCell>
+                {!isMobile && (
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {row.price_without_vat} €
+                  </TableCell>
+                )}
+                {!isMobile && (
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {row.vatRate}%
+                  </TableCell>
+                )}
+                <TableCell sx={{ whiteSpace: "nowrap" }}>{row.ttc} €</TableCell>
                 <TableCell>
                   <Chip
                     label={isMobile ? row.status[0] : row.status}
