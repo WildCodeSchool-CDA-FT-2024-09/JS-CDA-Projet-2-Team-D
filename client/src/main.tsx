@@ -4,12 +4,14 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
 import App from "./App.tsx";
+import ErrorPage from "./pages/ErrorPage.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
