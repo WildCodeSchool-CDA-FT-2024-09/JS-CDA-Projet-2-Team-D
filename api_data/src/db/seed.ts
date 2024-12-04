@@ -97,6 +97,13 @@ console.info("test seed");
         (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
     `);
 
+    // insert credit_debit
+    await queryRunner.query(`
+      INSERT INTO "credit_debit" ("id", "label") VALUES
+        (1, 'crédit'),
+        (2, 'débit');
+    `);
+
     // insert categories
     await queryRunner.query(`
       INSERT INTO "category" ("id", "label", "creditDebitId") VALUES
@@ -151,13 +158,6 @@ console.info("test seed");
         (2,	'TVA 5.5%', 5.5),
         (3,	'TVA 10%', 10),
         (4,	'TVA 20%', 20);
-    `);
-
-    // insert credit_debit
-    await queryRunner.query(`
-      INSERT INTO "credit_debit" ("id", "label") VALUES
-        (1, 'crédit'),
-        (2, 'débit');
     `);
 
     // insert roles
