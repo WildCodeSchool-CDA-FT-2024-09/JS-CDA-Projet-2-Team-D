@@ -14,4 +14,5 @@ export type Invoice = {
   status_id: number;
   user_id: number;
   date: Date;
+  invoice_number: string;
 };
