@@ -22,21 +22,21 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#D9D9D9", // Gris
+      main: "#D9D9D9", // Gray
       // light: will be calculated from palette.primary.main,
       // dark: will be calculated from palette.primary.main,
       contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#FFDD83", //Jaune
+      main: "#FFDD83", // Yellow
       contrastText: "#FFFFFF",
     },
     success: {
-      main: "#6EBF8B", // Vert
+      main: "#6EBF8B", // Green
       contrastText: "#FFFFFF",
     },
     error: {
-      main: "#E21818", // Rouge
+      main: "#E21818", // Red
       contrastText: "#FFFFFF",
     },
   },
