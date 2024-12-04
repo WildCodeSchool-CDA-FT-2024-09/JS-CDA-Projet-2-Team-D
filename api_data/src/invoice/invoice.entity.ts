@@ -83,7 +83,7 @@ export class Invoice extends BaseEntity {
   date: Date;
 
   @Field(() => String)
-  @Column({ nullable: false, type: "string" })
+  @Column({ nullable: false, type: "varchar" })
   invoiceNumber: string;
 
   @Field(() => User)
