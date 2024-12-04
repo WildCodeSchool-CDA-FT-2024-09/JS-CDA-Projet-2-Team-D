@@ -5,7 +5,14 @@ import { Resolver, Query, Arg } from "type-graphql";
 export default class InvoiceResolver {
   @Query(() => [Invoice])
   async getInvoicesByCommissionId(@Arg("commissionId") commissionId: number) {
-    console.info(commissionId);
-    return Invoice.find();
+    try {
+      return await Invoice.find({
+        where: { commission: { id: commissionId } },
+        relations: ["commission", "status", "vat", "creditDebit"],
+      });
+    } catch (error) {
+      console.error("Error fetching invoices by commission ID:", error);
+      throw new Error("Unable to fetch invoices for the given commission ID.");
+    }
   }
 }
