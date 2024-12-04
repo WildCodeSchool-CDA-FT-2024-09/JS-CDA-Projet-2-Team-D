@@ -13,4 +13,6 @@ export type Invoice = {
   vat_id: number;
   status_id: number;
   user_id: number;
+  date: Date;
+  invoice_number: string;
 };
