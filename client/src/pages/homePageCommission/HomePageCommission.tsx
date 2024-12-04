@@ -10,7 +10,8 @@ import {
   Typography,
   Chip,
 } from "@mui/material";
-import { useMediaQuery } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
+import BudgetGauge from "../../components/budgetGaugeChart/BudgetGaugeChart";
 
 const data = [
   {
@@ -71,25 +72,29 @@ const data = [
 
 const HomePageCommission = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
+  const theme = useTheme();
+
+  const budgetActuel = data.reduce((sum, row) => sum + row.ttc, 0);
+  const budgetGlobal = 2500;
 
   const getChipStyles = (status: string) => {
     let backgroundColor;
     switch (status) {
       case "Validé":
-        backgroundColor = "#6EBF8B";
+        backgroundColor = theme.palette.success.main;
         break;
       case "En attente":
-        backgroundColor = "#FFDD83";
+        backgroundColor = theme.palette.secondary.main;
         break;
       case "Refusé":
-        backgroundColor = "#E21818";
+        backgroundColor = theme.palette.error.main;
         break;
       default:
-        backgroundColor = "#ccc";
+        backgroundColor = theme.palette.primary.main;
     }
     return {
       backgroundColor,
-      color: "black",
+      color: theme.palette.getContrastText(backgroundColor),
       fontWeight: "bold",
       fontSize: "14px",
     };
@@ -104,6 +109,7 @@ const HomePageCommission = () => {
       >
         Récapitulatif des Factures de Commission
       </Typography>
+      <BudgetGauge budgetGlobal={budgetGlobal} budgetActuel={budgetActuel} />
       <TableContainer component={Paper}>
         <Table>
           <TableHead>

@@ -23,6 +23,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@mui/icons-material": "^6.1.9",
     "@mui/material": "^6.1.9",
+    "@mui/x-charts": "^7.23.0",
     "@types/react-router-dom": "^5.3.3",
     "graphql": "^16.9.0",
     "i": "^0.3.7",
