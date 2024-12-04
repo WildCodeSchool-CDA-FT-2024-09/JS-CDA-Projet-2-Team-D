@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import MenuSideBar from "./components/menuSideBar/MenuSideBar";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./global.css";
@@ -50,6 +51,7 @@ function App() {
           logoUrl="/Logo.svg"
           avatarColor="#6EBF8B"
         />
+        <MenuSideBar />
         <Outlet />
         <Footer />
       </ThemeProvider>
