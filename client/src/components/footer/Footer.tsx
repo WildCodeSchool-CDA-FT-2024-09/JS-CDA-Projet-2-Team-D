@@ -1,11 +1,21 @@
 import React from "react";
-import "./footer.css";
+import { Stack, Typography } from "@mui/material";
 
 const Footer: React.FC = () => {
   return (
-    <footer>
-      <p>© Copyright - Club Compta - 2024</p>
-    </footer>
+    <Stack
+      width="100%"
+      minHeight={75}
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Stack direction="row" spacing={4} alignItems="center">
+        <Typography variant="body2" color="textSecondary">
+          © Copyright - ClubCompta - {new Date().getFullYear()}
+        </Typography>
+      </Stack>
+    </Stack>
   );
 };
 
