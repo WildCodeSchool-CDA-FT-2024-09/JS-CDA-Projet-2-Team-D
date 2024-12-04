@@ -6,6 +6,7 @@ import connection from "./services/connection";
 import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
+import Invoice from "./pages/commission/Invoice.tsx";
 
 const router = createBrowserRouter([
   {
@@ -48,8 +49,14 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            index: true,
-            element: <h1>Responsable de commission</h1>,
+            path: "invoice",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <Invoice />,
+              },
+            ],
           },
         ],
       },
