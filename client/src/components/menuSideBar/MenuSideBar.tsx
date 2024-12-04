@@ -6,6 +6,8 @@ import Fade from "@mui/material/Fade";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import Link from "@mui/material/Link";
 
 function MenuSideBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -17,6 +19,10 @@ function MenuSideBar() {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const colorText = {
+    color: "black",
   };
 
   const theme = useTheme();
@@ -31,7 +37,11 @@ function MenuSideBar() {
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
       >
-        {isMobile ? <MenuIcon /> : <p>En&nbsp;tant&nbsp;que</p>}
+        {isMobile ? (
+          <MenuIcon />
+        ) : (
+          <p style={{ color: "black" }}>En&nbsp;tant&nbsp;que</p>
+        )}
       </Button>
       <Menu
         id="fade-menu"
@@ -44,13 +54,35 @@ function MenuSideBar() {
         TransitionComponent={Fade}
       >
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Administrateur
+          <Link
+            component={RouterLink}
+            to="/administrator"
+            className="linkNoStyle"
+            sx={colorText}
+          >
+            Administrateur
+          </Link>
         </MenuItem>
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Comptable
+          <Link
+            component={RouterLink}
+            to="/commission"
+            className="linkNoStyle"
+            sx={colorText}
+          >
+            Responsable de Commission
+          </Link>
         </MenuItem>
+
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Responsable de Commission
+          <Link
+            component={RouterLink}
+            to="/accountant"
+            className="linkNoStyle"
+            sx={colorText}
+          >
+            Comptable
+          </Link>
         </MenuItem>
       </Menu>
     </nav>
