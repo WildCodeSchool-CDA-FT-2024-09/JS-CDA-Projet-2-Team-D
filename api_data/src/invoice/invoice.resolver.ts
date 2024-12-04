@@ -1,10 +1,17 @@
+import { Resolver, Mutation, Arg } from "type-graphql";
 import { Invoice } from "./invoice.entity";
-import { Resolver, Query } from "type-graphql";
+import { InvoiceInput } from "./invoice.schema";
 
 @Resolver(Invoice)
 export default class InvoiceResolver {
-  @Query(() => [Invoice])
-  async getInvoices() {
-    return Invoice.find();
+  @Mutation(() => Invoice)
+  async createInvoice(@Arg("input") input: InvoiceInput): Promise<Invoice> {
+    const newInvoice = Invoice.create({
+      ...input,
+    });
+
+    await newInvoice.save();
+
+    return newInvoice;
   }
 }

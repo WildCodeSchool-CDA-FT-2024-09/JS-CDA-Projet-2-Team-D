@@ -62,6 +62,10 @@ export class Invoice extends BaseEntity {
   @ManyToOne(() => Vat, (vat) => vat.id)
   vat: Vat;
 
+  @Field(() => Date)
+  @Column({ nullable: false, type: "timestamp" })
+  date: Date;
+
   @Field(() => CreditDebit)
   @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
   creditDebit: CreditDebit;
@@ -77,6 +81,10 @@ export class Invoice extends BaseEntity {
   @Field(() => BankAccount)
   @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id)
   bankAccount: BankAccount;
+
+  @Field(() => String)
+  @Column({ nullable: false, type: "varchar" })
+  invoiceNumber: string;
 
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.id)
