@@ -7,6 +7,8 @@ import Fade from "@mui/material/Fade";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import Link from "@mui/material/Link";
 
 function MenuSideBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -45,13 +47,44 @@ function MenuSideBar() {
         TransitionComponent={Fade}
       >
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Administrateur
+          <Link
+            component={RouterLink}
+            to="/administrator"
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": { textDecoration: "none" },
+            }}
+          >
+            Administrateur
+          </Link>
         </MenuItem>
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Comptable
+          <Link
+            component={RouterLink}
+            to="/commission"
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": { textDecoration: "none" },
+            }}
+          >
+            Responsable de Commission
+          </Link>
         </MenuItem>
+
         <MenuItem className="menuSideBar" onClick={handleClose}>
-          Responsable de Commission
+          <Link
+            component={RouterLink}
+            to="/accountant"
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": { textDecoration: "none" },
+            }}
+          >
+            Comptable
+          </Link>
         </MenuItem>
       </Menu>
     </nav>
