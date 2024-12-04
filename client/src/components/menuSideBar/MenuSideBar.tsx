@@ -21,6 +21,10 @@ function MenuSideBar() {
     setAnchorEl(null);
   };
 
+  const colorText = {
+    color: "black",
+  };
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -33,7 +37,11 @@ function MenuSideBar() {
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
       >
-        {isMobile ? <MenuIcon /> : <p>En&nbsp;tant&nbsp;que</p>}
+        {isMobile ? (
+          <MenuIcon />
+        ) : (
+          <p style={{ color: "black" }}>En&nbsp;tant&nbsp;que</p>
+        )}
       </Button>
       <Menu
         id="fade-menu"
@@ -49,11 +57,8 @@ function MenuSideBar() {
           <Link
             component={RouterLink}
             to="/administrator"
-            sx={{
-              textDecoration: "none",
-              color: "inherit",
-              "&:hover": { textDecoration: "none" },
-            }}
+            className="linkNoStyle"
+            sx={colorText}
           >
             Administrateur
           </Link>
@@ -62,11 +67,8 @@ function MenuSideBar() {
           <Link
             component={RouterLink}
             to="/commission"
-            sx={{
-              textDecoration: "none",
-              color: "inherit",
-              "&:hover": { textDecoration: "none" },
-            }}
+            className="linkNoStyle"
+            sx={colorText}
           >
             Responsable de Commission
           </Link>
@@ -76,11 +78,8 @@ function MenuSideBar() {
           <Link
             component={RouterLink}
             to="/accountant"
-            sx={{
-              textDecoration: "none",
-              color: "inherit",
-              "&:hover": { textDecoration: "none" },
-            }}
+            className="linkNoStyle"
+            sx={colorText}
           >
             Comptable
           </Link>
