@@ -23,7 +23,7 @@ function MenuSideBar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
-    <div className="sideBar">
+    <nav className="sideBar">
       <Button
         id="fade-button"
         aria-controls={open ? "fade-menu" : undefined}
@@ -54,7 +54,7 @@ function MenuSideBar() {
           Responsable de Commission
         </MenuItem>
       </Menu>
-    </div>
+    </nav>
   );
 }
 
