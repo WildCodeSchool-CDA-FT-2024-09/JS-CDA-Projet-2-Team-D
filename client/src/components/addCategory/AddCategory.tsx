@@ -26,7 +26,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function AddCategory() {
   const [category, setCategory] = useState<string>("");
-  const [creditDebitId, setCreditDebitId] = useState<number>(1);
+  const [creditDebitId, setCreditDebitId] = useState<number>(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [addCategoryMutation, { loading, error }] = useAddCategoryMutation();
 
@@ -92,7 +92,7 @@ function AddCategory() {
                 sx={{ color: "black", marginBottom: 1, textAlign: "left" }}
                 variant="h6"
               >
-                Crédit ou Débit
+                Sélectionnez Crédit ou Débit
               </Typography>
               <InputLabel id="credit-debit-select-label"></InputLabel>
               <Select
@@ -110,6 +110,9 @@ function AddCategory() {
                   },
                 }}
               >
+                <MenuItem value={0} sx={{ color: "#9e9e9e" }} disabled>
+                  Crédit ou Débit
+                </MenuItem>
                 <MenuItem value={1} sx={{ color: "#9e9e9e" }}>
                   Crédit
                 </MenuItem>

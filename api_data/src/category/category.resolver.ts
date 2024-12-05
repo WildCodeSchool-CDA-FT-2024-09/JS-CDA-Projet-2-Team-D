@@ -19,7 +19,10 @@ export default class CategoryResolver {
     const creditDebit = await CreditDebit.findOneBy({ id: creditDebitId });
     if (!creditDebit) {
       // console.log("error");
-      throw new Error("CreditDebit not found");
+      throw new Error("Veuiller selectionner un type de crédit/débit valide");
+    }
+    if (label.trim() === "") {
+      throw new Error("Veuillez entrer un libellé de catégorie !");
     }
     const category = new Category();
     category.label = label;
