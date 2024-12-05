@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
-import { IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsString, Length } from "class-validator";
 import { Category } from "../category/category.entity";
 import { Invoice } from "../invoice/invoice.entity";
 
@@ -19,10 +19,10 @@ export class Subcategory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => Number)
-  @IsNumber()
-  @Column({ nullable: false, type: "int" })
-  category_id: number;
+  // @Field(() => Number)
+  // @IsNumber()
+  // @Column({ nullable: false, type: "int" })
+  // category_id: number;
 
   @Field(() => String)
   @IsString()

@@ -13,22 +13,84 @@ export const GET_USERS = gql`
 
 export const GET_INVOICES = gql`
   query GetInvoices {
-    getInvoices {
-      commission_id
-      date
-      category_id
-      invoice_id
-      subcategory_id
+    invoices {
+      id
+      price_without_vat
       label
-      credit_debit_id
       receipt
       info
       paid
-      price_without_vat
-      vat_id
-      status_id
-      user_id
-      total
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        label
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORIES = gql`
+  query GetCategories {
+    getCategories {
+      id
+      label
+      subcategories {
+        id
+        label
+      }
+      creditDebit {
+        id
+        label
+      }
+    }
+  }
+`;
+
+export const GET_VAT_RATES = gql`
+  query GetVats {
+    getVats {
+      id
+      label
+      rate
+      invoices {
+        id
+        label
+      }
+    }
+  }
+`;
+
+export const GET_COMMISSIONS = gql`
+  query GetCommissions {
+    getCommissions {
+      id
+      name
     }
   }
 `;

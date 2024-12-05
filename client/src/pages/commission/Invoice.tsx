@@ -1,8 +1,9 @@
 import React, { useState, ChangeEvent } from "react";
+// import Grid2 from "@mui/system/Unstable_Grid2";
 import {
   TextField,
-  Button,
   Grid,
+  Button,
   Paper,
   Typography,
   Select,
@@ -13,8 +14,13 @@ import {
   FormControlLabel,
   SelectChangeEvent,
 } from "@mui/material";
-import { useQuery, useMutation } from "@apollo/client";
-import { GET_VAT_RATES, CREATE_INVOICE } from "../../schema/mutations";
+import { useQuery } from "@apollo/client";
+import { Category, CreditDebit, Subcategory } from "../../types/graphql-types";
+import {
+  GET_VAT_RATES,
+  GET_COMMISSIONS,
+  GET_CATEGORIES,
+} from "../../schema/queries";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -46,8 +52,22 @@ const generateInvoiceId = (
 };
 
 const InvoiceForm: React.FC = () => {
-  const { data, loading, error } = useQuery(GET_VAT_RATES);
-  const [createInvoice] = useMutation(CREATE_INVOICE);
+  // Requête pour récupérer les catégories, sous-catégories, et types de crédit/débit
+  const {
+    data: categoriesData,
+    loading: loadingCategories,
+    error: categoriesError,
+  } = useQuery(GET_CATEGORIES);
+  const {
+    data: vatRatesData,
+    loading: loadingVatRates,
+    error: vatRatesError,
+  } = useQuery(GET_VAT_RATES);
+  const {
+    data: commissionsData,
+    loading: loadingCommissions,
+    error: commissionsError,
+  } = useQuery(GET_COMMISSIONS);
 
   const currentYear = new Date().getFullYear();
 
@@ -95,7 +115,7 @@ const InvoiceForm: React.FC = () => {
           : invoice.price_without_vat;
 
       // Récupérer le taux correspondant à l'ID de TVA
-      const selectedVAT = data?.vatRates.find(
+      const selectedVAT = vatRatesData?.vatRates.find(
         (vat: { id: number }) =>
           vat.id === (name === "vat_id" ? parsedValue : invoice.vat_id),
       );
@@ -115,18 +135,7 @@ const InvoiceForm: React.FC = () => {
         [name]: parsedValue,
       }));
     }
-    if (loading) return <Typography>Chargement des taux de TVA...</Typography>;
-    if (error)
-      return <Typography>Erreur lors du chargement des taux de TVA</Typography>;
   };
-
-  // const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const { name, checked } = event.target;
-  //   setInvoice((prevState) => ({
-  //     ...prevState,
-  //     [name]: checked,
-  //   }));
-  // };
 
   const handleDateChange = (date: Date | null) => {
     setInvoice((prevState) => ({
@@ -138,30 +147,48 @@ const InvoiceForm: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Prepare the input object based on the current state
-    const input = {
-      commission_id: invoice.commission_id,
-      date: invoice.date,
-      category_id: invoice.category_id,
-      subcategory_id: invoice.subcategory_id,
-      invoice_id: invoice.invoice_id,
-      label: invoice.label,
-      credit_debit_id: invoice.credit_debit_id,
-      price_without_vat: invoice.price_without_vat,
-      vat_id: invoice.vat_id,
-      receipt: invoice.receipt,
-      paid: invoice.paid,
-      info: invoice.info,
-      status_id: invoice.status_id,
-      user_id: invoice.user_id,
-    };
-
-    try {
-      const response = await createInvoice({ variables: { input } });
-      console.info("Invoice created:", response.data.setInvoice);
-    } catch (error) {
-      console.error("Error creating invoice:", error);
-    }
+    // const input = {
+    //   commission_id: invoice.commission_id,
+    //   date: invoice.date,
+    //   category_id: invoice.category_id,
+    //   subcategory_id: invoice.subcategory_id,
+    //   invoice_id: invoice.invoice_id,
+    //   label: invoice.label,
+    //   credit_debit_id: invoice.credit_debit_id,
+    //   price_without_vat: invoice.price_without_vat,
+    //   vat_id: invoice.vat_id,
+    //   receipt: invoice.receipt,
+    //   paid: invoice.paid,
+    //   info: invoice.info,
+    //   status_id: invoice.status_id,
+    //   user_id: invoice.user_id,
+    console.info("Form data:", invoice);
   };
+
+  // try {
+  //   const response = await createInvoice({ variables: { input } });
+  //   console.info("Invoice created:", response.data.setInvoice);
+  // } catch (error) {
+  //   console.error("Error creating invoice:", error);
+  // }
+  // Vérifier si une requête est en cours ou si une erreur est survenue
+  const loading = loadingCategories || loadingVatRates || loadingCommissions;
+  const error = categoriesError || vatRatesError || commissionsError;
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return (
+      <Typography>
+        Error:{" "}
+        {categoriesError?.message ||
+          vatRatesError?.message ||
+          commissionsError?.message}
+      </Typography>
+    );
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -180,7 +207,7 @@ const InvoiceForm: React.FC = () => {
               name="invoice_id"
               value={invoice.invoice_id}
               InputProps={{
-                readOnly: true, // Make this field read-only if you don't want it to be editable
+                readOnly: true,
               }}
             />
           </Grid>
@@ -193,9 +220,17 @@ const InvoiceForm: React.FC = () => {
                   value={invoice.commission_id.toString()}
                   onChange={handleChange}
                 >
-                  <MenuItem value="1">Commission 1</MenuItem>
-                  <MenuItem value="2">Commission 2</MenuItem>
-                  {/* Ajoutez d'autres options selon vos besoins */}
+                  {/* Afficher les options de commissions */}
+                  {commissionsData?.commissions.map(
+                    (commission: { id: number; label: string }) => (
+                      <MenuItem
+                        key={commission.id}
+                        value={commission.id.toString()}
+                      >
+                        {commission.label}
+                      </MenuItem>
+                    ),
+                  )}
                 </Select>
               </FormControl>
             </Grid>
@@ -217,9 +252,28 @@ const InvoiceForm: React.FC = () => {
                   value={invoice.category_id.toString()}
                   onChange={handleChange}
                 >
-                  <MenuItem value="1">Catégorie 1</MenuItem>
-                  <MenuItem value="2">Catégorie 2</MenuItem>
-                  {/* Ajoutez d'autres options selon vos besoins */}
+                  {/* Vérifiez si la catégorie existe et si les sous-catégories sont définies */}
+                  {categoriesData?.getCategories.find(
+                    (category: Category) => category.id === invoice.category_id,
+                  )?.subcategories?.length > 0 ? (
+                    categoriesData?.getCategories
+                      .find(
+                        (category: Category) =>
+                          category.id === invoice.category_id,
+                      )
+                      ?.subcategories.map((subcategory: Subcategory) => (
+                        <MenuItem
+                          key={subcategory.id}
+                          value={subcategory.id.toString()}
+                        >
+                          {subcategory.label}
+                        </MenuItem>
+                      ))
+                  ) : (
+                    <MenuItem value="">
+                      Aucune sous-catégorie disponible
+                    </MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </Grid>
@@ -231,9 +285,19 @@ const InvoiceForm: React.FC = () => {
                   value={invoice.subcategory_id.toString()}
                   onChange={handleChange}
                 >
-                  <MenuItem value="1">Sous-catégorie 1</MenuItem>
-                  <MenuItem value="2">Sous-catégorie 2</MenuItem>
-                  {/* Ajoutez d'autres options selon vos besoins */}
+                  {categoriesData?.getCategories
+                    .find(
+                      (category: Category) =>
+                        category.id === invoice.category_id,
+                    )
+                    ?.subcategories.map((subcategory: Subcategory) => (
+                      <MenuItem
+                        key={subcategory.id}
+                        value={subcategory.id.toString()}
+                      >
+                        {subcategory.label}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -247,13 +311,25 @@ const InvoiceForm: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Type"
-                name="credit_debit_id"
-                value={invoice.credit_debit_id.toString()}
-                onChange={handleChange}
-              />
+              <FormControl fullWidth>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  name="credit_debit_id"
+                  value={invoice.credit_debit_id.toString()}
+                  onChange={handleChange}
+                >
+                  {categoriesData?.getCategories
+                    .find(
+                      (category: Category) =>
+                        category.id === invoice.category_id,
+                    )
+                    ?.creditDebit.map((type: CreditDebit) => (
+                      <MenuItem key={type.id} value={type.id.toString()}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField
@@ -273,9 +349,10 @@ const InvoiceForm: React.FC = () => {
                   value={invoice.vat_id.toString()}
                   onChange={(e) => handleChange(e as SelectChangeEvent)}
                 >
-                  {data?.vatRates.map(
-                    (vat: { id: number; label: string; rate: number }) => (
-                      <MenuItem key={vat.id} value={vat.id}>
+                  {/* Afficher les options de TVA */}
+                  {vatRatesData?.data.getVatRates.map(
+                    (vat: { id: number; label: string }) => (
+                      <MenuItem key={vat.id} value={vat.id.toString()}>
                         {vat.label}
                       </MenuItem>
                     ),

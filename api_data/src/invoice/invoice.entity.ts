@@ -1,4 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  Length,
+  IsOptional,
+} from "class-validator";
 import { Field, ObjectType } from "type-graphql";
 import {
   BaseEntity,
@@ -55,11 +61,14 @@ export class Invoice extends BaseEntity {
   paid: boolean;
 
   @Field(() => Status)
-  @ManyToOne(() => Status, (status) => status.id)
+  @ManyToOne(() => Status, (status) => status.invoices, {
+    eager: true,
+    nullable: false,
+  })
   status: Status;
 
   @Field(() => Vat)
-  @ManyToOne(() => Vat, (vat) => vat.id)
+  @ManyToOne(() => Vat, (vat) => vat.invoices, { eager: true, nullable: false })
   vat: Vat;
 
   @Field(() => Date)
@@ -70,23 +79,30 @@ export class Invoice extends BaseEntity {
   @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
   creditDebit: CreditDebit;
 
-  @Field(() => Subcategory)
-  @ManyToOne(() => Subcategory, (subcategory) => subcategory.id)
-  subcategory: Subcategory;
+  @Field(() => Subcategory, { nullable: true })
+  @ManyToOne(() => Subcategory, (subcategory) => subcategory.id, {
+    nullable: true,
+  })
+  subcategory?: Subcategory;
 
-  @Field(() => Commission)
-  @ManyToOne(() => Commission, (commission) => commission.id)
-  commission: Commission;
+  @Field(() => Commission, { nullable: true })
+  @ManyToOne(() => Commission, (commission) => commission.id, {
+    nullable: true,
+  })
+  commission?: Commission;
 
-  @Field(() => BankAccount)
-  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id)
-  bankAccount: BankAccount;
+  @Field(() => BankAccount, { nullable: true })
+  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id, {
+    nullable: true,
+  })
+  @IsOptional()
+  bankAccount?: BankAccount;
 
   @Field(() => String)
   @Column({ nullable: false, type: "varchar" })
   invoiceNumber: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  user?: User;
 }

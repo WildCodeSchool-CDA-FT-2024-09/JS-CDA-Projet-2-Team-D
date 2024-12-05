@@ -5,6 +5,8 @@ import { Resolver, Query } from "type-graphql";
 export default class CategoryResolver {
   @Query(() => [Category])
   async getCategories() {
-    return Category.find();
+    return Category.find({
+      relations: ["subcategories", "creditDebit"],
+    });
   }
 }
