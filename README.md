@@ -57,7 +57,7 @@ Le but de notre application est d’améliorer l’efficacité dans la gestion d
 ![Typescript](https://img.shields.io/badge/typescript-178C6.svg?style=for-the-badge&logo=typescript&logoColor=blue&color=%233178c6)
 ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![MATERIAL UI](https://camo.githubusercontent.com/07b911021fd7d66a0db67c20e25ed6b3dc51916affd1a7b51d16c4a9520756e5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d6174657269616c25323055492d3030374646463f7374796c653d666f722d7468652d6261646765266c6f676f3d6d7569266c6f676f436f6c6f723d7768697465))
+![MATERIAL UI](https://camo.githubusercontent.com/07b911021fd7d66a0db67c20e25ed6b3dc51916affd1a7b51d16c4a9520756e5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d6174657269616c25323055492d3030374646463f7374796c653d666f722d7468652d6261646765266c6f676f3d6d7569266c6f676f436f6c6f723d7768697465)
 
 
 ### Côté Backend
@@ -74,7 +74,7 @@ Le but de notre application est d’améliorer l’efficacité dans la gestion d
 )
 ![vitest](https://camo.githubusercontent.com/2efb742960fd6ff9e481a56152efe8abd1ab5fd63e6c110ba2fd1ec49b60d3dc/687474703a2f2f696d672e736869656c64732e696f2f62616467652f5669746573742d2532333645394631383f7374796c653d666f722d7468652d6261646765266c6f676f3d566974657374266c6f676f436f6c6f723d253233666364373033)
 
-## Installation @ Utilisation
+## Installation & Utilisation
 ### Cloner le repo
 ([git@github.com:WildCodeSchool-CDA-FT-2024-09/JS-CDA-Projet-2-Team-D.git](https://github.com/WildCodeSchool-CDA-FT-2024-09/JS-CDA-Projet-2-Team-D))
 
@@ -87,6 +87,41 @@ Le but de notre application est d’améliorer l’efficacité dans la gestion d
 
 ### Créér les fichiers .env côté client et côté serveur puis lancer chaque branche
 - npm run dev
+
+
+### - MEMO
+#### Connexion à adminer
+- localhost:8080
+
+#### Connexion au serveur Apollo
+- localhost:7100/graph
+
+#### Connexion au site internet
+- localhost:7100
+
+#### liste les conteneurs en exécution ( ou tous)
+- docker ps
+
+- docker ps -a
+
+#### Démarre les conteneurs pour tous les services définis dans le fichier docker-compose.yml.
+- docker compose up --build
+
+#### lance un conteneur
+docker run <container_id>		    
+
+#### arrête un conteneur & supprime
+- docker stop <container_id>		    
+
+- docker down
+
+- docker system prune -af
+
+#### Connexion de façon interactive (en bash)
+- docker exec -it <container_id> sh 
+
+- docker compose -f docker-compose.test.yml up
+
 
 
 
