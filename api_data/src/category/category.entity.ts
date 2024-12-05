@@ -17,7 +17,7 @@ import { CreditDebit } from "../creditDebit/creditDebit.entity";
 export class Category extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Field(() => String)
   @IsString()

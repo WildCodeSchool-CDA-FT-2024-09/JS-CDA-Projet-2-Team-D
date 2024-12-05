@@ -17,10 +17,11 @@ import {
 } from "@mui/material";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: "#f9f9f9",
+  backgroundColor: "white",
   ...theme.typography.body2,
   padding: theme.spacing(1),
   color: theme.palette.text.secondary,
+  border: "1px solid gray",
 }));
 
 function AddCategory() {
@@ -51,10 +52,10 @@ function AddCategory() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, padding: 5, background: "#f3f3f3" }}>
+    <Box sx={{ flexGrow: 1, padding: 2 }}>
       <Grid container spacing={2}>
         <Grid size={12}>
-          <Item>
+          <Item sx={{ padding: 5 }}>
             <Typography
               variant="h6"
               gutterBottom

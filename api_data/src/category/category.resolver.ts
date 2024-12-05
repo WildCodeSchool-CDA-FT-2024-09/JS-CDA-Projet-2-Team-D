@@ -1,6 +1,7 @@
 import { Category } from "./category.entity";
 import { CreditDebit } from "../creditDebit/creditDebit.entity";
 import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { validate } from "class-validator";
 
 @Resolver(Category)
 export default class CategoryResolver {
@@ -23,6 +24,14 @@ export default class CategoryResolver {
     const category = new Category();
     category.label = label;
     category.creditDebit = creditDebit;
+
+    const errors = await validate(category);
+    if (errors.length > 0) {
+      throw new Error(
+        `Erreur dans la validation des données de la catégorie : ${errors}`
+      );
+    }
+
     await category.save();
     return category;
   }
