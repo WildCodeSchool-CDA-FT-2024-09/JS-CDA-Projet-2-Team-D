@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, InputType, Field } from "type-graphql";
 import {
-  // validate,
+  validate,
   IsString,
   IsNotEmpty,
   Length,
@@ -65,29 +65,30 @@ export default class UserResolver {
       user.email = data.email;
       user.password = await argon2.hash(data.password);
 
-      // const error = await validate(user);
-      // if (error.length > 0)
-      //   throw new Error(
-      //     `Erreur dans la validation des données utilisateur : ${error}`
-      //   );
+      const error = await validate(user);
+      if (error.length > 0)
+        throw new Error(
+          `Erreur dans la validation des données utilisateur : ${error}`
+        );
 
       await user.save();
 
       // Attach roles
       data.roles.map(async (roleInput) => {
-        const roleSelected = await Role.findOne({
+        const roleSelected = await Role.findOneOrFail({
           where: { id: roleInput.id },
         });
         if (roleSelected) {
           user.roles = [...(user.roles || []), roleSelected];
-          // await user.save();
+          await user.save();
         }
       });
-      console.info(user.roles);
 
-      await user.save();
-
-      return user;
+      // Return user with associated roles
+      return User.findOneOrFail({
+        where: { id: user.id },
+        relations: ["roles"],
+      });
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
