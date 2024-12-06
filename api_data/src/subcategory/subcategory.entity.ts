@@ -19,11 +19,6 @@ export class Subcategory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @Field(() => Number)
-  // @IsNumber()
-  // @Column({ nullable: false, type: "int" })
-  // category_id: number;
-
   @Field(() => String)
   @IsString()
   @IsNotEmpty()

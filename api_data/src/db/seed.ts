@@ -119,6 +119,7 @@ import { AppDataSource } from "./data-source";
 
     // insert subcategories
     await queryRunner.query(`
+
       INSERT INTO "subcategory" ("code", "label", "categoryId") VALUES
         ('DIV365', 'Divers', 1),
         ('ANN232', 'Annuel', 2),
