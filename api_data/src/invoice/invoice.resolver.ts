@@ -13,7 +13,18 @@ export default class InvoiceResolver {
   @Query(() => [Invoice])
   async getInvoices(): Promise<Invoice[]> {
     try {
-      const invoices = await Invoice.find();
+      const invoices = await Invoice.find({
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+      console.info("Raw invoices from database:", invoices);
 
       // Déclarer validInvoices comme un tableau d'Invoice
       const validInvoices: Invoice[] = invoices.map((invoice) => {

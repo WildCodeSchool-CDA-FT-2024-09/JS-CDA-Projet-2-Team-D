@@ -11,6 +11,7 @@ import {
   Column,
   Entity,
   ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Status } from "../status/status.entity";
@@ -92,10 +93,12 @@ export class Invoice extends BaseEntity {
   commission?: Commission;
 
   @Field(() => BankAccount, { nullable: true })
-  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id, {
+  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.invoices, {
     nullable: true,
+    eager: true,
   })
   @IsOptional()
+  @JoinColumn({ name: "bankAccountId" })
   bankAccount?: BankAccount;
 
   @Field(() => String)
