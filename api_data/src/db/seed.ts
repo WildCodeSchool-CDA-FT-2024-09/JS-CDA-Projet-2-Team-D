@@ -1,7 +1,5 @@
 import { AppDataSource } from "./data-source";
 
-console.info("test seed");
-
 (async () => {
   // initializing data source
   await AppDataSource.initialize();
@@ -52,19 +50,19 @@ console.info("test seed");
 
     // insert roles
     await queryRunner.query(`
-      INSERT INTO "role" ("id", "label") VALUES
-        (1,	'Administrateur'),
-        (2,	'Comptable'),
-        (3,	'Responsable Commission');
+      INSERT INTO "role" ("label") VALUES
+        ('Administrateur'),
+        ('Comptable'),
+        ('Responsable Commission');
     `);
 
     // insert users
     await queryRunner.query(`
-      INSERT INTO "user" ("id", "email", "firstname", "lastname", "password") VALUES
-        (1,	'maxime.roux@association.com',	'Maxime',	'Roux',	'aaa'),
-        (2,	'lucie.bernard@association.com',	'Lucie',	'Bernard',	'aaaaa'),
-        (3,	'caroline.mercier@association.com',	'Caroline',	'Mercier',	'cccc'),
-        (4,	'sophie.thomas@association.com',	'Sophie',	'Thomas',	'ssss');
+      INSERT INTO "user" ("email", "firstname", "lastname", "password") VALUES
+        ('maxime.roux@association.com',	'Maxime',	'Roux',	'aaa'),
+        ('lucie.bernard@association.com',	'Lucie',	'Bernard',	'aaaaa'),
+        ('caroline.mercier@association.com',	'Caroline',	'Mercier',	'cccc'),
+        ('sophie.thomas@association.com',	'Sophie',	'Thomas',	'ssss');
     `);
 
     // insert user_roles_role
@@ -81,102 +79,103 @@ console.info("test seed");
 
     // insert banks
     await queryRunner.query(`
-      INSERT INTO "bank" ("id", "label") VALUES
-        (1, 'Bank A'),
-        (2, 'Bank B');
+      INSERT INTO "bank" ("label") VALUES
+        ('Bank A'),
+        ('Bank B');
     `);
 
     // insert bank accounts
     await queryRunner.query(`
-      INSERT INTO "bank_account" ("id", "name", "account_number", "balance", "bankId") VALUES
-        (1, 'Compte courant', 'FR7612345678900000001234564', '10000.00', 1),
-        (2, 'Livret A', 'FR7612345678900000001234562', '5000.00', 1),
-        (3, 'Livret Développement Durable', 'FR7612345678900000001234566', '15000.00', 1),
-        (4, 'Livret A', 'FR7612345678900000001234565', '25000.00', 2),
-        (5, 'Livret Développement Durable', 'FR7612345678900000001234563', '12000.00', 2),
-        (6, 'Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
+      INSERT INTO "bank_account" ("name", "account_number", "balance", "bankId") VALUES
+        ('Compte courant', 'FR7612345678900000001234564', '10000.00', 1),
+        ('Livret A', 'FR7612345678900000001234562', '5000.00', 1),
+        ('Livret Développement Durable', 'FR7612345678900000001234566', '15000.00', 1),
+        ('Livret A', 'FR7612345678900000001234565', '25000.00', 2),
+        ('Livret Développement Durable', 'FR7612345678900000001234563', '12000.00', 2),
+        ('Compte courant', 'FR7612345678900000001234561', '20000.00', 2);
     `);
 
     // insert credit_debit
     await queryRunner.query(`
-      INSERT INTO "credit_debit" ("id", "label") VALUES
-        (1, 'crédit'),
-        (2, 'débit');
+      INSERT INTO "credit_debit" ("label") VALUES
+        ('crédit'),
+        ('débit');
     `);
 
     // insert categories
     await queryRunner.query(`
-      INSERT INTO "category" ("id", "label", "creditDebitId") VALUES
-        (1, 'Vente de marchandises', 1),
-        (2, 'Dons', 1),
-        (3, 'Bancaire', 1),
-        (4, 'Cotisations', 2),
-        (5, 'Prestation', 2),
-        (6, 'Subventions', 1),
-        (7, 'Véhicule', 2),
-        (8, 'Partenariat', 2),
-        (9, 'Location', 1),
-        (10, 'Opérationnel', 2);
+      INSERT INTO "category" ("label", "creditDebitId") VALUES
+        ('Vente de marchandises', 1),
+        ('Dons', 1),
+        ('Bancaire', 1),
+        ('Cotisations', 2),
+        ('Prestation', 2),
+        ('Subventions', 1),
+        ('Véhicule', 2),
+        ('Partenariat', 2),
+        ('Location', 1),
+        ('Opérationnel', 2);
     `);
 
     // insert subcategories
     await queryRunner.query(`
-      INSERT INTO "subcategory" ("id", "category_id", "code", "label", "categoryId") VALUES
-        (1, 1, 'DIV365', 'Divers', 1),
-        (2, 2, 'ANN232', 'Annuel', 2),
-        (3, 1, 'GOO209', 'Goodies', 1),
-        (4, 3, 'INT124', 'Intérêt', 3),
-        (5, 4, 'FAM511', 'Famille', 4),
-        (6, 4, 'JEU704', 'Jeunesse', 4),
-        (7, 9, 'FAM452', 'Famille', 9),
-        (8, 9, 'MAT138', 'Matériel', 9),
-        (9, 8, 'EVE967', 'Événement', 8),
-        (10, 3, 'INT424', 'Intérêt', 3);
+
+      INSERT INTO "subcategory" ("code", "label", "categoryId") VALUES
+        ('DIV365', 'Divers', 1),
+        ('ANN232', 'Annuel', 2),
+        ('GOO209', 'Goodies', 1),
+        ('INT124', 'Intérêt', 3),
+        ('FAM511', 'Famille', 4),
+        ('JEU704', 'Jeunesse', 4),
+        ('FAM452', 'Famille', 9),
+        ('MAT138', 'Matériel', 9),
+        ('EVE967', 'Événement', 8),
+        ('INT424', 'Intérêt', 3);
     `);
 
     // insert budget
     await queryRunner.query(`
-      INSERT INTO "budget" ("id", "label", "start_date", "end_date") VALUES
-        (1,	'Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
-        (2,	'Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
+      INSERT INTO "budget" ("label", "start_date", "end_date") VALUES
+        ('Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
+        ('Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
 
     // insert commission
     await queryRunner.query(`
-      INSERT INTO "commission" ("id", "name") VALUES
-        (1,	'Equipement'),
-        (2,  'Communication'),
-        (3,	'Événementiel'),
-        (4,	'Formation'),
-        (5,	'Animation'),
-        (6,	'Opérationnel');
+      INSERT INTO "commission" ("name") VALUES
+        ('Equipement'),
+        ('Communication'),
+        ('Événementiel'),
+        ('Formation'),
+        ('Animation'),
+        ('Opérationnel');
     `);
     // insert TVA
     await queryRunner.query(`
-      INSERT INTO "vat" ("id", "label", "rate") VALUES
-        (1,	'TVA 0%', 0),
-        (2,	'TVA 5.5%', 5.5),
-        (3,	'TVA 10%', 10),
-        (4,	'TVA 20%', 20);
+      INSERT INTO "vat" ("label", "rate") VALUES
+        ('TVA 0%', 0),
+        ('TVA 5.5%', 5.5),
+        ('TVA 10%', 10),
+        ('TVA 20%', 20);
     `);
 
-    // insert roles
+    // insert status
     await queryRunner.query(`
-        INSERT INTO "status" ("id", "label") VALUES
-         (1,	'Validé'),
-         (2,	'En attente'),
-         (3,	'Refusé');
+        INSERT INTO "status" ("label") VALUES
+         ('Validé'),
+         ('En attente'),
+         ('Refusé');
     `);
 
     // insert invoice
     await queryRunner.query(`
-      INSERT INTO "invoice" ("id", "price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
-        (1,	400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
-        (2,	50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
-        (3,	60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
-        (4,	500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
-        (5,	30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
-        (6,	600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6');
+      INSERT INTO "invoice" ("price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
+        (400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
+        (50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
+        (60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
+        (500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
+        (30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
+        (600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6');
     `);
 
     //Insert budget_commission
@@ -189,6 +188,18 @@ console.info("test seed");
         (2,	5,	8000),
         (2,	6,	3000);
  `);
+
+    //Insert user_commissions_commission
+    await queryRunner.query(`
+    INSERT INTO "user_commissions_commission" ("userId", "commissionId") VALUES
+      (1,	1),
+      (1,	2),
+      (2,	2),
+      (2,	3),
+      (3,	3),
+      (4,	1),
+      (4,	2);
+  `);
 
     await queryRunner.commitTransaction();
 

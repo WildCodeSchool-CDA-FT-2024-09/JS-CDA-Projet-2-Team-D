@@ -7,6 +7,8 @@ import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
+import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
+import Invoice from "./pages/commission/Invoice.tsx";
 
 const router = createBrowserRouter([
   {
@@ -39,8 +41,14 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            index: true,
-            element: <h1>Comptable</h1>,
+            path: "category",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <ManageCategory />,
+              },
+            ],
           },
         ],
       },
@@ -48,6 +56,16 @@ const router = createBrowserRouter([
         path: "commission",
         element: <Outlet />,
         children: [
+          {
+            path: "invoice",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <Invoice />,
+              },
+            ],
+          },
           {
             index: true,
             element: <HomePageCommission />,
