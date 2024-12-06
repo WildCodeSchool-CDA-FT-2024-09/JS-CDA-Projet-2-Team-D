@@ -40,6 +40,15 @@ const theme = createTheme({
       contrastText: "#FFFFFF",
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 798,
+      lg: 1024,
+      xl: 1280,
+    },
+  },
 });
 
 function App() {
