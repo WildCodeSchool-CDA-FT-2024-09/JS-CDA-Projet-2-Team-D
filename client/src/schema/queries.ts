@@ -7,6 +7,10 @@ export const GET_USERS = gql`
       firstname
       lastname
       email
+      roles {
+        id
+        label
+      }
     }
   }
 `;
@@ -22,7 +26,7 @@ export const GET_ROLES = gql`
 
 export const GET_INVOICES = gql`
   query GetInvoices {
-    invoices {
+    getInvoices {
       id
       price_without_vat
       label

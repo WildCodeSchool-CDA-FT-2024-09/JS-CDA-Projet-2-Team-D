@@ -53,7 +53,9 @@ class CreateUserInput {
 export default class UserResolver {
   @Query(() => [User])
   async getUsers() {
-    return await User.find();
+    return await User.find({
+      relations: ["roles"],
+    });
   }
 
   @Mutation(() => User)

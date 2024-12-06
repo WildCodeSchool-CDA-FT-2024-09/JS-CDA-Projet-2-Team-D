@@ -1,7 +1,12 @@
-import { useRef, useState } from "react";
-import { useGetRolesQuery } from "../../../types/graphql-types";
+import { useRef, useState, RefObject } from "react";
+import {
+  useGetRolesQuery,
+  useCreateNewUserMutation,
+} from "../../../types/graphql-types";
+import { BooleanMap } from "../../../types/types";
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
   InputLabel,
@@ -13,7 +18,7 @@ import {
   TextField,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import BtnCrud from "../../../components/BtnCrud";
+import AddIcon from "@mui/icons-material/Add";
 import { RefMap } from "../../../types/types";
 
 const ITEM_HEIGHT = 48;
@@ -30,6 +35,8 @@ const MenuProps = {
 export default function CreateUser() {
   const [roles, setRoles] = useState<string[]>([]);
   const { data: rolesData } = useGetRolesQuery();
+  const [createNewUser] = useCreateNewUserMutation();
+  // const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // used instead of states to avoid multiple re-renders when typing
   const userRef: RefMap = {
@@ -38,8 +45,16 @@ export default function CreateUser() {
     email: useRef<HTMLInputElement>(null),
     password: useRef<HTMLInputElement>(null),
     passwordConfirm: useRef<HTMLInputElement>(null),
-    //roles: useRef([]),
+    //roles: useRef<HTMLInputElement>([]),
   };
+
+  // Check input errors
+  const [inputError, setInputError] = useState<BooleanMap>({
+    firstname: false,
+    lastname: false,
+    email: false,
+    password: false,
+  });
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -51,9 +66,91 @@ export default function CreateUser() {
     );
   };
 
+  const handleInputChange = (
+    field: string,
+    inputRef: RefObject<HTMLInputElement>,
+  ) => {
+    if (field === "firstname" || field === "lastname") {
+      const isValid = validateNameInput(inputRef);
+      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+    } else if (field === "email") {
+      const isValid = validateEmailInput(inputRef);
+      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+    } else if (field === "password") {
+      const isValid = validatePasswordInput(inputRef);
+      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+    } else if (field === "passwordConfirm") {
+      const isValid = validatePasswordConfirmInput();
+      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+    }
+  };
+
+  const validateNameInput = (inputRef: RefObject<HTMLInputElement>) => {
+    const value = inputRef.current && inputRef.current.value;
+    return value
+      ? /^.{1,50}$/.test(value) && /^[A-Za-z0-9À-ÖØ-öø-ÿ@_-\s]+$/.test(value)
+      : false;
+  };
+
+  const validateEmailInput = (inputRef: RefObject<HTMLInputElement>) => {
+    const value = inputRef.current && inputRef.current.value;
+    return value
+      ? /^.{5,150}$/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+      : false;
+  };
+
+  const validatePasswordInput = (inputRef: RefObject<HTMLInputElement>) => {
+    const value = inputRef.current && inputRef.current.value;
+    // At least one uppercase letter, one number, one special character, minimum of 8 characters
+    return value
+      ? /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+      : false;
+  };
+
+  const validatePasswordConfirmInput = () => {
+    return userRef.password.current?.value !==
+      userRef.passwordConfirm.current?.value
+      ? false
+      : true;
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(userRef.firstname.current, userRef.lastname.current);
+    try {
+      console.log(
+        userRef.firstname.current?.value,
+        userRef.lastname.current?.value,
+        userRef.email.current?.value,
+        userRef.password.current?.value,
+      );
+
+      await createNewUser({
+        variables: {
+          data: {
+            firstname: userRef.firstname.current
+              ? userRef.firstname.current.value
+              : "",
+            lastname: userRef.lastname.current
+              ? userRef.lastname.current.value
+              : "",
+            email: userRef.email.current ? userRef.email.current.value : "",
+            password: userRef.password.current
+              ? userRef.password.current.value
+              : "",
+            roles: [{ id: 1 }, { id: 2 }],
+          },
+        },
+      });
+
+      // setSuccessMessage("Utilisateur ajouté avec succès.");
+
+      // if (userRef.firstname.current) userRef.firstname.current.value = "";
+    } catch (error) {
+      console.error("Erreur lors de l'ajout d'un utilisateur", error);
+      // setMessage("Le nom doit être unique");
+      // setOpenAlert(true);
+      // setNameError(true);
+    }
   };
 
   return (
@@ -79,7 +176,14 @@ export default function CreateUser() {
               label="Prénom"
               name="firstname"
               variant="outlined"
-              ref={userRef.firstname}
+              inputRef={userRef.firstname}
+              onChange={() => handleInputChange("firstname", userRef.firstname)}
+              error={inputError.firstname}
+              helperText={
+                inputError.firstname
+                  ? "Le prénom doit contenir uniquement des caractères alphanumériques (max 50)"
+                  : ""
+              }
             />
           </Grid>
           <Grid size={6}>
@@ -90,7 +194,14 @@ export default function CreateUser() {
               label="Nom"
               name="lastname"
               variant="outlined"
-              ref={userRef.lastname}
+              inputRef={userRef.lastname}
+              onChange={() => handleInputChange("lastname", userRef.lastname)}
+              error={inputError.lastname}
+              helperText={
+                inputError.lastname
+                  ? "Le nom doit contenir uniquement des caractères alphanumériques (max 50)"
+                  : ""
+              }
             />
           </Grid>
           <Grid size={6}>
@@ -102,7 +213,14 @@ export default function CreateUser() {
               name="email"
               type="email"
               variant="outlined"
-              ref={userRef.email}
+              inputRef={userRef.email}
+              onChange={() => handleInputChange("email", userRef.email)}
+              error={inputError.email}
+              helperText={
+                inputError.email
+                  ? "Ceci n'est pas une adresse email valide"
+                  : ""
+              }
             />
           </Grid>
           <Grid size={6}>
@@ -140,7 +258,14 @@ export default function CreateUser() {
               name="password"
               type="password"
               variant="outlined"
-              ref={userRef.password}
+              inputRef={userRef.password}
+              onChange={() => handleInputChange("password", userRef.password)}
+              error={inputError.password}
+              helperText={
+                inputError.password
+                  ? "Le mot de passe doit contenir au minimum 8 caractères, dont au moins 1 chiffre, 1 majuscule et 1 caractère spécial"
+                  : ""
+              }
             />
           </Grid>
           <Grid size={6}>
@@ -152,13 +277,24 @@ export default function CreateUser() {
               name="passwordConfirm"
               type="password"
               variant="outlined"
-              ref={userRef.passwordConfirm}
+              inputRef={userRef.passwordConfirm}
+              onChange={() =>
+                handleInputChange("passwordConfirm", userRef.passwordConfirm)
+              }
+              error={inputError.passwordConfirm}
+              helperText={
+                inputError.passwordConfirm
+                  ? "La confirmation de mot de passe ne correspond pas"
+                  : ""
+              }
             />
           </Grid>
 
           <Grid size={4}></Grid>
           <Grid size={4}>
-            <BtnCrud disabled={false} handleClick={() => null} type={"add"} />
+            <Button type="submit" variant="contained" startIcon={<AddIcon />}>
+              Ajouter
+            </Button>
           </Grid>
           <Grid size={4}></Grid>
         </Grid>
