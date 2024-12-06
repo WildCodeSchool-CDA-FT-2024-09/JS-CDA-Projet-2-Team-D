@@ -112,7 +112,7 @@ export default class InvoiceResolver {
   async getInvoicesByCommissionId(@Arg("commissionId") commissionId: number) {
     try {
       return await Invoice.find({
-        where: { commission: { id: commissionId } },
+        where: { commission: { id: commissionId } }, //budget, limit 20
         relations: ["commission", "status", "vat", "creditDebit"],
       });
     } catch (error) {
