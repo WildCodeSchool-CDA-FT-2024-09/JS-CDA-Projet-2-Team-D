@@ -5,6 +5,6 @@ import { Vat } from "./vat.entity";
 export default class VatResolver {
   @Query(() => [Vat])
   async getVats() {
-    return await Vat.find();
+    return await Vat.find({ relations: ["invoices"] });
   }
 }

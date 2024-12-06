@@ -7,7 +7,9 @@ import { validate } from "class-validator";
 export default class CategoryResolver {
   @Query(() => [Category])
   async getCategories() {
-    return Category.find();
+    return Category.find({
+      relations: ["subcategories", "creditDebit"],
+    });
   }
 
   // add a new category
