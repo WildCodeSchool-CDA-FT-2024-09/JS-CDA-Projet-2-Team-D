@@ -119,17 +119,18 @@ import { AppDataSource } from "./data-source";
 
     // insert subcategories
     await queryRunner.query(`
-      INSERT INTO "subcategory" ("categoryId", "code", "label") VALUES
-        (1, 'DIV365', 'Divers'),
-        (2, 'ANN232', 'Annuel'),
-        (1, 'GOO209', 'Goodies'),
-        (3, 'INT124', 'Intérêt'),
-        (4, 'FAM511', 'Famille'),
-        (4, 'JEU704', 'Jeunesse'),
-        (9, 'FAM452', 'Famille'),
-        (9, 'MAT138', 'Matériel'),
-        (8, 'EVE967', 'Événement'),
-        (3, 'INT424', 'Intérêt');
+
+      INSERT INTO "subcategory" ("code", "label", "categoryId") VALUES
+        ('DIV365', 'Divers', 1),
+        ('ANN232', 'Annuel', 2),
+        ('GOO209', 'Goodies', 1),
+        ('INT124', 'Intérêt', 3),
+        ('FAM511', 'Famille', 4),
+        ('JEU704', 'Jeunesse', 4),
+        ('FAM452', 'Famille', 9),
+        ('MAT138', 'Matériel', 9),
+        ('EVE967', 'Événement', 8),
+        ('INT424', 'Intérêt', 3);
     `);
 
     // insert budget

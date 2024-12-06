@@ -1,10 +1,17 @@
-import { IsBoolean, IsNotEmpty, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  Length,
+  IsOptional,
+} from "class-validator";
 import { Field, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   Entity,
   ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Status } from "../status/status.entity";
@@ -55,38 +62,50 @@ export class Invoice extends BaseEntity {
   paid: boolean;
 
   @Field(() => Status)
-  @ManyToOne(() => Status, (status) => status.id)
+  @ManyToOne(() => Status, (status) => status.invoices, {
+    eager: true,
+    nullable: false,
+  })
   status: Status;
 
   @Field(() => Vat)
-  @ManyToOne(() => Vat, (vat) => vat.id)
+  @ManyToOne(() => Vat, (vat) => vat.invoices, { eager: true, nullable: false })
   vat: Vat;
-
-  @Field(() => CreditDebit)
-  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
-  creditDebit: CreditDebit;
-
-  @Field(() => Subcategory)
-  @ManyToOne(() => Subcategory, (subcategory) => subcategory.id)
-  subcategory: Subcategory;
-
-  @Field(() => Commission)
-  @ManyToOne(() => Commission, (commission) => commission.id)
-  commission: Commission;
-
-  @Field(() => BankAccount)
-  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.id)
-  bankAccount: BankAccount;
 
   @Field(() => Date)
   @Column({ nullable: false, type: "timestamp" })
   date: Date;
 
+  @Field(() => CreditDebit)
+  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
+  creditDebit: CreditDebit;
+
+  @Field(() => Subcategory, { nullable: true })
+  @ManyToOne(() => Subcategory, (subcategory) => subcategory.id, {
+    nullable: true,
+  })
+  subcategory?: Subcategory;
+
+  @Field(() => Commission, { nullable: true })
+  @ManyToOne(() => Commission, (commission) => commission.id, {
+    nullable: true,
+  })
+  commission?: Commission;
+
+  @Field(() => BankAccount, { nullable: true })
+  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.invoices, {
+    nullable: true,
+    eager: true,
+  })
+  @IsOptional()
+  @JoinColumn({ name: "bankAccountId" })
+  bankAccount?: BankAccount;
+
   @Field(() => String)
   @Column({ nullable: false, type: "varchar" })
   invoiceNumber: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  user?: User;
 }

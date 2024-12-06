@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import { IsNotEmpty, IsString, Length, IsNumber, Min } from "class-validator";
 import { Field, Float, Int, ObjectType } from "type-graphql";
 import { Bank } from "../bank/bank.entity";
 import { Invoice } from "../invoice/invoice.entity";
@@ -19,6 +20,9 @@ export class BankAccount extends BaseEntity {
   id: number;
 
   @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 50)
   @Column({ nullable: false, type: "varchar", length: 50 })
   name: string;
 
@@ -27,6 +31,8 @@ export class BankAccount extends BaseEntity {
   account_number: string;
 
   @Field(() => Float)
+  @IsNumber()
+  @Min(0)
   @Column({ nullable: false, type: "float" })
   balance: number;
 
@@ -34,7 +40,7 @@ export class BankAccount extends BaseEntity {
   @ManyToOne(() => Bank, (bank) => bank.bankAccounts)
   bank: Bank;
 
-  @Field(() => [Invoice])
+  @Field(() => [Invoice], { nullable: true })
   @OneToMany(() => Invoice, (invoice) => invoice.bankAccount)
   invoices: Invoice[];
 }

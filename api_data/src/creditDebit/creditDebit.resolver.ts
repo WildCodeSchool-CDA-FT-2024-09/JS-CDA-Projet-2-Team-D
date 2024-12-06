@@ -4,7 +4,7 @@ import { CreditDebit } from "./creditDebit.entity";
 @Resolver(CreditDebit)
 export default class CreditDebitResolver {
   @Query(() => [CreditDebit])
-  async getCreditDebits() {
+  async getCreditDebits(): Promise<CreditDebit[]> {
     return await CreditDebit.find();
   }
 }
