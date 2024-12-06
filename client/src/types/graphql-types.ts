@@ -28,6 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  DateTimeISO: { input: unknown; output: unknown };
 };
 
 export type Bank = {
@@ -43,7 +44,7 @@ export type BankAccount = {
   balance: Scalars["Float"]["output"];
   bank: Bank;
   id: Scalars["Int"]["output"];
-  invoices: Array<Invoice>;
+  invoices?: Maybe<Array<Invoice>>;
   name: Scalars["String"]["output"];
 };
 
@@ -72,18 +73,20 @@ export type CreditDebit = {
 
 export type Invoice = {
   __typename?: "Invoice";
-  bankAccount: BankAccount;
-  commission: Commission;
+  bankAccount?: Maybe<BankAccount>;
+  commission?: Maybe<Commission>;
   creditDebit: CreditDebit;
+  date: Scalars["DateTimeISO"]["output"];
   id: Scalars["Float"]["output"];
   info: Scalars["String"]["output"];
+  invoiceNumber: Scalars["String"]["output"];
   label: Scalars["String"]["output"];
   paid: Scalars["Boolean"]["output"];
   price_without_vat: Scalars["Float"]["output"];
   receipt: Scalars["String"]["output"];
   status: Status;
-  subcategory: Subcategory;
-  user: User;
+  subcategory?: Maybe<Subcategory>;
+  user?: Maybe<User>;
   vat: Vat;
 };
 
@@ -128,7 +131,6 @@ export type Status = {
 export type Subcategory = {
   __typename?: "Subcategory";
   category: Category;
-  category_id: Scalars["Float"]["output"];
   code: Scalars["String"]["output"];
   id: Scalars["Float"]["output"];
   invoices: Array<Invoice>;
@@ -175,6 +177,84 @@ export type GetUsersQuery = {
     firstname: string;
     lastname: string;
     email: string;
+  }>;
+};
+
+export type GetInvoicesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetInvoicesQuery = {
+  __typename?: "Query";
+  getInvoices: Array<{
+    __typename?: "Invoice";
+    id: number;
+    price_without_vat: number;
+    label: string;
+    receipt: string;
+    info: string;
+    paid: boolean;
+    date: unknown;
+    invoiceNumber: string;
+    status: { __typename?: "Status"; id: number; label: string };
+    vat: { __typename?: "Vat"; id: number; rate: number };
+    creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
+    subcategory?: {
+      __typename?: "Subcategory";
+      id: number;
+      label: string;
+    } | null;
+    commission?: { __typename?: "Commission"; id: number; name: string } | null;
+    bankAccount?: {
+      __typename?: "BankAccount";
+      id: number;
+      name: string;
+    } | null;
+    user?: {
+      __typename?: "User";
+      id: number;
+      firstname: string;
+      lastname: string;
+    } | null;
+  }>;
+};
+
+export type GetCategoriesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCategoriesQuery = {
+  __typename?: "Query";
+  getCategories: Array<{
+    __typename?: "Category";
+    id: number;
+    label: string;
+    subcategories: Array<{
+      __typename?: "Subcategory";
+      id: number;
+      label: string;
+    }>;
+    creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
+  }>;
+};
+
+export type GetVatsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetVatsQuery = {
+  __typename?: "Query";
+  getVats: Array<{
+    __typename?: "Vat";
+    id: number;
+    label: string;
+    rate: number;
+    invoices: Array<{ __typename?: "Invoice"; id: number; label: string }>;
+  }>;
+};
+
+export type GetCommissionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCommissionsQuery = {
+  __typename?: "Query";
+  getCommissions: Array<{
+    __typename?: "Commission";
+    id: number;
+    name: string;
   }>;
 };
 
@@ -302,9 +382,361 @@ export type GetUsersQueryResult = Apollo.QueryResult<
   GetUsersQuery,
   GetUsersQueryVariables
 >;
+export const GetInvoicesDocument = gql`
+  query GetInvoices {
+    getInvoices {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        label
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetInvoicesQuery__
+ *
+ * To run a query within a React component, call `useGetInvoicesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoicesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetInvoicesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetInvoicesQuery,
+    GetInvoicesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetInvoicesQuery, GetInvoicesQueryVariables>(
+    GetInvoicesDocument,
+    options,
+  );
+}
+export function useGetInvoicesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetInvoicesQuery,
+    GetInvoicesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetInvoicesQuery, GetInvoicesQueryVariables>(
+    GetInvoicesDocument,
+    options,
+  );
+}
+export function useGetInvoicesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetInvoicesQuery,
+        GetInvoicesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetInvoicesQuery, GetInvoicesQueryVariables>(
+    GetInvoicesDocument,
+    options,
+  );
+}
+export type GetInvoicesQueryHookResult = ReturnType<typeof useGetInvoicesQuery>;
+export type GetInvoicesLazyQueryHookResult = ReturnType<
+  typeof useGetInvoicesLazyQuery
+>;
+export type GetInvoicesSuspenseQueryHookResult = ReturnType<
+  typeof useGetInvoicesSuspenseQuery
+>;
+export type GetInvoicesQueryResult = Apollo.QueryResult<
+  GetInvoicesQuery,
+  GetInvoicesQueryVariables
+>;
+export const GetCategoriesDocument = gql`
+  query GetCategories {
+    getCategories {
+      id
+      label
+      subcategories {
+        id
+        label
+      }
+      creditDebit {
+        id
+        label
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCategoriesQuery__
+ *
+ * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCategoriesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCategoriesQuery,
+    GetCategoriesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(
+    GetCategoriesDocument,
+    options,
+  );
+}
+export function useGetCategoriesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCategoriesQuery,
+    GetCategoriesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(
+    GetCategoriesDocument,
+    options,
+  );
+}
+export function useGetCategoriesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCategoriesQuery,
+        GetCategoriesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCategoriesQuery,
+    GetCategoriesQueryVariables
+  >(GetCategoriesDocument, options);
+}
+export type GetCategoriesQueryHookResult = ReturnType<
+  typeof useGetCategoriesQuery
+>;
+export type GetCategoriesLazyQueryHookResult = ReturnType<
+  typeof useGetCategoriesLazyQuery
+>;
+export type GetCategoriesSuspenseQueryHookResult = ReturnType<
+  typeof useGetCategoriesSuspenseQuery
+>;
+export type GetCategoriesQueryResult = Apollo.QueryResult<
+  GetCategoriesQuery,
+  GetCategoriesQueryVariables
+>;
+export const GetVatsDocument = gql`
+  query GetVats {
+    getVats {
+      id
+      label
+      rate
+      invoices {
+        id
+        label
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetVatsQuery__
+ *
+ * To run a query within a React component, call `useGetVatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVatsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetVatsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetVatsQuery, GetVatsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetVatsQuery, GetVatsQueryVariables>(
+    GetVatsDocument,
+    options,
+  );
+}
+export function useGetVatsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetVatsQuery,
+    GetVatsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetVatsQuery, GetVatsQueryVariables>(
+    GetVatsDocument,
+    options,
+  );
+}
+export function useGetVatsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetVatsQuery, GetVatsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetVatsQuery, GetVatsQueryVariables>(
+    GetVatsDocument,
+    options,
+  );
+}
+export type GetVatsQueryHookResult = ReturnType<typeof useGetVatsQuery>;
+export type GetVatsLazyQueryHookResult = ReturnType<typeof useGetVatsLazyQuery>;
+export type GetVatsSuspenseQueryHookResult = ReturnType<
+  typeof useGetVatsSuspenseQuery
+>;
+export type GetVatsQueryResult = Apollo.QueryResult<
+  GetVatsQuery,
+  GetVatsQueryVariables
+>;
+export const GetCommissionsDocument = gql`
+  query GetCommissions {
+    getCommissions {
+      id
+      name
+    }
+  }
+`;
+
+/**
+ * __useGetCommissionsQuery__
+ *
+ * To run a query within a React component, call `useGetCommissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommissionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommissionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCommissionsQuery,
+    GetCommissionsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCommissionsQuery, GetCommissionsQueryVariables>(
+    GetCommissionsDocument,
+    options,
+  );
+}
+export function useGetCommissionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCommissionsQuery,
+    GetCommissionsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetCommissionsQuery, GetCommissionsQueryVariables>(
+    GetCommissionsDocument,
+    options,
+  );
+}
+export function useGetCommissionsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCommissionsQuery,
+        GetCommissionsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCommissionsQuery,
+    GetCommissionsQueryVariables
+  >(GetCommissionsDocument, options);
+}
+export type GetCommissionsQueryHookResult = ReturnType<
+  typeof useGetCommissionsQuery
+>;
+export type GetCommissionsLazyQueryHookResult = ReturnType<
+  typeof useGetCommissionsLazyQuery
+>;
+export type GetCommissionsSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommissionsSuspenseQuery
+>;
+export type GetCommissionsQueryResult = Apollo.QueryResult<
+  GetCommissionsQuery,
+  GetCommissionsQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
+    GetInvoices: "GetInvoices",
+    GetCategories: "GetCategories",
+    GetVats: "GetVats",
+    GetCommissions: "GetCommissions",
   },
   Mutation: {
     AddCategory: "AddCategory",
