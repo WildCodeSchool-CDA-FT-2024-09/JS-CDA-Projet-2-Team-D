@@ -87,6 +87,16 @@ export type Invoice = {
   vat: Vat;
 };
 
+export type Mutation = {
+  __typename?: "Mutation";
+  addCategory: Category;
+};
+
+export type MutationAddCategoryArgs = {
+  creditDebitId: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
+};
+
 export type Query = {
   __typename?: "Query";
   getBankAccounts: Array<BankAccount>;
@@ -145,6 +155,16 @@ export type Vat = {
   rate: Scalars["Float"]["output"];
 };
 
+export type AddCategoryMutationVariables = Exact<{
+  label: Scalars["String"]["input"];
+  creditDebitId: Scalars["Float"]["input"];
+}>;
+
+export type AddCategoryMutation = {
+  __typename?: "Mutation";
+  addCategory: { __typename?: "Category"; id: number; label: string };
+};
+
 export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetUsersQuery = {
@@ -158,6 +178,58 @@ export type GetUsersQuery = {
   }>;
 };
 
+export const AddCategoryDocument = gql`
+  mutation AddCategory($label: String!, $creditDebitId: Float!) {
+    addCategory(label: $label, creditDebitId: $creditDebitId) {
+      id
+      label
+    }
+  }
+`;
+export type AddCategoryMutationFn = Apollo.MutationFunction<
+  AddCategoryMutation,
+  AddCategoryMutationVariables
+>;
+
+/**
+ * __useAddCategoryMutation__
+ *
+ * To run a mutation, you first call `useAddCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addCategoryMutation, { data, loading, error }] = useAddCategoryMutation({
+ *   variables: {
+ *      label: // value for 'label'
+ *      creditDebitId: // value for 'creditDebitId'
+ *   },
+ * });
+ */
+export function useAddCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddCategoryMutation,
+    AddCategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<AddCategoryMutation, AddCategoryMutationVariables>(
+    AddCategoryDocument,
+    options,
+  );
+}
+export type AddCategoryMutationHookResult = ReturnType<
+  typeof useAddCategoryMutation
+>;
+export type AddCategoryMutationResult =
+  Apollo.MutationResult<AddCategoryMutation>;
+export type AddCategoryMutationOptions = Apollo.BaseMutationOptions<
+  AddCategoryMutation,
+  AddCategoryMutationVariables
+>;
 export const GetUsersDocument = gql`
   query GetUsers {
     getUsers {
@@ -233,5 +305,8 @@ export type GetUsersQueryResult = Apollo.QueryResult<
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
+  },
+  Mutation: {
+    AddCategory: "AddCategory",
   },
 };
