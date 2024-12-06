@@ -7,6 +7,7 @@ import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import CreateUser from "./pages/administrator/user/CreateUser.tsx";
+import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
                 element: <Invoice />,
               },
             ],
+          },
+          {
+            index: true,
+            element: <HomePageCommission />,
           },
         ],
       },
