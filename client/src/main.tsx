@@ -7,6 +7,7 @@ import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import CreateUser from "./pages/administrator/user/CreateUser.tsx";
+import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 
 const router = createBrowserRouter([
   {
@@ -43,8 +44,14 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           {
-            index: true,
-            element: <h1>Comptable</h1>,
+            path: "category",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <ManageCategory />,
+              },
+            ],
           },
         ],
       },
