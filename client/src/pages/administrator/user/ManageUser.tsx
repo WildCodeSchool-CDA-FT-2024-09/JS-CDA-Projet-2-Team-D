@@ -8,6 +8,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import BtnCrud from "../../../components/BtnCrud";
+import { Box } from "@mui/material";
+import BtnLink from "../../../components/BtnLink";
 
 export default function ManageUser() {
   const { loading, error, data } = useGetUsersQuery();
@@ -18,6 +20,34 @@ export default function ManageUser() {
   return (
     <div>
       <h1>Gestion des utilisateurs</h1>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <div>Left Element</div>
+        <BtnLink
+          to="/administrator/user/add"
+          sx={{
+            display: "inline-block",
+            marginLeft: "auto",
+            backgroundColor: "primary.main",
+            padding: "8px 16px",
+            color: "primary.contrastText",
+            textTransform: "uppercase",
+            borderRadius: "4px",
+            textDecoration: "none",
+            textAlign: "center",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+          }}
+        >
+          Ajouter un utilisateur
+        </BtnLink>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des utilisateurs">

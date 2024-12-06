@@ -9,6 +9,8 @@ import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
+import Home from "./pages/Home.tsx";
+import Administrator from "./pages/administrator/Administrator.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,12 +20,16 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <h1>Home page</h1>,
+        element: <Home />,
       },
       {
         path: "administrator",
         element: <Outlet />,
         children: [
+          {
+            index: true,
+            element: <Administrator />,
+          },
           {
             path: "user",
             element: <Outlet />,

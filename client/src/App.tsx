@@ -22,13 +22,13 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#D9D9D9", // Gray
+      main: "#00235B", // Blue
       // light: will be calculated from palette.primary.main,
       // dark: will be calculated from palette.primary.main,
-      contrastText: "#FFFFFF",
+      contrastText: "#F5F5F5",
     },
     secondary: {
-      main: "#FFDD83", // Yellow
+      main: "#DADBBD", // Yellow
       contrastText: "#FFFFFF",
     },
     success: {
