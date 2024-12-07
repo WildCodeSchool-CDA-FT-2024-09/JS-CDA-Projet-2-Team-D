@@ -5,6 +5,7 @@ import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
 import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
+import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
@@ -24,7 +25,11 @@ const router = createBrowserRouter([
       },
       {
         path: "administrator",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="1">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
           {
             index: true,
@@ -44,7 +49,11 @@ const router = createBrowserRouter([
       },
       {
         path: "accountant",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="2">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
           {
             path: "category",
@@ -60,7 +69,11 @@ const router = createBrowserRouter([
       },
       {
         path: "commission",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="3">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
           {
             path: "invoice",

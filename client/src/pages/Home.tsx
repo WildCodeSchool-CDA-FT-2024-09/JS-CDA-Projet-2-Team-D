@@ -2,7 +2,7 @@ import { useUser } from "../hooks/useUser";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import BtnLink from "../components/BtnLink";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Grid2, TextField, Typography } from "@mui/material";
 import logo from "/Logo_seul.svg";
 
 const buttonStyle = {
@@ -30,7 +30,7 @@ export default function Home() {
       id: 1,
       firstname: "Maxime Roux",
       email: "maxime.roux@association.com",
-      roles: [1, 2],
+      roles: ["1", "2"],
     });
   };
 
@@ -39,7 +39,7 @@ export default function Home() {
       id: 2,
       firstname: "Lucie Bernard",
       email: "lucie.bernard@association.com",
-      roles: [2, 3],
+      roles: ["2", "3"],
     });
   };
 
@@ -48,7 +48,7 @@ export default function Home() {
       id: 3,
       firstname: "Caroline Mercier",
       email: "caroline.mercier@association.com",
-      roles: [3],
+      roles: ["3"],
     });
   };
 
@@ -97,28 +97,67 @@ export default function Home() {
           </Button>
         </Box>
 
-        <Stack spacing={2} sx={{ marginTop: "4em" }}>
-          <BtnLink
-            to="/administrator"
-            sx={buttonStyle}
-            onClick={handleLoginAdmin}
-          >
-            Administrateur
-          </BtnLink>
-          <BtnLink
-            to="/accountant"
-            sx={buttonStyle}
-            onClick={handleLoginAccountant}
-          >
-            Comptable
-          </BtnLink>
-          <BtnLink
-            to="/commission"
-            sx={buttonStyle}
-            onClick={handleLoginCommission}
-          >
-            Responsable de commission
-          </BtnLink>
+        <Stack spacing={2} sx={{ marginTop: "4em", marginBottom: "2em" }}>
+          <Grid2 container spacing={2}>
+            <Grid2
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              size={6}
+              spacing={2}
+            >
+              <BtnLink
+                to="/administrator"
+                sx={buttonStyle}
+                onClick={handleLoginAdmin}
+              >
+                Login Administrateur
+              </BtnLink>
+            </Grid2>
+            <Grid2 size={6} spacing={2}>
+              <BtnLink to="/administrator" sx={buttonStyle}>
+                Administrateur
+              </BtnLink>
+            </Grid2>
+            <Grid2
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              size={6}
+            >
+              <BtnLink
+                to="/accountant"
+                sx={buttonStyle}
+                onClick={handleLoginAccountant}
+              >
+                Login Comptable
+              </BtnLink>
+            </Grid2>
+            <Grid2 size={6}>
+              <BtnLink to="/accountant" sx={buttonStyle}>
+                Comptable
+              </BtnLink>
+            </Grid2>
+            <Grid2
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              size={6}
+            >
+              <BtnLink
+                to="/commission"
+                sx={buttonStyle}
+                onClick={handleLoginCommission}
+              >
+                Login Responsable de commission
+              </BtnLink>
+            </Grid2>
+            <Grid2 size={6}>
+              <BtnLink to="/commission" sx={buttonStyle}>
+                Responsable de commission
+              </BtnLink>
+            </Grid2>
+          </Grid2>
         </Stack>
       </Box>
     </>

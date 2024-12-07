@@ -4,12 +4,13 @@ type User = {
   id: number;
   firstname: string;
   email: string;
-  roles: number[];
-  authToken?: string;
+  roles: string[];
 } | null;
 
 export type UserContextType = {
   user: User | null;
+  isAuthenticated: boolean;
+  hasRole: (role: string) => boolean;
   login: (user: User | null) => void;
   logout: () => void;
 };
@@ -41,6 +42,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  const isAuthenticated = Boolean(user);
+
+  const hasRole = (role: string): boolean => {
+    return user?.roles.includes(role) ?? false;
+  };
+
   // Sync state with localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -53,7 +60,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider
+      value={{ user, isAuthenticated, hasRole, login, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
