@@ -1,15 +1,16 @@
 import { useUser } from "../../hooks/useUser";
 import Stack from "@mui/material/Stack";
 import BtnLink from "../../components/BtnLink";
+import { useNavigate } from "react-router-dom";
 
 export default function Administrator() {
   const { user } = useUser();
+  const navigate = useNavigate();
 
-  if (user?.roles.some((role) => role === 1)) {
-    console.log("YES");
-  } else {
-    console.log("NO");
+  if (user?.roles.some((role) => role !== 1)) {
+    navigate("/");
   }
+
   return (
     <>
       <h1>Accès administrateur</h1>
