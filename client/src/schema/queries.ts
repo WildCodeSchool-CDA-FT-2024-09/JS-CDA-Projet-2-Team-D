@@ -13,7 +13,7 @@ export const GET_USERS = gql`
 
 export const GET_INVOICES = gql`
   query GetInvoices {
-    invoices {
+    getInvoices {
       id
       price_without_vat
       label
@@ -63,6 +63,7 @@ export const GET_CATEGORIES = gql`
       subcategories {
         id
         label
+        code
       }
       creditDebit {
         id

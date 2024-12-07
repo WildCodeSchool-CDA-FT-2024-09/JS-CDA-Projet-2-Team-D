@@ -22,14 +22,14 @@ export class Subcategory extends BaseEntity {
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  @Column({ nullable: false, type: "varchar", length: 30 })
+  @Column({ nullable: true, type: "varchar", length: 30 })
   code: string;
 
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
   @Length(1, 30)
-  @Column({ nullable: false, type: "varchar", length: 30 })
+  @Column({ nullable: true, type: "varchar", length: 30 })
   label: string;
 
   @Field(() => Category)
