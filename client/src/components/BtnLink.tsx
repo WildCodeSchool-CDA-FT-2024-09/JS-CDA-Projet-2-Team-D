@@ -12,18 +12,17 @@ interface StyledLinkProps extends MuiLinkProps {
 }
 
 const StyledLinkRoot = styled(MuiLink)(({ theme }) => ({
-  textDecoration: "none", // Removes underline
-  color: theme.palette.primary.main, // Primary color
-  fontWeight: "bold", // Bold text
-  transition: "color 0.3s ease", // Smooth transition
+  textDecoration: "none",
+  color: theme.palette.primary.main,
+  fontWeight: "bold",
   "&:hover": {
-    textDecoration: "underline", // Underline on hover
-    color: theme.palette.secondary.main, // Hover color
+    textDecoration: "underline",
+    color: theme.palette.secondary.main,
   },
 }));
 
 /**
- * StyledLink Component
+ * BtnLink Component
  * A reusable link component for external and internal navigation.
  *
  * @param {StyledLinkProps} props - Props for the StyledLink component.

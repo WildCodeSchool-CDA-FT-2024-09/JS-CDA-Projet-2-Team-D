@@ -1,8 +1,9 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Container from "@mui/material/Container";
 import MenuSideBar from "./components/menuSideBar/MenuSideBar";
+import Home from "./pages/Home";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Toolbar } from "@mui/material";
 import { Grid2 } from "@mui/material";
@@ -29,7 +30,7 @@ const theme = createTheme({
     },
     secondary: {
       main: "#DADBBD", // Yellow
-      contrastText: "#FFFFFF",
+      contrastText: "#00235B",
     },
     success: {
       main: "#6EBF8B", // Green
@@ -52,28 +53,38 @@ const theme = createTheme({
 });
 
 function App() {
+  const location = useLocation();
+  const currentPage = location.pathname;
+
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Header
-          title="ClubCompta"
-          subtitle="Budget 2024/2025"
-          userType="Responsable"
-          logoUrl="/Logo.svg"
-          avatarColor="#6EBF8B"
-        />
-        <Toolbar />
-        <Container maxWidth="xl">
-          <Grid2 container spacing={2}>
-            <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
-              <MenuSideBar />
-            </Grid2>
-            <Grid2 size={10}>
-              <Outlet />
-            </Grid2>
-          </Grid2>
-          <Footer />
-        </Container>
+        {currentPage !== "/" ? (
+          <>
+            <Header
+              title="ClubCompta"
+              subtitle="Budget 2024/2025"
+              userType="Responsable"
+              logoUrl="/Logo.svg"
+              avatarColor="#6EBF8B"
+            />
+            <Toolbar />
+
+            <Container maxWidth="xl">
+              <Grid2 container spacing={2}>
+                <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
+                  <MenuSideBar />
+                </Grid2>
+                <Grid2 size={10}>
+                  <Outlet />
+                </Grid2>
+              </Grid2>
+              <Footer />
+            </Container>
+          </>
+        ) : (
+          <Home />
+        )}
       </ThemeProvider>
     </>
   );

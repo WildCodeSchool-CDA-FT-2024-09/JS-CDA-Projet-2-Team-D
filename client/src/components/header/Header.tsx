@@ -60,7 +60,15 @@ const Header: React.FC<HeaderProps> = ({
                   display: { xs: "none", sm: "block" }, // Masked on mobile (xs) and displayed for sm +
                 }}
               >
-                <Link to="/">{title}</Link>
+                <Link
+                  to="/"
+                  style={{
+                    textDecoration: "none",
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  {title}
+                </Link>
               </Typography>
               {(subtitle || userType) && (
                 <Typography variant="h2" className="header-subtitle">
