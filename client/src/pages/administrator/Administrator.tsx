@@ -1,7 +1,15 @@
+import { useUser } from "../../hooks/useUser";
 import Stack from "@mui/material/Stack";
 import BtnLink from "../../components/BtnLink";
 
 export default function Administrator() {
+  const { user } = useUser();
+
+  if (user?.roles.some((role) => role === 1)) {
+    console.log("YES");
+  } else {
+    console.log("NO");
+  }
   return (
     <>
       <h1>Accès administrateur</h1>
