@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.10",
+    "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@graphql-codegen/cli": "^5.0.3",
@@ -26,7 +27,7 @@
     "@mui/system": "^6.1.10",
     "@mui/x-date-pickers": "^7.23.0",
     "@types/react-router-dom": "^5.3.3",
-    "date-fns": "^2.29.3",
+    "date-fns": "^2.30.0",
     "graphql": "^16.9.0",
     "i": "^0.3.7",
     "npm": "^10.9.1",

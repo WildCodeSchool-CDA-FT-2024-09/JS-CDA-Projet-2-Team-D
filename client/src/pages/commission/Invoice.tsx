@@ -22,6 +22,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { fr } from "date-fns/locale";
 
 interface InvoiceState {
   commission_id: number;
@@ -72,11 +73,11 @@ const InvoiceForm: React.FC = () => {
 
   const [invoice, setInvoice] = useState<InvoiceState>({
     commission_id: 0,
-    date: null,
+    date: new Date(),
     price_without_vat: 0,
     category_id: 0,
     invoice_id: generateInvoiceId(currentYear),
-    subcategory_id: 1,
+    subcategory_id: 0,
     label: "",
     receipt: "",
     credit_debit_id: 1,
@@ -108,7 +109,7 @@ const InvoiceForm: React.FC = () => {
       ? Number(value)
       : value;
 
-    // Gestion de la logique spécifique pour "price_without_vat" ou "vat_id"
+    // Management of the specific logic for "price_without_vat" or "vat_id"
     if (name === "price_without_vat" || name === "vat_id") {
       const ht =
         name === "price_without_vat"
@@ -117,13 +118,11 @@ const InvoiceForm: React.FC = () => {
             : 0
           : invoice.price_without_vat;
 
-      // Vérifier si les données de taux de TVA sont disponibles
       if (!vatRatesData?.getVats) {
         console.error("Les données de taux de TVA ne sont pas disponibles.");
         return;
       }
 
-      // Trouver le taux de TVA correspondant
       const selectedVAT = vatRatesData.getVats.find(
         (vat) => vat.id === (name === "vat_id" ? parsedValue : invoice.vat_id),
       );
@@ -134,18 +133,13 @@ const InvoiceForm: React.FC = () => {
       }
 
       const vatRate = selectedVAT.rate || 0;
-
-      // Calculer le total TTC
       const totalTTC = ht + (ht * vatRate) / 100;
-
-      // Mettre à jour l'état avec le prix total TTC calculé
       setInvoice((prevState) => ({
         ...prevState,
         [name]: parsedValue,
         total: totalTTC,
       }));
     } else {
-      // Si ce n'est pas "price_without_vat" ou "vat_id", simplement mettre à jour l'état
       setInvoice((prevState) => ({
         ...prevState,
         [name]: parsedValue,
@@ -156,16 +150,14 @@ const InvoiceForm: React.FC = () => {
   const handleDateChange = (date: Date | null) => {
     setInvoice((prevState) => ({
       ...prevState,
-      date: date,
+      date: date || new Date(),
     }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Vérification des champs obligatoires
+    // Checking mandatory fields
     const newErrors: { [key: string]: string } = {};
-
-    // Liste des champs obligatoires
     const requiredFields = [
       "label",
       "price_without_vat",
@@ -192,8 +184,8 @@ const InvoiceForm: React.FC = () => {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors); // Afficher les erreurs si des champs sont vides
-      return; // Empêcher l'envoi si des erreurs existent
+      setErrors(newErrors);
+      return;
     }
 
     console.info("Form data:", invoice);
@@ -221,7 +213,7 @@ const InvoiceForm: React.FC = () => {
   // } catch (error) {
   //   console.error("Error creating invoice:", error);
   // }
-  // Vérifier si une requête est en cours ou si une erreur est survenue
+
   const loading = loadingCategories || loadingVatRates || loadingCommissions;
   const error = categoriesError || vatRatesError || commissionsError;
 
@@ -246,7 +238,7 @@ const InvoiceForm: React.FC = () => {
   const creditDebitLabel = selectedCategory?.creditDebit?.label || "";
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
       <Paper
         elevation={3}
         style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
@@ -300,21 +292,15 @@ const InvoiceForm: React.FC = () => {
 
             <Grid item xs={12} sm={6}>
               <DatePicker
-                aria-label={`Date de la facture sélectionnée : ${invoice.date ? invoice.date.toLocaleDateString() : "Non sélectionnée"}`}
+                label="Date de la facture"
                 value={invoice.date}
                 onChange={handleDateChange}
-                error={!!errors["date"]}
+                format="EE dd MMMM yyyy"
                 slots={{
                   textField: (params) => <TextField {...params} fullWidth />,
                 }}
               />
-              {errors["date"] && (
-                <Typography color="error" variant="body2">
-                  Ce champ est obligatoire.
-                </Typography>
-              )}
             </Grid>
-
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Catégorie</InputLabel>
@@ -401,7 +387,7 @@ const InvoiceForm: React.FC = () => {
                   invoice.price_without_vat === 0
                     ? ""
                     : invoice.price_without_vat
-                } // Affiche vide si zéro
+                }
                 onChange={handleChange}
                 type="number"
                 inputProps={{ min: 0 }}
@@ -412,38 +398,40 @@ const InvoiceForm: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth>
-                <InputLabel>Taux TVA</InputLabel>
                 <Select
                   name="vat_id"
-                  value={invoice.vat_id?.toString()}
+                  value={
+                    invoice.vat_id?.toString() ||
+                    vatRatesData?.getVats[0]?.id.toString() ||
+                    ""
+                  }
                   onChange={(e) => handleChange(e as SelectChangeEvent)}
-                  error={!!errors["vat_id"]}
                   aria-label={`Taux TVA sélectionné : ${
                     vatRatesData?.getVats.find(
                       (vat) => vat.id === invoice.vat_id,
                     )?.label || "Non sélectionné"
                   }`}
                 >
-                  <MenuItem value="">Sélectionner un taux de TVA</MenuItem>
                   {vatRatesData?.getVats.map((vat) => (
                     <MenuItem key={vat.id} value={vat.id.toString()}>
                       {vat.label}
                     </MenuItem>
                   ))}
                 </Select>
-                {errors["vat_id"] && (
-                  <Typography color="error" variant="body2">
-                    {errors["vat_id"]}
-                  </Typography>
-                )}
               </FormControl>
             </Grid>
-
             {/* Total - Displaying dynamic credit/debit label */}
             <Grid item xs={12}>
               <Typography variant="h6" aria-live="polite">
-                Total TTC: {invoice.total.toFixed(2)} €{" "}
-                {creditDebitLabel && `(${creditDebitLabel})`}
+                Total TTC:{" "}
+                <span style={{ marginLeft: "10px" }}>
+                  {invoice.total.toFixed(2)} €
+                </span>
+                {creditDebitLabel && (
+                  <span style={{ marginLeft: "10px" }}>
+                    ({creditDebitLabel})
+                  </span>
+                )}
               </Typography>
             </Grid>
             <Grid item xs={12}>
@@ -458,7 +446,6 @@ const InvoiceForm: React.FC = () => {
                 >
                   <MenuItem value="justificatif1">Justificatif 1</MenuItem>
                   <MenuItem value="justificatif2">Justificatif 2</MenuItem>
-                  {/* Ajoutez d'autres options selon vos besoins */}
                 </Select>
               </FormControl>
             </Grid>
