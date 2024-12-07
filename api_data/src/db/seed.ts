@@ -117,20 +117,38 @@ import { AppDataSource } from "./data-source";
         ('Opérationnel', 2);
     `);
 
-    // insert subcategories
+    // Insert subcategories
     await queryRunner.query(`
-
       INSERT INTO "subcategory" ("code", "label", "categoryId") VALUES
-        ('DIV365', 'Divers', 1),
-        ('ANN232', 'Annuel', 2),
-        ('GOO209', 'Goodies', 1),
-        ('INT124', 'Intérêt', 3),
-        ('FAM511', 'Famille', 4),
-        ('JEU704', 'Jeunesse', 4),
-        ('FAM452', 'Famille', 9),
-        ('MAT138', 'Matériel', 9),
-        ('EVE967', 'Événement', 8),
-        ('INT424', 'Intérêt', 3);
+        -- Vente de marchandises (Catégorie 1)
+        ('VEN123', 'Promotion', 1),
+        ('VEN456', 'Accessoires', 1),
+        -- Dons (Catégorie 2)
+        ('DON789', 'Campagnes caritatives', 2),
+        ('DON012', 'Don anonyme', 2),
+        -- Bancaire (Catégorie 3)
+        ('BAN345', 'Opérations diverses', 3),
+        ('BAN678', 'Retraits', 3),
+        -- Cotisations (Catégorie 4)
+        ('COT890', 'Abonnements', 4),
+        ('COT321', 'Adhésion collective', 4),
+        -- Prestation (Catégorie 5)
+        ('PRE654', 'Consulting premium', 5),
+        ('PRE987', 'Service technique', 5),
+        -- Subventions (Catégorie 6)
+        ('SUB852', 'Projets éducatifs', 6),
+        ('SUB963', 'Développement durable', 6),
+        -- Véhicule (Catégorie 7)
+        ('VEH741', 'Réparations', 7),
+        ('VEH852', 'Équipement', 7),
+        -- Partenariat (Catégorie 8)
+        ('PAR963', 'Événements publics', 8),
+        ('PAR147', 'Échange commercial', 8),
+        -- Location (Catégorie 9)
+        ('LOC258', 'Équipements spécifiques', 9),
+        -- Opérationnel (Catégorie 10)
+        ('OPE369', 'Petite maintenance', 10),
+        ('OPE147', 'Achats informatiques', 10);
     `);
 
     // insert budget
