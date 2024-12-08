@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
-import { User } from "../types/graphql-types";
 import BtnLink from "../components/BtnLink";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
