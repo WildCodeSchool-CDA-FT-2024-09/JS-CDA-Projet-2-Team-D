@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
+import { User } from "../types/graphql-types";
+import BtnLink from "../components/BtnLink";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import BtnLink from "../components/BtnLink";
 import { Button, Grid2, TextField, Typography } from "@mui/material";
 import logo from "/Logo_seul.svg";
 
@@ -24,32 +26,12 @@ const buttonStyle = {
 
 export default function Home() {
   const { login } = useUser();
+  const navigate = useNavigate();
 
-  const handleLoginAdmin = () => {
-    login({
-      id: 1,
-      firstname: "Maxime Roux",
-      email: "maxime.roux@association.com",
-      roles: ["1", "2"],
-    });
-  };
-
-  const handleLoginAccountant = () => {
-    login({
-      id: 2,
-      firstname: "Lucie Bernard",
-      email: "lucie.bernard@association.com",
-      roles: ["2", "3"],
-    });
-  };
-
-  const handleLoginCommission = () => {
-    login({
-      id: 3,
-      firstname: "Caroline Mercier",
-      email: "caroline.mercier@association.com",
-      roles: ["3"],
-    });
+  // Log fake account for dev purpose only
+  const handleFakeLogin = (fakeUser: any, path: string) => {
+    login(fakeUser);
+    navigate(path);
   };
 
   return (
@@ -106,7 +88,20 @@ export default function Home() {
               size={6}
               spacing={2}
             >
-              <BtnLink sx={buttonStyle} onClick={handleLoginAdmin}>
+              <BtnLink
+                sx={buttonStyle}
+                onClick={() =>
+                  handleFakeLogin(
+                    {
+                      id: 1,
+                      firstname: "Maxime Roux",
+                      email: "maxime.roux@association.com",
+                      roles: ["1", "2"],
+                    },
+                    "/administrator",
+                  )
+                }
+              >
                 Login Administrateur
               </BtnLink>
             </Grid2>
@@ -121,7 +116,20 @@ export default function Home() {
               alignItems="center"
               size={6}
             >
-              <BtnLink sx={buttonStyle} onClick={handleLoginAccountant}>
+              <BtnLink
+                sx={buttonStyle}
+                onClick={() =>
+                  handleFakeLogin(
+                    {
+                      id: 2,
+                      firstname: "Lucie Bernard",
+                      email: "lucie.bernard@association.com",
+                      roles: ["2", "3"],
+                    },
+                    "/accountant",
+                  )
+                }
+              >
                 Login Comptable
               </BtnLink>
             </Grid2>
@@ -136,7 +144,20 @@ export default function Home() {
               alignItems="center"
               size={6}
             >
-              <BtnLink sx={buttonStyle} onClick={handleLoginCommission}>
+              <BtnLink
+                sx={buttonStyle}
+                onClick={() =>
+                  handleFakeLogin(
+                    {
+                      id: 3,
+                      firstname: "Caroline Mercier",
+                      email: "caroline.mercier@association.com",
+                      roles: ["3"],
+                    },
+                    "/commission",
+                  )
+                }
+              >
                 Login Responsable de commission
               </BtnLink>
             </Grid2>
