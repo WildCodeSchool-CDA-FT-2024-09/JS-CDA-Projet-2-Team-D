@@ -21,21 +21,19 @@ function DisplayCategory() {
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   const rows =
-    data?.getCategories
-      ?.map((category) =>
-        (category.subcategories?.length
-          ? category.subcategories
-          : [{ id: null, label: null, code: null }]
-        ).map((subcategory) => ({
-          key: `${category.id}-${subcategory.id}`,
-          categoryId: category.id,
-          subcategoryId: subcategory.id || null,
-          name: category.label,
-          subcategory: subcategory.label || "Aucune sous-catégorie",
-          code: subcategory.code || "Aucun code",
-        })),
-      )
-      .flat() || [];
+    data?.getCategories?.flatMap((category) =>
+      (category.subcategories?.length
+        ? category.subcategories
+        : [{ id: null, label: null, code: null }]
+      ).map((subcategory) => ({
+        key: `${category.id}-${subcategory.id}`,
+        categoryId: category.id,
+        subcategoryId: subcategory.id || null,
+        name: category.label,
+        subcategory: subcategory.label || "Aucune sous-catégorie",
+        code: subcategory.code || "Aucun code",
+      })),
+    ) || [];
 
   const theme = createTheme({
     components: {
