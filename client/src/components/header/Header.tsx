@@ -1,5 +1,4 @@
 import React from "react";
-import { useUser } from "../../hooks/useUser";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -8,7 +7,6 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
-import LogoutBtn from "../LogoutBtn";
 import "./Header.css";
 
 interface HeaderProps {
@@ -26,9 +24,6 @@ const Header: React.FC<HeaderProps> = ({
   logoUrl,
 }) => {
   const theme = useTheme();
-  const { user } = useUser();
-
-  console.log(user);
 
   // Color mapping depending on user role
   const roleColorMapping: { [key: string]: string } = {
@@ -85,7 +80,6 @@ const Header: React.FC<HeaderProps> = ({
 
           <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
             <Avatar color={avatarColor} />
-            {user && <LogoutBtn />}
           </Box>
         </Toolbar>
       </Container>

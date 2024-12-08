@@ -5,6 +5,7 @@ import Footer from "./components/footer/Footer";
 import Container from "@mui/material/Container";
 import MenuSideBar from "./components/menuSideBar/MenuSideBar";
 import Home from "./pages/Home";
+import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Toolbar } from "@mui/material";
 import { Grid2 } from "@mui/material";
@@ -78,6 +79,7 @@ function App() {
                     <MenuSideBar />
                   </Grid2>
                   <Grid2 size={10}>
+                    <UserBar />
                     <Outlet />
                   </Grid2>
                 </Grid2>

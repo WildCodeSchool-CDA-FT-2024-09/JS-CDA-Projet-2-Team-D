@@ -106,11 +106,7 @@ export default function Home() {
               size={6}
               spacing={2}
             >
-              <BtnLink
-                to="/administrator"
-                sx={buttonStyle}
-                onClick={handleLoginAdmin}
-              >
+              <BtnLink sx={buttonStyle} onClick={handleLoginAdmin}>
                 Login Administrateur
               </BtnLink>
             </Grid2>
@@ -125,11 +121,7 @@ export default function Home() {
               alignItems="center"
               size={6}
             >
-              <BtnLink
-                to="/accountant"
-                sx={buttonStyle}
-                onClick={handleLoginAccountant}
-              >
+              <BtnLink sx={buttonStyle} onClick={handleLoginAccountant}>
                 Login Comptable
               </BtnLink>
             </Grid2>
@@ -144,11 +136,7 @@ export default function Home() {
               alignItems="center"
               size={6}
             >
-              <BtnLink
-                to="/commission"
-                sx={buttonStyle}
-                onClick={handleLoginCommission}
-              >
+              <BtnLink sx={buttonStyle} onClick={handleLoginCommission}>
                 Login Responsable de commission
               </BtnLink>
             </Grid2>
