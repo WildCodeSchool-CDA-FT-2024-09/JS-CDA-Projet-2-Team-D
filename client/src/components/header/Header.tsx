@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
 import "./Header.css";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
@@ -34,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
   const avatarColor = roleColorMapping[userType || "default"];
 
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" color="secondary">
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -59,7 +60,15 @@ const Header: React.FC<HeaderProps> = ({
                   display: { xs: "none", sm: "block" }, // Masked on mobile (xs) and displayed for sm +
                 }}
               >
-                {title}
+                <Link
+                  to="/"
+                  style={{
+                    textDecoration: "none",
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  {title}
+                </Link>
               </Typography>
               {(subtitle || userType) && (
                 <Typography variant="h2" className="header-subtitle">
