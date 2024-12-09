@@ -5,11 +5,14 @@ import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
 import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
+import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import CreateUser from "./pages/administrator/user/CreateUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
+import Home from "./pages/Home.tsx";
+import Administrator from "./pages/administrator/Administrator.tsx";
 
 const router = createBrowserRouter([
   {
@@ -19,12 +22,20 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <h1>Home page</h1>,
+        element: <Home />,
       },
       {
         path: "administrator",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="1">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
+          {
+            index: true,
+            element: <Administrator />,
+          },
           {
             path: "user",
             element: <Outlet />,
@@ -43,7 +54,11 @@ const router = createBrowserRouter([
       },
       {
         path: "accountant",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="2">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
           {
             path: "category",
@@ -59,7 +74,11 @@ const router = createBrowserRouter([
       },
       {
         path: "commission",
-        element: <Outlet />,
+        element: (
+          <RoleProtectedRoute requiredRole="3">
+            <Outlet />
+          </RoleProtectedRoute>
+        ),
         children: [
           {
             path: "invoice",

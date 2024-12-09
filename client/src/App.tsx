@@ -1,8 +1,11 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
+import { UserProvider } from "./context/UserContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Container from "@mui/material/Container";
 import MenuSideBar from "./components/menuSideBar/MenuSideBar";
+import Home from "./pages/Home";
+import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Toolbar } from "@mui/material";
 import { Grid2 } from "@mui/material";
@@ -22,14 +25,14 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#D9D9D9", // Gray
+      main: "#00235B", // Blue
       // light: will be calculated from palette.primary.main,
       // dark: will be calculated from palette.primary.main,
-      contrastText: "#FFFFFF",
+      contrastText: "#F5F5F5",
     },
     secondary: {
-      main: "#FFDD83", // Yellow
-      contrastText: "#FFFFFF",
+      main: "#DADBBD", // Yellow
+      contrastText: "#00235B",
     },
     success: {
       main: "#6EBF8B", // Green
@@ -52,29 +55,42 @@ const theme = createTheme({
 });
 
 function App() {
+  const location = useLocation();
+  const currentPage = location.pathname;
+
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <Header
-          title="ClubCompta"
-          subtitle="Budget 2024/2025"
-          userType="Responsable"
-          logoUrl="/Logo.svg"
-          avatarColor="#6EBF8B"
-        />
-        <Toolbar />
-        <Container maxWidth="xl">
-          <Grid2 container spacing={2}>
-            <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
-              <MenuSideBar />
-            </Grid2>
-            <Grid2 size={10}>
-              <Outlet />
-            </Grid2>
-          </Grid2>
-          <Footer />
-        </Container>
-      </ThemeProvider>
+      <UserProvider>
+        <ThemeProvider theme={theme}>
+          {currentPage !== "/" ? (
+            <>
+              <Header
+                title="ClubCompta"
+                subtitle="Budget 2024/2025"
+                userType="Responsable"
+                logoUrl="/Logo.svg"
+                avatarColor="#6EBF8B"
+              />
+              <Toolbar />
+
+              <Container maxWidth="xl">
+                <Grid2 container spacing={2}>
+                  <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
+                    <MenuSideBar />
+                  </Grid2>
+                  <Grid2 size={10}>
+                    <UserBar />
+                    <Outlet />
+                  </Grid2>
+                </Grid2>
+                <Footer />
+              </Container>
+            </>
+          ) : (
+            <Home />
+          )}
+        </ThemeProvider>
+      </UserProvider>
     </>
   );
 }
