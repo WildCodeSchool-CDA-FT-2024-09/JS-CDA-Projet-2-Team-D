@@ -19,10 +19,10 @@ import {
   useGetCategoriesQuery,
   useGetCommissionsQuery,
 } from "../../types/graphql-types";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { fr } from "date-fns/locale";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { fr } from "date-fns/locale";
 
 interface InvoiceState {
   commission_id: number;
@@ -147,12 +147,12 @@ const InvoiceForm: React.FC = () => {
     }
   };
 
-  const handleDateChange = (date: Date | null) => {
-    setInvoice((prevState) => ({
-      ...prevState,
-      date: date || new Date(),
-    }));
-  };
+  // const handleDateChange = (date: Date | null) => {
+  //   setInvoice((prevState) => ({
+  //     ...prevState,
+  //     date: date || new Date(),
+  //   }));
+  // };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -238,59 +238,59 @@ const InvoiceForm: React.FC = () => {
   const creditDebitLabel = selectedCategory?.creditDebit?.label || "";
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-      <Paper
-        elevation={3}
-        style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
-      >
-        <Typography variant="h5" gutterBottom>
-          Facture
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              aria-label="Identifiant de la facture"
-              name="invoice_id"
-              value={invoice.invoice_id}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
+    // <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+    <Paper
+      elevation={3}
+      style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
+    >
+      <Typography variant="h5" gutterBottom>
+        Facture
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            aria-label="Identifiant de la facture"
+            name="invoice_id"
+            value={invoice.invoice_id}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Commissions</InputLabel>
+              <Select
+                name="commission_id"
+                value={invoice.commission_id.toString()}
+                onChange={handleChange}
+                error={!!errors["commission_id"]}
+                aria-label={`Commission sélectionnée : ${
+                  commissionsData?.getCommissions.find(
+                    (commission) => commission.id === invoice.commission_id,
+                  )?.name || "Non sélectionnée"
+                }`}
+              >
+                {commissionsData?.getCommissions.map((commission) => (
+                  <MenuItem
+                    key={commission.id}
+                    value={commission.id.toString()}
+                  >
+                    {commission.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors["commission_id"] && (
+                <Typography color="error" variant="body2">
+                  {errors["commission_id"]}
+                </Typography>
+              )}
+            </FormControl>
           </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Commissions</InputLabel>
-                <Select
-                  name="commission_id"
-                  value={invoice.commission_id.toString()}
-                  onChange={handleChange}
-                  error={!!errors["commission_id"]}
-                  aria-label={`Commission sélectionnée : ${
-                    commissionsData?.getCommissions.find(
-                      (commission) => commission.id === invoice.commission_id,
-                    )?.name || "Non sélectionnée"
-                  }`}
-                >
-                  {commissionsData?.getCommissions.map((commission) => (
-                    <MenuItem
-                      key={commission.id}
-                      value={commission.id.toString()}
-                    >
-                      {commission.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors["commission_id"] && (
-                  <Typography color="error" variant="body2">
-                    {errors["commission_id"]}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
 
-            <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
               <DatePicker
                 label="Date de la facture"
                 value={invoice.date}
@@ -300,193 +300,187 @@ const InvoiceForm: React.FC = () => {
                   textField: (params) => <TextField {...params} fullWidth />,
                 }}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Catégorie</InputLabel>
-                <Select
-                  name="category_id"
-                  value={invoice.category_id.toString()}
-                  onChange={handleChange}
-                  error={!!errors["category_id"]}
-                  aria-label={`Catégorie sélectionnée : ${
-                    categoriesData?.getCategories.find(
-                      (category) => category.id === invoice.category_id,
-                    )?.label || "Non sélectionnée"
-                  }`}
-                >
-                  {categoriesData?.getCategories.map((category) => (
-                    <MenuItem key={category.id} value={category.id}>
-                      {category.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors["category_id"] && (
-                  <Typography color="error" variant="body2">
-                    {errors["category_id"]}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Sous-catégorie</InputLabel>
-                <Select
-                  name="subcategory_id"
-                  value={invoice.subcategory_id.toString()}
-                  onChange={handleChange}
-                  error={!!errors["subcategory_id"]}
-                  aria-label={`Sous-catégorie sélectionnée : ${
-                    selectedCategory?.subcategories?.find(
-                      (subcategory) =>
-                        subcategory.id === invoice.subcategory_id,
-                    )?.label || "Non sélectionnée"
-                  }`}
-                >
-                  {selectedCategory?.subcategories?.map((subcategory) => (
-                    <MenuItem
-                      key={subcategory.id}
-                      value={subcategory.id.toString()}
-                    >
-                      {subcategory.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors["subcategory_id"] && (
-                  <Typography color="error" variant="body2">
-                    {errors["subcategory_id"]}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Libellé"
-                name="label"
-                value={invoice.label}
+            </Grid> */}
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Catégorie</InputLabel>
+              <Select
+                name="category_id"
+                value={invoice.category_id.toString()}
                 onChange={handleChange}
-                aria-live="polite"
-                aria-describedby="libelle-helper"
-                error={!!errors["label"]}
-                helperText={errors["label"]}
-              />
-              <div
-                id="libelle-helper"
-                style={{
-                  display: invoice.label.length === 0 ? "block" : "none",
-                }}
-              ></div>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Prix HT"
-                name="price_without_vat"
-                value={
-                  invoice.price_without_vat === 0
-                    ? ""
-                    : invoice.price_without_vat
-                }
-                onChange={handleChange}
-                type="number"
-                inputProps={{ min: 0 }}
-                error={!!errors["price_without_vat"]}
-                helperText={errors["price_without_vat"]}
-                aria-label="Montant du prix hors taxe, à remplir sans la TVA"
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth>
-                <Select
-                  name="vat_id"
-                  value={
-                    invoice.vat_id?.toString() ||
-                    vatRatesData?.getVats[0]?.id.toString() ||
-                    ""
-                  }
-                  onChange={(e) => handleChange(e as SelectChangeEvent)}
-                  aria-label={`Taux TVA sélectionné : ${
-                    vatRatesData?.getVats.find(
-                      (vat) => vat.id === invoice.vat_id,
-                    )?.label || "Non sélectionné"
-                  }`}
-                >
-                  {vatRatesData?.getVats.map((vat) => (
-                    <MenuItem key={vat.id} value={vat.id.toString()}>
-                      {vat.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            {/* Total - Displaying dynamic credit/debit label */}
-            <Grid item xs={12}>
-              <Typography variant="h6" aria-live="polite">
-                Total TTC:{" "}
-                <span style={{ marginLeft: "10px" }}>
-                  {invoice.total.toFixed(2)} €
-                </span>
-                {creditDebitLabel && (
-                  <span style={{ marginLeft: "10px" }}>
-                    ({creditDebitLabel})
-                  </span>
-                )}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Justificatifs</InputLabel>
-                <Select
-                  name="receipt"
-                  value={invoice.receipt}
-                  onChange={handleChange}
-                  // error={!!errors["receipt"]}
-                  // helperText={errors["receipt"]}
-                >
-                  <MenuItem value="justificatif1">Justificatif 1</MenuItem>
-                  <MenuItem value="justificatif2">Justificatif 2</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            {/* Checkbox for Paid */}
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={invoice.paid}
-                    onChange={(e) =>
-                      setInvoice({ ...invoice, paid: e.target.checked })
-                    }
-                    name="paid"
-                    aria-checked={invoice.paid ? "true" : "false"} // Announces the status of the check box
-                  />
-                }
-                label="Paid"
-                aria-live="polite" // Hearing aid to announce changes
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Informations complémentaires"
-                name="info"
-                value={invoice.info}
-                onChange={handleChange}
-                multiline
-                rows={4}
-                aria-live="polite"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary">
-                Enregistrer la facture
-              </Button>
-            </Grid>
+                error={!!errors["category_id"]}
+                aria-label={`Catégorie sélectionnée : ${
+                  categoriesData?.getCategories.find(
+                    (category) => category.id === invoice.category_id,
+                  )?.label || "Non sélectionnée"
+                }`}
+              >
+                {categoriesData?.getCategories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors["category_id"] && (
+                <Typography color="error" variant="body2">
+                  {errors["category_id"]}
+                </Typography>
+              )}
+            </FormControl>
           </Grid>
-        </form>
-      </Paper>
-    </LocalizationProvider>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Sous-catégorie</InputLabel>
+              <Select
+                name="subcategory_id"
+                value={invoice.subcategory_id.toString()}
+                onChange={handleChange}
+                error={!!errors["subcategory_id"]}
+                aria-label={`Sous-catégorie sélectionnée : ${
+                  selectedCategory?.subcategories?.find(
+                    (subcategory) => subcategory.id === invoice.subcategory_id,
+                  )?.label || "Non sélectionnée"
+                }`}
+              >
+                {selectedCategory?.subcategories?.map((subcategory) => (
+                  <MenuItem
+                    key={subcategory.id}
+                    value={subcategory.id.toString()}
+                  >
+                    {subcategory.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors["subcategory_id"] && (
+                <Typography color="error" variant="body2">
+                  {errors["subcategory_id"]}
+                </Typography>
+              )}
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Libellé"
+              name="label"
+              value={invoice.label}
+              onChange={handleChange}
+              aria-live="polite"
+              aria-describedby="libelle-helper"
+              error={!!errors["label"]}
+              helperText={errors["label"]}
+            />
+            <div
+              id="libelle-helper"
+              style={{
+                display: invoice.label.length === 0 ? "block" : "none",
+              }}
+            ></div>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Prix HT"
+              name="price_without_vat"
+              value={
+                invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
+              }
+              onChange={handleChange}
+              type="number"
+              inputProps={{ min: 0 }}
+              error={!!errors["price_without_vat"]}
+              helperText={errors["price_without_vat"]}
+              aria-label="Montant du prix hors taxe, à remplir sans la TVA"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth>
+              <Select
+                name="vat_id"
+                value={
+                  invoice.vat_id?.toString() ||
+                  vatRatesData?.getVats[0]?.id.toString() ||
+                  ""
+                }
+                onChange={(e) => handleChange(e as SelectChangeEvent)}
+                aria-label={`Taux TVA sélectionné : ${
+                  vatRatesData?.getVats.find((vat) => vat.id === invoice.vat_id)
+                    ?.label || "Non sélectionné"
+                }`}
+              >
+                {vatRatesData?.getVats.map((vat) => (
+                  <MenuItem key={vat.id} value={vat.id.toString()}>
+                    {vat.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          {/* Total - Displaying dynamic credit/debit label */}
+          <Grid item xs={12}>
+            <Typography variant="h6" aria-live="polite">
+              Total TTC:{" "}
+              <span style={{ marginLeft: "10px" }}>
+                {invoice.total.toFixed(2)} €
+              </span>
+              {creditDebitLabel && (
+                <span style={{ marginLeft: "10px" }}>({creditDebitLabel})</span>
+              )}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel>Justificatifs</InputLabel>
+              <Select
+                name="receipt"
+                value={invoice.receipt}
+                onChange={handleChange}
+                // error={!!errors["receipt"]}
+                // helperText={errors["receipt"]}
+              >
+                <MenuItem value="justificatif1">Justificatif 1</MenuItem>
+                <MenuItem value="justificatif2">Justificatif 2</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          {/* Checkbox for Paid */}
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={invoice.paid}
+                  onChange={(e) =>
+                    setInvoice({ ...invoice, paid: e.target.checked })
+                  }
+                  name="paid"
+                  aria-checked={invoice.paid ? "true" : "false"} // Announces the status of the check box
+                />
+              }
+              label="Paid"
+              aria-live="polite" // Hearing aid to announce changes
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Informations complémentaires"
+              name="info"
+              value={invoice.info}
+              onChange={handleChange}
+              multiline
+              rows={4}
+              aria-live="polite"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button type="submit" variant="contained" color="primary">
+              Enregistrer la facture
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </Paper>
+    //  </LocalizationProvider>
   );
 };
 export default InvoiceForm;
