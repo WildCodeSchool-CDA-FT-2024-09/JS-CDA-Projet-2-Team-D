@@ -1,5 +1,4 @@
 import React, { useState, ChangeEvent } from "react";
-// import Grid2 from "@mui/system/Unstable_Grid2";
 import {
   TextField,
   Grid,
@@ -14,6 +13,7 @@ import {
   FormControlLabel,
   SelectChangeEvent,
 } from "@mui/material";
+import BtnUpload from "../../components/BtnUpload";
 import {
   useGetVatsQuery,
   useGetCategoriesQuery,
@@ -32,7 +32,7 @@ interface InvoiceState {
   subcategory_id: number;
   label: string;
   credit_debit_id: number;
-  receipt: string;
+  receipt: File | null;
   info: string;
   paid: boolean;
   price_without_vat: number;
@@ -41,14 +41,6 @@ interface InvoiceState {
   user_id: number;
   total: number; // Total amount (TTC)
 }
-
-const generateInvoiceId = (
-  currentYear: number,
-  lastInvoiceId?: number,
-): string => {
-  const newInvoiceId = (lastInvoiceId || 0) + 1; // Increment existing ID or start from 1z à partir de 1
-  return `Facture - ${currentYear} - ${newInvoiceId}`;
-};
 
 const InvoiceForm: React.FC = () => {
   const {
@@ -69,17 +61,17 @@ const InvoiceForm: React.FC = () => {
     error: commissionsError,
   } = useGetCommissionsQuery();
 
-  const currentYear = new Date().getFullYear();
+  // const currentYear = new Date().getFullYear();
 
   const [invoice, setInvoice] = useState<InvoiceState>({
     commission_id: 0,
     date: new Date(),
     price_without_vat: 0,
     category_id: 0,
-    invoice_id: generateInvoiceId(currentYear),
+    invoice_id: "",
     subcategory_id: 0,
     label: "",
-    receipt: "",
+    receipt: null,
     credit_debit_id: 1,
     info: "",
     paid: false,
@@ -90,6 +82,13 @@ const InvoiceForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleFileUpload = (file: File | null) => {
+    setInvoice((prevState) => ({
+      ...prevState,
+      receipt: file,
+    }));
+  };
 
   const handleChange = (
     event:
@@ -183,13 +182,17 @@ const InvoiceForm: React.FC = () => {
         "Sélectionner une sous-catégorie est obligatoire.";
     }
 
+    if (invoice.receipt) {
+      console.info("Uploaded file:", invoice.receipt);
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
     console.info("Form data:", invoice);
-    // Prepare the input object based on the current state
+    //  Prepare the input object based on the current state
     // const input = {
     //   commission_id: invoice.commission_id,
     //   date: invoice.date,
@@ -243,21 +246,10 @@ const InvoiceForm: React.FC = () => {
       elevation={3}
       style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
     >
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom align="center">
         Facture
       </Typography>
       <form onSubmit={handleSubmit}>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            aria-label="Identifiant de la facture"
-            name="invoice_id"
-            value={invoice.invoice_id}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-        </Grid>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
@@ -417,7 +409,7 @@ const InvoiceForm: React.FC = () => {
             </FormControl>
           </Grid>
           {/* Total - Displaying dynamic credit/debit label */}
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <Typography variant="h6" aria-live="polite">
               Total TTC:{" "}
               <span style={{ marginLeft: "10px" }}>
@@ -428,23 +420,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </Typography>
           </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel>Justificatifs</InputLabel>
-              <Select
-                name="receipt"
-                value={invoice.receipt}
-                onChange={handleChange}
-                // error={!!errors["receipt"]}
-                // helperText={errors["receipt"]}
-              >
-                <MenuItem value="justificatif1">Justificatif 1</MenuItem>
-                <MenuItem value="justificatif2">Justificatif 2</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          {/* Checkbox for Paid */}
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -453,12 +429,28 @@ const InvoiceForm: React.FC = () => {
                     setInvoice({ ...invoice, paid: e.target.checked })
                   }
                   name="paid"
-                  aria-checked={invoice.paid ? "true" : "false"} // Announces the status of the check box
+                  aria-checked={invoice.paid ? "true" : "false"}
                 />
               }
-              label="Paid"
-              aria-live="polite" // Hearing aid to announce changes
+              label="Payé"
+              aria-live="polite"
             />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Typography>Justificatif</Typography>
+            <BtnUpload onFileChange={handleFileUpload} />
+            {invoice.receipt && (
+              <Typography variant="body2" color="textSecondary">
+                {invoice.receipt.name}
+              </Typography>
+            )}
           </Grid>
           <Grid item xs={12}>
             <TextField
