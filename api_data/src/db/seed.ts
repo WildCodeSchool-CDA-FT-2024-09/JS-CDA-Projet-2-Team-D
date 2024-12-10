@@ -188,12 +188,21 @@ import { AppDataSource } from "./data-source";
     // insert invoice
     await queryRunner.query(`
       INSERT INTO "invoice" ("price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
-        (400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
-        (50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
-        (60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
-        (500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
-        (30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
-        (600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6');
+          (400, 'essence', '', 'reçu plein scooter livraison', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-03-02', 'facture_2022_1'),
+          (50, 'cigarette', '', 'cartouche à la frontière', 'f', 2, 3, 2, 4, 6, NULL, 4, '2022-04-05', 'facture_2022_2'),
+          (60, 'chaussure', '', 'chaussure de sécurité', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-08-11', 'facture_2022_3'),
+          (500, 'chocolat', '', 'goûter', 'f', 1, 1, 2, 3, 4, 4, 4, '2022-07-11', 'facture_2022_4'),
+          (30, 'bijoux', '', 'chaine en toc', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-03-24', 'facture_2022_5'),
+          (600, 'Lego', '', 'cadeaux', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-04-09', 'facture_2022_6'),
+          (450, 'entretien', '', 'nettoyage voiture', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-06-15', 'facture_2022_7'),
+          (550, 'transport', '', 'billet train', 'f', 1, 2, 2, 4, 6, 3, 3, '2022-07-10', 'facture_2022_8'),
+          (90, 'outillage', '', 'outil professionnel', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-09-18', 'facture_2022_9'),
+          (200, 'électronique', '', 'accessoire bureau', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-11-05', 'facture_2022_10'),
+          (80, 'livre', '', 'achat livre technique', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-12-01', 'facture_2022_11'),
+          (300, 'vêtements', '', 'achat uniforme', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-01-10', 'facture_2022_12'),
+          (100, 'frais divers', '', 'facture générique 1', 'f', 1, 1, 2, 3, 4, 1, 2, '2023-02-05', 'facture_2022_13'),
+          (70, 'services', '', 'abonnement mensuel', 'f', 3, 4, 1, 3, 5, 3, 1, '2023-03-15', 'facture_2022_14'),
+          (120, 'restaurant', '', 'repas cloture année', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-04-20', 'facture_2022_15');
     `);
 
     //Insert budget_commission

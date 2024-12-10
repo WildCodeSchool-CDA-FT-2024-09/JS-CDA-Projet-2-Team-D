@@ -19,10 +19,10 @@ import {
   useGetCategoriesQuery,
   useGetCommissionsQuery,
 } from "../../types/graphql-types";
-// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { fr } from "date-fns/locale";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { fr } from "date-fns/locale";
 
 interface InvoiceState {
   commission_id: number;
@@ -146,12 +146,12 @@ const InvoiceForm: React.FC = () => {
     }
   };
 
-  // const handleDateChange = (date: Date | null) => {
-  //   setInvoice((prevState) => ({
-  //     ...prevState,
-  //     date: date || new Date(),
-  //   }));
-  // };
+  const handleDateChange = (date: Date | null) => {
+    setInvoice((prevState) => ({
+      ...prevState,
+      date: date || new Date(),
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -281,17 +281,22 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6}>
+            <LocalizationProvider
+              dateAdapter={AdapterDateFns}
+              adapterLocale={fr}
+            >
               <DatePicker
                 label="Date de la facture"
                 value={invoice.date}
                 onChange={handleDateChange}
-                format="EE dd MMMM yyyy"
+                format="eee dd MMMM yyyy"
                 slots={{
                   textField: (params) => <TextField {...params} fullWidth />,
                 }}
               />
-            </Grid> */}
+            </LocalizationProvider>
+          </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Catégorie</InputLabel>
