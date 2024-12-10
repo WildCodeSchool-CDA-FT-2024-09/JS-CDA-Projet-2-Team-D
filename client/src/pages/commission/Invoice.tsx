@@ -281,7 +281,6 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-
           {/* <Grid item xs={12} sm={6}>
               <DatePicker
                 label="Date de la facture"
