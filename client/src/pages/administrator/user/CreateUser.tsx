@@ -4,8 +4,8 @@ import {
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
 import { BooleanMap } from "../../../types/types";
-import AddIcon from "@mui/icons-material/Add";
 import { RefMap } from "../../../types/types";
+import useNotification from "../../../hooks/useNotification";
 import {
   Box,
   Button,
@@ -18,8 +18,8 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import Grid from "@mui/material/Grid2";
 
 const ITEM_HEIGHT = 48;
@@ -38,6 +38,9 @@ export default function CreateUser() {
   const { data: rolesData } = useGetRolesQuery();
   const [createNewUser] = useCreateNewUserMutation();
 
+  // User feedback
+  const { notifySuccess, notifyError } = useNotification();
+
   // used instead of states to avoid multiple re-renders when typing
   const userRef: RefMap = {
     firstname: useRef<HTMLInputElement>(null),
@@ -55,9 +58,6 @@ export default function CreateUser() {
     email: false,
     password: false,
   });
-
-  const [successMessage, setSuccessMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -148,8 +148,7 @@ export default function CreateUser() {
         },
       });
 
-      setSuccessMessage("Utilisateur ajouté avec succès.");
-      setErrorMessage("");
+      notifySuccess("Utilisateur ajouté avec succès");
 
       if (userRef.firstname.current) userRef.firstname.current.value = "";
       if (userRef.lastname.current) userRef.lastname.current.value = "";
@@ -158,8 +157,7 @@ export default function CreateUser() {
       if (userRef.passwordConfirm.current)
         userRef.passwordConfirm.current.value = "";
     } catch (error) {
-      setSuccessMessage("");
-      setErrorMessage("Erreur lors de l'ajout de l'utilisateur.");
+      notifyError("Erreur lors de l'ajout de l'utilisateur");
       console.error("Erreur lors de l'ajout d'un utilisateur", error);
     }
   };
@@ -177,16 +175,6 @@ export default function CreateUser() {
   return (
     <div>
       <h1>Ajouter un utilisateur</h1>
-      {successMessage && (
-        <Typography color="success" sx={{ marginTop: 2 }}>
-          {successMessage}
-        </Typography>
-      )}
-      {errorMessage && (
-        <Typography color="error" sx={{ marginTop: 2 }}>
-          {errorMessage}
-        </Typography>
-      )}
       <Box
         component="form"
         onSubmit={handleSubmit}
