@@ -7,6 +7,19 @@ export const GET_USERS = gql`
       firstname
       lastname
       email
+      roles {
+        id
+        label
+      }
+    }
+  }
+`;
+
+export const GET_ROLES = gql`
+  query GetRoles {
+    getRoles {
+      id
+      label
     }
   }
 `;

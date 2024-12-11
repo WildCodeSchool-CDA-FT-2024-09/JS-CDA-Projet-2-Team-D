@@ -8,3 +8,18 @@ export const ADD_CATEGORY = gql`
     }
   }
 `;
+
+export const CREATE_NEW_USER = gql`
+  mutation CreateNewUser($data: CreateUserInput!) {
+    createNewUser(data: $data) {
+      id
+      firstname
+      lastname
+      email
+      password
+      roles {
+        id
+      }
+    }
+  }
+`;

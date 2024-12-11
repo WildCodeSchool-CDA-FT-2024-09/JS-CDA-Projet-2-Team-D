@@ -1,4 +1,6 @@
 import { useGetUsersQuery } from "../../../types/graphql-types";
+import BtnCrud from "../../../components/BtnCrud";
+import BtnLink from "../../../components/BtnLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -7,9 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import BtnCrud from "../../../components/BtnCrud";
 import { Box } from "@mui/material";
-import BtnLink from "../../../components/BtnLink";
 
 export default function ManageUser() {
   const { loading, error, data } = useGetUsersQuery();
@@ -27,11 +27,9 @@ export default function ManageUser() {
           alignItems: "center",
         }}
       >
-        <div>Left Element</div>
         <BtnLink
           to="/administrator/user/add"
           sx={{
-            display: "inline-block",
             marginLeft: "auto",
             backgroundColor: "primary.main",
             padding: "8px 16px",
@@ -42,6 +40,7 @@ export default function ManageUser() {
             textAlign: "center",
             "&:hover": {
               backgroundColor: "primary.dark",
+              textDecoration: "none",
             },
           }}
         >

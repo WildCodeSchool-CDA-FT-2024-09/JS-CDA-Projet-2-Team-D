@@ -1,7 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import {
   TextField,
-  Grid,
   Button,
   Paper,
   Typography,
@@ -13,6 +12,7 @@ import {
   FormControlLabel,
   SelectChangeEvent,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
 import {
   useGetVatsQuery,
@@ -241,7 +241,6 @@ const InvoiceForm: React.FC = () => {
   const creditDebitLabel = selectedCategory?.creditDebit?.label || "";
 
   return (
-    // <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
     <Paper
       elevation={3}
       style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
@@ -251,7 +250,7 @@ const InvoiceForm: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Commissions</InputLabel>
               <Select
@@ -281,7 +280,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={12} sm={6}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
@@ -297,7 +296,7 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Catégorie</InputLabel>
               <Select
@@ -324,7 +323,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Sous-catégorie</InputLabel>
               <Select
@@ -354,7 +353,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Libellé"
@@ -373,7 +372,7 @@ const InvoiceForm: React.FC = () => {
               }}
             ></div>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={12} sm={6}>
             <TextField
               fullWidth
               label="Prix HT"
@@ -389,7 +388,7 @@ const InvoiceForm: React.FC = () => {
               aria-label="Montant du prix hors taxe, à remplir sans la TVA"
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={12} sm={4}>
             <FormControl fullWidth>
               <Select
                 name="vat_id"
@@ -413,7 +412,7 @@ const InvoiceForm: React.FC = () => {
             </FormControl>
           </Grid>
           {/* Total - Displaying dynamic credit/debit label */}
-          <Grid item xs={6}>
+          <Grid size={6}>
             <Typography variant="h6" aria-live="polite">
               Total TTC:{" "}
               <span style={{ marginLeft: "10px" }}>
@@ -424,7 +423,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid size={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -441,8 +440,7 @@ const InvoiceForm: React.FC = () => {
             />
           </Grid>
           <Grid
-            item
-            xs={12}
+            size={12}
             container
             direction="column"
             alignItems="center"
@@ -456,7 +454,7 @@ const InvoiceForm: React.FC = () => {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Informations complémentaires"
@@ -468,7 +466,7 @@ const InvoiceForm: React.FC = () => {
               aria-live="polite"
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Button type="submit" variant="contained" color="primary">
               Enregistrer la facture
             </Button>
@@ -476,7 +474,6 @@ const InvoiceForm: React.FC = () => {
         </Grid>
       </form>
     </Paper>
-    //  </LocalizationProvider>
   );
 };
 export default InvoiceForm;
