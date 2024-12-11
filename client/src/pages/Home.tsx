@@ -28,7 +28,15 @@ export default function Home() {
   const navigate = useNavigate();
 
   // Log fake account for dev purpose only
-  const handleFakeLogin = (fakeUser: any, path: string) => {
+  const handleFakeLogin = (
+    fakeUser: {
+      id: number;
+      firstname: string;
+      email: string;
+      roles: string[];
+    },
+    path: string,
+  ) => {
     login(fakeUser);
     navigate(path);
   };
