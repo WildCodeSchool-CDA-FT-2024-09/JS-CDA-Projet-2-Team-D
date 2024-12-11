@@ -32,7 +32,7 @@ const theme = createTheme({
       contrastText: "#F5F5F5",
     },
     secondary: {
-      main: "#DADBBD", // Yellow
+      main: "#D2DEF1", // Light blue
       contrastText: "#00235B",
     },
     success: {
