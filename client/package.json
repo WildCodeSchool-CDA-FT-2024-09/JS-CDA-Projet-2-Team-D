@@ -27,7 +27,6 @@
     "@mui/x-charts": "^7.23.0",
     "@mui/x-date-pickers": "^7.23.0",
     "@types/react-router-dom": "^5.3.3",
-    "argon2": "^0.41.1",
     "date-fns": "^2.29.3",
     "graphql": "^16.9.0",
     "i": "^0.3.7",
