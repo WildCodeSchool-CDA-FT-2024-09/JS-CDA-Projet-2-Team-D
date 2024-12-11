@@ -63,6 +63,14 @@ export type Commission = {
   users: Array<User>;
 };
 
+export type CreateUserInput = {
+  email: Scalars["String"]["input"];
+  firstname: Scalars["String"]["input"];
+  lastname: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
+  roles: Array<RolesInput>;
+};
+
 export type CreditDebit = {
   __typename?: "CreditDebit";
   categories: Category;
@@ -93,11 +101,16 @@ export type Invoice = {
 export type Mutation = {
   __typename?: "Mutation";
   addCategory: Category;
+  createNewUser: User;
 };
 
 export type MutationAddCategoryArgs = {
   creditDebitId: Scalars["Float"]["input"];
   label: Scalars["String"]["input"];
+};
+
+export type MutationCreateNewUserArgs = {
+  data: CreateUserInput;
 };
 
 export type Query = {
@@ -108,10 +121,16 @@ export type Query = {
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
   getInvoices: Array<Invoice>;
+  getInvoicesByCommissionId: Array<Invoice>;
+  getRoles: Array<Role>;
   getStatuss: Array<Status>;
   getSubcategories: Array<Subcategory>;
   getUsers: Array<User>;
   getVats: Array<Vat>;
+};
+
+export type QueryGetInvoicesByCommissionIdArgs = {
+  commissionId: Scalars["Float"]["input"];
 };
 
 export type Role = {
@@ -119,6 +138,10 @@ export type Role = {
   id: Scalars["Int"]["output"];
   label: Scalars["String"]["output"];
   users: Array<User>;
+};
+
+export type RolesInput = {
+  id: Scalars["Float"]["input"];
 };
 
 export type Status = {
@@ -167,6 +190,23 @@ export type AddCategoryMutation = {
   addCategory: { __typename?: "Category"; id: number; label: string };
 };
 
+export type CreateNewUserMutationVariables = Exact<{
+  data: CreateUserInput;
+}>;
+
+export type CreateNewUserMutation = {
+  __typename?: "Mutation";
+  createNewUser: {
+    __typename?: "User";
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    roles: Array<{ __typename?: "Role"; id: number }>;
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetUsersQuery = {
@@ -177,7 +217,15 @@ export type GetUsersQuery = {
     firstname: string;
     lastname: string;
     email: string;
+    roles: Array<{ __typename?: "Role"; id: number; label: string }>;
   }>;
+};
+
+export type GetRolesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetRolesQuery = {
+  __typename?: "Query";
+  getRoles: Array<{ __typename?: "Role"; id: number; label: string }>;
 };
 
 export type GetInvoicesQueryVariables = Exact<{ [key: string]: never }>;
@@ -258,6 +306,25 @@ export type GetCommissionsQuery = {
   }>;
 };
 
+export type GetInvoicesByCommissionIdQueryVariables = Exact<{
+  commissionId: Scalars["Float"]["input"];
+}>;
+
+export type GetInvoicesByCommissionIdQuery = {
+  __typename?: "Query";
+  getInvoicesByCommissionId: Array<{
+    __typename?: "Invoice";
+    date: unknown;
+    id: number;
+    label: string;
+    price_without_vat: number;
+    commission?: { __typename?: "Commission"; name: string; id: number } | null;
+    creditDebit: { __typename?: "CreditDebit"; label: string; id: number };
+    status: { __typename?: "Status"; id: number; label: string };
+    vat: { __typename?: "Vat"; id: number; rate: number; label: string };
+  }>;
+};
+
 export const AddCategoryDocument = gql`
   mutation AddCategory($label: String!, $creditDebitId: Float!) {
     addCategory(label: $label, creditDebitId: $creditDebitId) {
@@ -310,6 +377,63 @@ export type AddCategoryMutationOptions = Apollo.BaseMutationOptions<
   AddCategoryMutation,
   AddCategoryMutationVariables
 >;
+export const CreateNewUserDocument = gql`
+  mutation CreateNewUser($data: CreateUserInput!) {
+    createNewUser(data: $data) {
+      id
+      firstname
+      lastname
+      email
+      password
+      roles {
+        id
+      }
+    }
+  }
+`;
+export type CreateNewUserMutationFn = Apollo.MutationFunction<
+  CreateNewUserMutation,
+  CreateNewUserMutationVariables
+>;
+
+/**
+ * __useCreateNewUserMutation__
+ *
+ * To run a mutation, you first call `useCreateNewUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateNewUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createNewUserMutation, { data, loading, error }] = useCreateNewUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateNewUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateNewUserMutation,
+    CreateNewUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateNewUserMutation,
+    CreateNewUserMutationVariables
+  >(CreateNewUserDocument, options);
+}
+export type CreateNewUserMutationHookResult = ReturnType<
+  typeof useCreateNewUserMutation
+>;
+export type CreateNewUserMutationResult =
+  Apollo.MutationResult<CreateNewUserMutation>;
+export type CreateNewUserMutationOptions = Apollo.BaseMutationOptions<
+  CreateNewUserMutation,
+  CreateNewUserMutationVariables
+>;
 export const GetUsersDocument = gql`
   query GetUsers {
     getUsers {
@@ -317,6 +441,10 @@ export const GetUsersDocument = gql`
       firstname
       lastname
       email
+      roles {
+        id
+        label
+      }
     }
   }
 `;
@@ -381,6 +509,76 @@ export type GetUsersSuspenseQueryHookResult = ReturnType<
 export type GetUsersQueryResult = Apollo.QueryResult<
   GetUsersQuery,
   GetUsersQueryVariables
+>;
+export const GetRolesDocument = gql`
+  query GetRoles {
+    getRoles {
+      id
+      label
+    }
+  }
+`;
+
+/**
+ * __useGetRolesQuery__
+ *
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRolesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetRolesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetRolesQuery, GetRolesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(
+    GetRolesDocument,
+    options,
+  );
+}
+export function useGetRolesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetRolesQuery,
+    GetRolesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(
+    GetRolesDocument,
+    options,
+  );
+}
+export function useGetRolesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetRolesQuery, GetRolesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetRolesQuery, GetRolesQueryVariables>(
+    GetRolesDocument,
+    options,
+  );
+}
+export type GetRolesQueryHookResult = ReturnType<typeof useGetRolesQuery>;
+export type GetRolesLazyQueryHookResult = ReturnType<
+  typeof useGetRolesLazyQuery
+>;
+export type GetRolesSuspenseQueryHookResult = ReturnType<
+  typeof useGetRolesSuspenseQuery
+>;
+export type GetRolesQueryResult = Apollo.QueryResult<
+  GetRolesQuery,
+  GetRolesQueryVariables
 >;
 export const GetInvoicesDocument = gql`
   query GetInvoices {
@@ -730,15 +928,120 @@ export type GetCommissionsQueryResult = Apollo.QueryResult<
   GetCommissionsQuery,
   GetCommissionsQueryVariables
 >;
+export const GetInvoicesByCommissionIdDocument = gql`
+  query GetInvoicesByCommissionId($commissionId: Float!) {
+    getInvoicesByCommissionId(commissionId: $commissionId) {
+      commission {
+        name
+        id
+      }
+      creditDebit {
+        label
+        id
+      }
+      date
+      id
+      label
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+        label
+      }
+      price_without_vat
+    }
+  }
+`;
+
+/**
+ * __useGetInvoicesByCommissionIdQuery__
+ *
+ * To run a query within a React component, call `useGetInvoicesByCommissionIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoicesByCommissionIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
+ *   variables: {
+ *      commissionId: // value for 'commissionId'
+ *   },
+ * });
+ */
+export function useGetInvoicesByCommissionIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetInvoicesByCommissionIdQuery,
+    GetInvoicesByCommissionIdQueryVariables
+  > &
+    (
+      | { variables: GetInvoicesByCommissionIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetInvoicesByCommissionIdQuery,
+    GetInvoicesByCommissionIdQueryVariables
+  >(GetInvoicesByCommissionIdDocument, options);
+}
+export function useGetInvoicesByCommissionIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetInvoicesByCommissionIdQuery,
+    GetInvoicesByCommissionIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetInvoicesByCommissionIdQuery,
+    GetInvoicesByCommissionIdQueryVariables
+  >(GetInvoicesByCommissionIdDocument, options);
+}
+export function useGetInvoicesByCommissionIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetInvoicesByCommissionIdQuery,
+        GetInvoicesByCommissionIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetInvoicesByCommissionIdQuery,
+    GetInvoicesByCommissionIdQueryVariables
+  >(GetInvoicesByCommissionIdDocument, options);
+}
+export type GetInvoicesByCommissionIdQueryHookResult = ReturnType<
+  typeof useGetInvoicesByCommissionIdQuery
+>;
+export type GetInvoicesByCommissionIdLazyQueryHookResult = ReturnType<
+  typeof useGetInvoicesByCommissionIdLazyQuery
+>;
+export type GetInvoicesByCommissionIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetInvoicesByCommissionIdSuspenseQuery
+>;
+export type GetInvoicesByCommissionIdQueryResult = Apollo.QueryResult<
+  GetInvoicesByCommissionIdQuery,
+  GetInvoicesByCommissionIdQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
+    GetRoles: "GetRoles",
     GetInvoices: "GetInvoices",
     GetCategories: "GetCategories",
     GetVats: "GetVats",
     GetCommissions: "GetCommissions",
+    GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
   },
   Mutation: {
     AddCategory: "AddCategory",
+    CreateNewUser: "CreateNewUser",
   },
 };
