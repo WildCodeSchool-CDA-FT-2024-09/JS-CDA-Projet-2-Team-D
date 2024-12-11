@@ -1,9 +1,10 @@
-import { Entity, ManyToOne, Column, PrimaryColumn } from "typeorm";
-import { Field } from "type-graphql";
+import { Entity, ManyToOne, Column, PrimaryColumn, JoinColumn } from "typeorm";
+import { Field, ObjectType } from "type-graphql";
 import { Budget } from "../budget/budget.entity";
 import { Commission } from "../commission/commission.entity";
 import { IsNotEmpty } from "class-validator";
 
+@ObjectType()
 @Entity()
 export class BudgetCommission {
   @Field(() => Number)
@@ -19,9 +20,19 @@ export class BudgetCommission {
   @IsNotEmpty()
   amount: number;
 
-  @ManyToOne(() => Budget, (budget) => budget.id)
+  @Field(() => Budget)
+  @ManyToOne(() => Budget, (budget) => budget.budgetCommissions, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn({ name: "budgetId" })
   budget: Budget;
 
-  @ManyToOne(() => Commission, (commission) => commission.id)
+  @Field(() => Commission)
+  @ManyToOne(() => Commission, (commission) => commission.budgetCommissions, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn({ name: "commissionId" })
   commission: Commission;
 }

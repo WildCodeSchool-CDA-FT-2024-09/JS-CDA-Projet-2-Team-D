@@ -8,7 +8,6 @@ import {
 } from "typeorm";
 import { Field, ObjectType, Int, GraphQLISODateTime } from "type-graphql";
 import { IsNotEmpty, IsString, Length } from "class-validator";
-import { Commission } from "../commission/commission.entity";
 import { BudgetCommission } from "../budgetCommission/budgetCommission.entity";
 
 @ObjectType()
@@ -33,10 +32,10 @@ export class Budget extends BaseEntity {
   @Column({ type: "timestamp" })
   end_date: Date;
 
-  // @Field(() => [Commission])
+  @Field(() => [BudgetCommission])
   @OneToMany(
     () => BudgetCommission,
     (budgetCommission) => budgetCommission.budget
   )
-  commissions: Commission[];
+  budgetCommissions: BudgetCommission[];
 }

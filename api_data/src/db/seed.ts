@@ -175,7 +175,21 @@ import { AppDataSource } from "./data-source";
         (60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
         (500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
         (30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
-        (600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6');
+        (600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6'),
+        (45, 'café', '', 'capsules café', 'f', 1, 2, 1, 3, 4, 6, 2, '2022-02-10', 'facture_2022_7'),
+        (250, 'équipement', '', 'matériel sportif', 'f', 2, 3, 2, 4, 4, 6, 4, '2022-05-15', 'facture_2022_8'),
+        (70, 'restaurant', '', 'repas réunion', 'f', 3, 1, 2, 3, 4, 6, 1, '2022-06-20', 'facture_2022_9'),
+        (100, 'livres', '', 'documents formation', 'f', 1, 1, 2, 3, 4, 6, 2, '2022-03-14', 'facture_2022_10'),
+        (90, 'papeterie', '', 'matériel bureau', 'f', 2, 2, 2, 4, 4, 6, 4, '2022-09-05', 'facture_2022_11'),
+        (200, 'logiciels', '', 'achat logiciel', 'f', 3, 3, 1, 3, 4, 6, 1, '2022-11-12', 'facture_2022_12'),
+        (80, 'impression', '', 'cartouches imprimante', 'f', 1, 4, 2, 3, 4, 6, 2, '2022-01-19', 'facture_2022_13'),
+        (400, 'transport', '', 'déplacement équipe', 'f', 2, 1, 2, 4, 4, 6, 4, '2022-12-25', 'facture_2022_14'),
+        (35, 'fournitures', '', 'accessoires divers', 'f', 3, 3, 2, 3, 4, 6, 1, '2022-04-17', 'facture_2022_15'),
+        (300, 'animation', '', 'services animation', 'f', 1, 2, 1, 4, 4, 6, 2, '2022-07-03', 'facture_2022_16'),
+        (120, 'sécurité', '', 'alarme bureau', 'f', 2, 1, 2, 3, 4, 6, 4, '2022-10-10', 'facture_2022_17'),
+        (65, 'nettoyage', '', 'produits ménagers', 'f', 3, 4, 1, 3, 4, 6, 1, '2022-08-25', 'facture_2022_18'),
+        (75, 'décoration', '', 'plantes bureau', 'f', 1, 1, 2, 3, 4, 6, 2, '2022-09-08', 'facture_2022_19'),
+        (150, 'publicité', '', 'flyers événement', 'f', 2, 2, 2, 4, 4, 6, 4, '2022-05-21', 'facture_2022_20');
     `);
 
     //Insert budget_commission
