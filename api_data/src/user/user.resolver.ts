@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Arg, InputType, Field } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Arg,
+  InputType,
+  Field,
+  Int,
+} from "type-graphql";
 import {
   validate,
   IsString,
@@ -9,6 +17,7 @@ import {
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
+import { PaginatedUsers } from "./user.type";
 
 @InputType()
 class RolesInput {
@@ -51,11 +60,18 @@ class CreateUserInput {
 
 @Resolver(User)
 export default class UserResolver {
-  @Query(() => [User])
-  async getUsers() {
-    return await User.find({
+  @Query(() => PaginatedUsers)
+  async getUsers(
+    @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
+    @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
+  ): Promise<PaginatedUsers> {
+    const [users, totalCount] = await User.findAndCount({
       relations: ["roles"],
+      skip: offset,
+      take: limit,
     });
+
+    return { users, totalCount };
   }
 
   @Mutation(() => User)

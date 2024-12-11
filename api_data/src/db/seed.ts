@@ -117,20 +117,38 @@ import { AppDataSource } from "./data-source";
         ('Opérationnel', 2);
     `);
 
-    // insert subcategories
+    // Insert subcategories
     await queryRunner.query(`
-
       INSERT INTO "subcategory" ("code", "label", "categoryId") VALUES
-        ('DIV365', 'Divers', 1),
-        ('ANN232', 'Annuel', 2),
-        ('GOO209', 'Goodies', 1),
-        ('INT124', 'Intérêt', 3),
-        ('FAM511', 'Famille', 4),
-        ('JEU704', 'Jeunesse', 4),
-        ('FAM452', 'Famille', 9),
-        ('MAT138', 'Matériel', 9),
-        ('EVE967', 'Événement', 8),
-        ('INT424', 'Intérêt', 3);
+        -- Vente de marchandises (Catégorie 1)
+        ('VEN123', 'Promotion', 1),
+        ('VEN456', 'Accessoires', 1),
+        -- Dons (Catégorie 2)
+        ('DON789', 'Campagnes caritatives', 2),
+        ('DON012', 'Don anonyme', 2),
+        -- Bancaire (Catégorie 3)
+        ('BAN345', 'Opérations diverses', 3),
+        ('BAN678', 'Retraits', 3),
+        -- Cotisations (Catégorie 4)
+        ('COT890', 'Abonnements', 4),
+        ('COT321', 'Adhésion collective', 4),
+        -- Prestation (Catégorie 5)
+        ('PRE654', 'Consulting premium', 5),
+        ('PRE987', 'Service technique', 5),
+        -- Subventions (Catégorie 6)
+        ('SUB852', 'Projets éducatifs', 6),
+        ('SUB963', 'Développement durable', 6),
+        -- Véhicule (Catégorie 7)
+        ('VEH741', 'Réparations', 7),
+        ('VEH852', 'Équipement', 7),
+        -- Partenariat (Catégorie 8)
+        ('PAR963', 'Événements publics', 8),
+        ('PAR147', 'Échange commercial', 8),
+        -- Location (Catégorie 9)
+        ('LOC258', 'Équipements spécifiques', 9),
+        -- Opérationnel (Catégorie 10)
+        ('OPE369', 'Petite maintenance', 10),
+        ('OPE147', 'Achats informatiques', 10);
     `);
 
     // insert budget
@@ -170,6 +188,21 @@ import { AppDataSource } from "./data-source";
     // insert invoice
     await queryRunner.query(`
       INSERT INTO "invoice" ("price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
+          (400, 'essence', '', 'reçu plein scooter livraison', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-03-02', 'facture_2022_1'),
+          (50, 'cigarette', '', 'cartouche à la frontière', 'f', 2, 3, 2, 4, 6, NULL, 4, '2022-04-05', 'facture_2022_2'),
+          (60, 'chaussure', '', 'chaussure de sécurité', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-08-11', 'facture_2022_3'),
+          (500, 'chocolat', '', 'goûter', 'f', 1, 1, 2, 3, 4, 4, 4, '2022-07-11', 'facture_2022_4'),
+          (30, 'bijoux', '', 'chaine en toc', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-03-24', 'facture_2022_5'),
+          (600, 'Lego', '', 'cadeaux', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-04-09', 'facture_2022_6'),
+          (450, 'entretien', '', 'nettoyage voiture', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-06-15', 'facture_2022_7'),
+          (550, 'transport', '', 'billet train', 'f', 1, 2, 2, 4, 6, 3, 3, '2022-07-10', 'facture_2022_8'),
+          (90, 'outillage', '', 'outil professionnel', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-09-18', 'facture_2022_9'),
+          (200, 'électronique', '', 'accessoire bureau', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-11-05', 'facture_2022_10'),
+          (80, 'livre', '', 'achat livre technique', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-12-01', 'facture_2022_11'),
+          (300, 'vêtements', '', 'achat uniforme', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-01-10', 'facture_2022_12'),
+          (100, 'frais divers', '', 'facture générique 1', 'f', 1, 1, 2, 3, 4, 1, 2, '2023-02-05', 'facture_2022_13'),
+          (70, 'services', '', 'abonnement mensuel', 'f', 3, 4, 1, 3, 5, 3, 1, '2023-03-15', 'facture_2022_14'),
+          (120, 'restaurant', '', 'repas cloture année', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-04-20', 'facture_2022_15');
         (400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
         (50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
         (60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),

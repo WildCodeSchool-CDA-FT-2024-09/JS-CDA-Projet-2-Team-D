@@ -6,6 +6,7 @@ import {
 import { BooleanMap } from "../../../types/types";
 import { RefMap } from "../../../types/types";
 import useNotification from "../../../hooks/useNotification";
+import BtnLink from "../../../components/BtnLink";
 import {
   Box,
   Button,
@@ -174,7 +175,33 @@ export default function CreateUser() {
 
   return (
     <div>
-      <h1>Ajouter un utilisateur</h1>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <h1>Ajouter un utilisateur</h1>
+        <BtnLink
+          to="/administrator/user"
+          sx={{
+            marginLeft: "auto",
+            backgroundColor: "secondary.main",
+            padding: "6px 8px",
+            color: "secondary.contrastText",
+            textTransform: "uppercase",
+            borderRadius: "4px",
+            textAlign: "center",
+            fontSize: ".9em",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+          }}
+        >
+          Liste des utilisateurs
+        </BtnLink>
+      </Box>
+
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -313,7 +340,7 @@ export default function CreateUser() {
           </Grid>
 
           <Grid size={4}></Grid>
-          <Grid size={4}>
+          <Grid size={4} sx={{ textAlign: "center" }}>
             <Button
               disabled={handleDisabledButton()}
               type="submit"
