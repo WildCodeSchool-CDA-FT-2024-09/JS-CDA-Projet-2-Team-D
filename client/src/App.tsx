@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router";
 import { UserProvider } from "./context/UserContext";
+import NotificationProvider from "./context/NotificationContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Container from "@mui/material/Container";
@@ -62,56 +63,37 @@ function App() {
     <>
       <UserProvider>
         <ThemeProvider theme={theme}>
-          {currentPage !== "/" ? (
-            <>
-              <Header
-                title="ClubCompta"
-                subtitle="Budget 2024/2025"
-                userType="Responsable"
-                logoUrl="/Logo.svg"
-                avatarColor="#6EBF8B"
-              />
-              <Toolbar />
+          <NotificationProvider>
+            {currentPage !== "/" ? (
+              <>
+                <Header
+                  title="ClubCompta"
+                  subtitle="Budget 2024/2025"
+                  userType="Responsable"
+                  logoUrl="/Logo.svg"
+                  avatarColor="#6EBF8B"
+                />
+                <Toolbar />
 
-              <Container maxWidth="xl">
-                <Grid2 container spacing={2}>
-                  <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
-                    <MenuSideBar />
+                <Container maxWidth="xl">
+                  <Grid2 container spacing={2}>
+                    <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
+                      <MenuSideBar />
+                    </Grid2>
+                    <Grid2 size={10}>
+                      <UserBar />
+                      <Outlet />
+                    </Grid2>
                   </Grid2>
-                  <Grid2 size={10}>
-                    <UserBar />
-                    <Outlet />
-                  </Grid2>
-                </Grid2>
-                <Footer />
-              </Container>
-            </>
-          ) : (
-            <Home />
-          )}
+                  <Footer />
+                </Container>
+              </>
+            ) : (
+              <Home />
+            )}
+          </NotificationProvider>
         </ThemeProvider>
       </UserProvider>
-      <ThemeProvider theme={theme}>
-        <Header
-          title="ClubCompta"
-          subtitle="Budget 2024/2025"
-          userType="Comptable"
-          logoUrl="/Logo.svg"
-          avatarColor="#6EBF8B"
-        />
-        <Toolbar />
-        <Container maxWidth="xl">
-          <Grid2 container spacing={2}>
-            <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
-              <MenuSideBar />
-            </Grid2>
-            <Grid2 size={10}>
-              <Outlet />
-            </Grid2>
-          </Grid2>
-          <Footer />
-        </Container>
-      </ThemeProvider>
     </>
   );
 }

@@ -9,6 +9,7 @@ import VatResolver from "./vat/vat.resolver";
 import StatusResolver from "./status/status.resolver";
 import CommissionResolver from "./commission/commission.resolver";
 import InvoiceResolver from "./invoice/invoice.resolver";
+import RoleResolver from "./role/role.resolver";
 
 const getSchema = async () => {
   return await buildSchema({
@@ -23,6 +24,7 @@ const getSchema = async () => {
       StatusResolver,
       CommissionResolver,
       InvoiceResolver,
+      RoleResolver,
     ],
     validate: true,
   });

@@ -1,5 +1,7 @@
 import { useGetCategoriesQuery } from "../../types/graphql-types";
 
+import { useState } from "react";
+
 import {
   Table,
   TableBody,
@@ -8,89 +10,158 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box,
+  Collapse,
+  IconButton,
+  Typography,
+  useTheme,
 } from "@mui/material";
 
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CreateIcon from "@mui/icons-material/Create";
-import { ThemeProvider } from "@mui/system";
-import { createTheme } from "@mui/material/styles";
+import AddCircleOutline from "@mui/icons-material/AddCircleOutline";
 
-function DisplayCategory() {
+function createData(
+  label: string,
+  id: number,
+  subcategories: { id: number; label: string; code: string }[],
+) {
+  return {
+    categoryId: id,
+    categoryLabel: label,
+    subcategory: subcategories.map((subcategory) => ({
+      id: subcategory.id,
+      label: subcategory.label,
+      code: subcategory.code,
+    })),
+  };
+}
+
+function Row(props: { row: ReturnType<typeof createData> }) {
+  const { row } = props;
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? (
+              <KeyboardArrowUpIcon sx={{ fontSize: "2rem" }} />
+            ) : (
+              <KeyboardArrowDownIcon sx={{ fontSize: "2rem" }} />
+            )}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
+          {row.categoryLabel}
+        </TableCell>
+        <TableCell align="center">
+          <IconButton>{<CreateIcon />}</IconButton>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Typography
+                gutterBottom
+                component="div"
+                sx={{ fontSize: "1.3rem" }}
+              >
+                Sous-catégorie(s)
+              </Typography>
+              <Table
+                size="small"
+                aria-label="purchases"
+                sx={{ marginBottom: "4vh" }}
+              >
+                <TableHead>
+                  <TableRow sx={{ fontSize: "4rem" }}>
+                    <TableCell>
+                      <Typography
+                        sx={{ fontSize: "1.2rem", fontWeight: "900" }}
+                      >
+                        Label
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "1.2rem", fontWeight: "900" }}>
+                      Code
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.subcategory.map((sub) => (
+                    <TableRow key={sub.id}>
+                      <TableCell component="th" scope="row">
+                        {sub.label}
+                        <IconButton>{<CreateIcon />}</IconButton>
+                      </TableCell>
+
+                      <TableCell>{sub.code}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+
+                <TableCell sx={{ paddingBottom: "2vh", fontSize: "1.1rem" }}>
+                  {" "}
+                  <IconButton>{<AddCircleOutline />}</IconButton>Ajouter une
+                  sous-catégorie
+                </TableCell>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+}
+
+function DisplayCategory2() {
+  const theme = useTheme();
+
   const { data, loading, error } = useGetCategoriesQuery();
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   const rows =
-    data?.getCategories?.flatMap((category) =>
-      (category.subcategories?.length
-        ? category.subcategories
-        : [{ id: null, label: null, code: null }]
-      ).map((subcategory) => ({
-        key: `${category.id}-${subcategory.id}`,
-        categoryId: category.id,
-        subcategoryId: subcategory.id || null,
-        name: category.label,
-        subcategory: subcategory.label || "Aucune sous-catégorie",
-        code: subcategory.code || "Aucun code",
-      })),
-    ) || [];
-
-  const theme = createTheme({
-    components: {
-      MuiTableCell: {
-        styleOverrides: {
-          head: {
-            fontWeight: "bold",
-            borderBottom: "1px solid black",
-          },
-        },
-      },
-    },
-  });
+    data?.getCategories.map((category) => {
+      return createData(
+        category.label,
+        category.id,
+        category.subcategories || [],
+      );
+    }) || [];
 
   return (
     <TableContainer
       component={Paper}
-      sx={{
-        marginTop: 10,
-        marginLeft: 5,
-        width: {
-          xs: "80%",
-          sm: "95%",
-          md: "90%",
-          lg: "100%",
-        },
-      }}
+      sx={{ border: 1, marginTop: 10, marginLeft: 3 }}
     >
-      <Table
-        sx={{ minWidth: 650, border: 1, gap: "4px" }}
-        aria-label="simple table"
-      >
-        <ThemeProvider theme={theme}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Catégories</TableCell>
-              <TableCell align="right">Sous-Catégorie</TableCell>
-              <TableCell align="right">Code</TableCell>
-              <TableCell align="right">Modifier une catégorie</TableCell>
-              <TableCell align="right">Modifier une sous-catégorie</TableCell>
-            </TableRow>
-          </TableHead>
-        </ThemeProvider>
-        <TableBody>
-          {rows?.map((row) => (
-            <TableRow
-              key={row.key}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow sx={{ backgroundColor: theme.palette.primary.main }}>
+            <TableCell />
+            <TableCell sx={{ color: "white", fontSize: "1.5rem" }}>
+              Catégorie
+            </TableCell>
+            <TableCell
+              align="center"
+              sx={{ color: "white", fontSize: "1.5rem" }}
             >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.subcategory} </TableCell>
-              <TableCell align="right">{row.code}</TableCell>
-              <TableCell align="right">{<CreateIcon />}</TableCell>
-              <TableCell align="right">{<CreateIcon />}</TableCell>
-            </TableRow>
+              Modifier une catégorie
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <Row key={row.categoryId} row={row} />
           ))}
         </TableBody>
       </Table>
@@ -98,4 +169,4 @@ function DisplayCategory() {
   );
 }
 
-export default DisplayCategory;
+export default DisplayCategory2;

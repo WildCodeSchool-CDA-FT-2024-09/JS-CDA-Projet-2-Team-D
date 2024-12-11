@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { useGetUsersQuery } from "../../../types/graphql-types";
+import BtnCrud from "../../../components/BtnCrud";
+import BtnLink from "../../../components/BtnLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -7,15 +10,33 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import BtnCrud from "../../../components/BtnCrud";
-import { Box } from "@mui/material";
-import BtnLink from "../../../components/BtnLink";
+import Pagination from "@mui/material/Pagination";
+import Box from "@mui/material/Box";
 
 export default function ManageUser() {
-  const { loading, error, data } = useGetUsersQuery();
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(2);
+  const offset = (page - 1) * limit;
+
+  const { loading, error, data } = useGetUsersQuery({
+    variables: {
+      limit: limit,
+      offset: offset,
+    },
+  });
+
+  // the event parameter is prefixed with _ to avoid the linter flag as event is not used here but is mandatory in the MUI Pagination component
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value);
+  };
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
+
+  const totalPages = Math.ceil((data?.getUsers?.totalCount || 0) / limit);
 
   return (
     <div>
@@ -27,19 +48,17 @@ export default function ManageUser() {
           alignItems: "center",
         }}
       >
-        <div>Left Element</div>
         <BtnLink
           to="/administrator/user/add"
           sx={{
-            display: "inline-block",
             marginLeft: "auto",
             backgroundColor: "primary.main",
-            padding: "8px 16px",
+            padding: "6px 8px",
             color: "primary.contrastText",
             textTransform: "uppercase",
             borderRadius: "4px",
-            textDecoration: "none",
             textAlign: "center",
+            fontSize: ".9em",
             "&:hover": {
               backgroundColor: "primary.dark",
             },
@@ -62,7 +81,7 @@ export default function ManageUser() {
           </TableHead>
           <TableBody>
             {data &&
-              data.getUsers.map((user) => (
+              data.getUsers.users.map((user) => (
                 <TableRow
                   key={user.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -91,6 +110,18 @@ export default function ManageUser() {
               ))}
           </TableBody>
         </Table>
+        <Stack
+          spacing={2}
+          sx={{ marginBottom: "1em", display: "flex", alignItems: "flex-end" }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
       </TableContainer>
     </div>
   );
