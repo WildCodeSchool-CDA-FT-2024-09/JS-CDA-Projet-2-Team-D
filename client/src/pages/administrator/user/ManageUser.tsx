@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useGetUsersQuery } from "../../../types/graphql-types";
 import BtnCrud from "../../../components/BtnCrud";
 import BtnLink from "../../../components/BtnLink";
@@ -10,8 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Pagination from "@mui/material/Pagination";
-import { Box } from "@mui/material";
-import { useState } from "react";
+import Box from "@mui/material/Box";
 
 export default function ManageUser() {
   const [page, setPage] = useState<number>(1);
@@ -25,14 +25,18 @@ export default function ManageUser() {
     },
   });
 
-  const handlePageChange = (event, value) => {
+  // the event parameter is prefixed with _ to avoid the linter flag as event is not used here but is mandatory in the MUI Pagination component
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
     setPage(value);
   };
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
-  const totalPages = Math.ceil(data.getUsers.totalCount / limit);
+  const totalPages = Math.ceil((data?.getUsers?.totalCount || 0) / limit);
 
   return (
     <div>
@@ -49,11 +53,12 @@ export default function ManageUser() {
           sx={{
             marginLeft: "auto",
             backgroundColor: "primary.main",
-            padding: "8px 16px",
+            padding: "6px 8px",
             color: "primary.contrastText",
             textTransform: "uppercase",
             borderRadius: "4px",
             textAlign: "center",
+            fontSize: ".9em",
             "&:hover": {
               backgroundColor: "primary.dark",
             },
@@ -105,7 +110,10 @@ export default function ManageUser() {
               ))}
           </TableBody>
         </Table>
-        <Stack spacing={2}>
+        <Stack
+          spacing={2}
+          sx={{ marginBottom: "1em", display: "flex", alignItems: "flex-end" }}
+        >
           <Pagination
             count={totalPages}
             page={page}
