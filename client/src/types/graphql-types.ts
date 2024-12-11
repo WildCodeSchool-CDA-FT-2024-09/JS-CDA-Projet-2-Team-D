@@ -229,6 +229,7 @@ export type GetCategoriesQuery = {
       __typename?: "Subcategory";
       id: number;
       label: string;
+      code: string;
     }>;
     creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
   }>;
@@ -501,6 +502,7 @@ export const GetCategoriesDocument = gql`
       subcategories {
         id
         label
+        code
       }
       creditDebit {
         id

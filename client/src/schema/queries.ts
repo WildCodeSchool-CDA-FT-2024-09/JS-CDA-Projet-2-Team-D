@@ -80,6 +80,7 @@ export const GET_CATEGORIES = gql`
       subcategories {
         id
         label
+        code
       }
       creditDebit {
         id

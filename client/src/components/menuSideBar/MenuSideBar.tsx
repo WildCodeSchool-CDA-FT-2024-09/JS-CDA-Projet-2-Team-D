@@ -9,6 +9,8 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
 
+type UserRole = "administrator" | "commission" | "accountant";
+
 function MenuSideBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -26,7 +28,11 @@ function MenuSideBar() {
   };
 
   const theme = useTheme();
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const userRole: UserRole = "accountant";
+
   return (
     <nav className="sideBar">
       <Button
@@ -85,6 +91,11 @@ function MenuSideBar() {
           </Link>
         </MenuItem>
       </Menu>
+      <MenuItem>
+        {userRole === ("accountant" as UserRole) && "Comptable"}
+        {userRole === ("administrator" as UserRole) && "Administrateur"}
+        {userRole === ("commission" as UserRole) && "Responsable de Commission"}
+      </MenuItem>
     </nav>
   );
 }
