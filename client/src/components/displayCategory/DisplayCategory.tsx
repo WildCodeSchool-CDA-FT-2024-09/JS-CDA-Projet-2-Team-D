@@ -1,4 +1,5 @@
 import { useGetCategoriesQuery } from "../../types/graphql-types";
+import { useAddSubcategoryMutation } from "../../types/graphql-types";
 
 import { useState } from "react";
 
@@ -41,6 +42,12 @@ function createData(
 function Row(props: { row: ReturnType<typeof createData> }) {
   const { row } = props;
   const [open, setOpen] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+
+  const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
+  const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
+
+  const [addASubcategory] = useAddSubcategoryMutation();
 
   return (
     <>
@@ -109,9 +116,94 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 </TableBody>
 
                 <TableCell sx={{ paddingBottom: "2vh", fontSize: "1.1rem" }}>
-                  {" "}
-                  <IconButton>{<AddCircleOutline />}</IconButton>Ajouter une
-                  sous-catégorie
+                  <IconButton onClick={() => setShowInput(!showInput)}>
+                    {<AddCircleOutline />}
+                  </IconButton>
+                  Ajouter une sous-catégorie
+                  {showInput && (
+                    <Box sx={{ gap: "50px" }}>
+                      <TableRow
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Box
+                            component="input"
+                            type="text"
+                            placeholder="Nom de la sous-catégorie"
+                            sx={{
+                              width: "15vw",
+                              height: "4vh",
+                              fontSize: "1.1rem",
+                              marginBottom: "2vh",
+                              "&::placeholder": {
+                                color: "grey",
+                              },
+                            }}
+                            value={newSubcategoryLabel}
+                            onChange={(e) =>
+                              setNewSubcategoryLabel(e.target.value)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ alignItems: "right" }}
+                        >
+                          <input
+                            type="text"
+                            placeholder="Code de la sous-catégorie"
+                            style={{
+                              width: "15vw",
+                              height: "4vh",
+                              fontSize: "1.1rem",
+                              marginBottom: "2vh",
+                              border: "1px solid black",
+                            }}
+                            value={newSubcategoryCode}
+                            onChange={(e) =>
+                              setNewSubcategoryCode(e.target.value)
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+
+                      <button
+                        style={{
+                          width: "10vw",
+                          height: "4vh",
+                          fontSize: "1.1rem",
+                          marginBottom: "2vh",
+                        }}
+                        onClick={() => {
+                          addASubcategory({
+                            variables: {
+                              label: newSubcategoryLabel,
+                              code: newSubcategoryCode,
+                              categoryId: row.categoryId,
+                            },
+                          });
+                        }}
+                      >
+                        Valider
+                      </button>
+                      <button
+                        style={{
+                          width: "10vw",
+                          height: "4vh",
+                          fontSize: "1.1rem",
+                          marginBottom: "2vh",
+                        }}
+                        onClick={() => setShowInput(!showInput)}
+                      >
+                        Annuler
+                      </button>
+                    </Box>
+                  )}
                 </TableCell>
               </Table>
             </Box>
