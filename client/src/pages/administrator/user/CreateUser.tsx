@@ -4,6 +4,8 @@ import {
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
 import { BooleanMap } from "../../../types/types";
+import AddIcon from "@mui/icons-material/Add";
+import { RefMap } from "../../../types/types";
 import {
   Box,
   Button,
@@ -16,10 +18,9 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import AddIcon from "@mui/icons-material/Add";
-import { RefMap } from "../../../types/types";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -36,7 +37,6 @@ export default function CreateUser() {
   const [roles, setRoles] = useState<string[]>([]);
   const { data: rolesData } = useGetRolesQuery();
   const [createNewUser] = useCreateNewUserMutation();
-  // const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // used instead of states to avoid multiple re-renders when typing
   const userRef: RefMap = {
@@ -45,7 +45,7 @@ export default function CreateUser() {
     email: useRef<HTMLInputElement>(null),
     password: useRef<HTMLInputElement>(null),
     passwordConfirm: useRef<HTMLInputElement>(null),
-    //roles: useRef<HTMLInputElement>([]),
+    roles: useRef<HTMLInputElement>(null),
   };
 
   // Check input errors
@@ -55,6 +55,9 @@ export default function CreateUser() {
     email: false,
     password: false,
   });
+
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -117,12 +120,15 @@ export default function CreateUser() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      console.log(
-        userRef.firstname.current?.value,
-        userRef.lastname.current?.value,
-        userRef.email.current?.value,
-        userRef.password.current?.value,
-      );
+      const selectedRoleObjects = roles
+        .map((roleLabel) =>
+          rolesData?.getRoles.find((role) => role.label === roleLabel),
+        )
+        .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
+        .map((role) => ({ id: role.id }));
+
+      // Default role to commission
+      if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
 
       await createNewUser({
         variables: {
@@ -137,25 +143,50 @@ export default function CreateUser() {
             password: userRef.password.current
               ? userRef.password.current.value
               : "",
-            roles: [{ id: 1 }, { id: 2 }],
+            roles: selectedRoleObjects,
           },
         },
       });
 
-      // setSuccessMessage("Utilisateur ajouté avec succès.");
+      setSuccessMessage("Utilisateur ajouté avec succès.");
+      setErrorMessage("");
 
-      // if (userRef.firstname.current) userRef.firstname.current.value = "";
+      if (userRef.firstname.current) userRef.firstname.current.value = "";
+      if (userRef.lastname.current) userRef.lastname.current.value = "";
+      if (userRef.email.current) userRef.email.current.value = "";
+      if (userRef.password.current) userRef.password.current.value = "";
+      if (userRef.passwordConfirm.current)
+        userRef.passwordConfirm.current.value = "";
     } catch (error) {
+      setSuccessMessage("");
+      setErrorMessage("Erreur lors de l'ajout de l'utilisateur.");
       console.error("Erreur lors de l'ajout d'un utilisateur", error);
-      // setMessage("Le nom doit être unique");
-      // setOpenAlert(true);
-      // setNameError(true);
     }
+  };
+
+  // Disable add button if errors
+  const handleDisabledButton = (): boolean => {
+    return (
+      Object.values(inputError).some((el) => el) ||
+      Object.values(userRef).some(
+        (el) => el.current != null && el.current.value == "",
+      )
+    );
   };
 
   return (
     <div>
       <h1>Ajouter un utilisateur</h1>
+      {successMessage && (
+        <Typography color="success" sx={{ marginTop: 2 }}>
+          {successMessage}
+        </Typography>
+      )}
+      {errorMessage && (
+        <Typography color="error" sx={{ marginTop: 2 }}>
+          {errorMessage}
+        </Typography>
+      )}
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -181,7 +212,7 @@ export default function CreateUser() {
               error={inputError.firstname}
               helperText={
                 inputError.firstname
-                  ? "Le prénom doit contenir uniquement des caractères alphanumériques (max 50)"
+                  ? "Uniquement des caractères alphanumériques (max 50)"
                   : ""
               }
             />
@@ -196,10 +227,11 @@ export default function CreateUser() {
               variant="outlined"
               inputRef={userRef.lastname}
               onChange={() => handleInputChange("lastname", userRef.lastname)}
+              onBlur={() => handleInputChange("lastname", userRef.lastname)}
               error={inputError.lastname}
               helperText={
                 inputError.lastname
-                  ? "Le nom doit contenir uniquement des caractères alphanumériques (max 50)"
+                  ? "Uniquement des caractères alphanumériques (max 50)"
                   : ""
               }
             />
@@ -215,6 +247,7 @@ export default function CreateUser() {
               variant="outlined"
               inputRef={userRef.email}
               onChange={() => handleInputChange("email", userRef.email)}
+              onBlur={() => handleInputChange("email", userRef.email)}
               error={inputError.email}
               helperText={
                 inputError.email
@@ -260,6 +293,7 @@ export default function CreateUser() {
               variant="outlined"
               inputRef={userRef.password}
               onChange={() => handleInputChange("password", userRef.password)}
+              onBlur={() => handleInputChange("password", userRef.password)}
               error={inputError.password}
               helperText={
                 inputError.password
@@ -292,7 +326,12 @@ export default function CreateUser() {
 
           <Grid size={4}></Grid>
           <Grid size={4}>
-            <Button type="submit" variant="contained" startIcon={<AddIcon />}>
+            <Button
+              disabled={handleDisabledButton()}
+              type="submit"
+              variant="contained"
+              startIcon={<AddIcon />}
+            >
               Ajouter
             </Button>
           </Grid>
