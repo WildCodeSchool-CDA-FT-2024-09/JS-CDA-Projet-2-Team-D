@@ -9,13 +9,30 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
+import Pagination from "@mui/material/Pagination";
 import { Box } from "@mui/material";
+import { useState } from "react";
 
 export default function ManageUser() {
-  const { loading, error, data } = useGetUsersQuery();
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(2);
+  const offset = (page - 1) * limit;
+
+  const { loading, error, data } = useGetUsersQuery({
+    variables: {
+      limit: limit,
+      offset: offset,
+    },
+  });
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
+
+  const totalPages = Math.ceil(data.getUsers.totalCount / limit);
 
   return (
     <div>
@@ -36,11 +53,9 @@ export default function ManageUser() {
             color: "primary.contrastText",
             textTransform: "uppercase",
             borderRadius: "4px",
-            textDecoration: "none",
             textAlign: "center",
             "&:hover": {
               backgroundColor: "primary.dark",
-              textDecoration: "none",
             },
           }}
         >
@@ -61,7 +76,7 @@ export default function ManageUser() {
           </TableHead>
           <TableBody>
             {data &&
-              data.getUsers.map((user) => (
+              data.getUsers.users.map((user) => (
                 <TableRow
                   key={user.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -90,6 +105,15 @@ export default function ManageUser() {
               ))}
           </TableBody>
         </Table>
+        <Stack spacing={2}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
       </TableContainer>
     </div>
   );
