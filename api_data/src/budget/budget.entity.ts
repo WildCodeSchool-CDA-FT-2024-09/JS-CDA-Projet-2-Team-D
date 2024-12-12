@@ -31,7 +31,7 @@ export class Budget extends BaseEntity {
     onDelete: "CASCADE",
     eager: true,
   })
-  @JoinColumn({ name: "budgetId" })
+  @JoinColumn({ name: "exerciseId" })
   exercise: Exercise;
 
   @Field(() => Commission)
@@ -40,5 +40,5 @@ export class Budget extends BaseEntity {
     eager: true,
   })
   @JoinColumn({ name: "commissionId" })
-  commission: Commission;
+  commissions: Commission;
 }
