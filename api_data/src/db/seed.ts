@@ -207,7 +207,7 @@ import { AppDataSource } from "./data-source";
 
     //Insert budget
     await queryRunner.query(`
-      INSERT INTO "budget" ("budgetId", "commissionId", "amount") VALUES
+      INSERT INTO "budget" ("exerciseId", "commissionId", "amount") VALUES
         (1,	1,	50500),
         (2,	2,	12600),
         (1,	3,	15000),
