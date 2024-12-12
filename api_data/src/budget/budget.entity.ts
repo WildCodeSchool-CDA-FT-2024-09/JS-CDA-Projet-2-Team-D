@@ -6,11 +6,12 @@ import {
   JoinColumn,
   BaseEntity,
 } from "typeorm";
-import { Field } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import { Exercise } from "../exercise/exercise.entity";
 import { Commission } from "../commission/commission.entity";
 import { IsNotEmpty } from "class-validator";
 
+@ObjectType()
 @Entity()
 export class Budget extends BaseEntity {
   @Field(() => Number)
