@@ -1,6 +1,6 @@
 import React from "react";
 import { TextField, TextFieldProps } from "@mui/material";
-import { Field, FieldProps } from "formik";
+// import { Field, FieldProps } from "formik";
 
 interface FormTextFieldProps extends Omit<TextFieldProps, "name"> {
   name: string;
@@ -21,29 +21,19 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
   multiline = false,
   rows,
   onChange,
-  validate,
-  ...rest
 }) => {
   return (
-    <Field name={name} validate={validate}>
-      {({ field, meta }: FieldProps) => (
-        <TextField
-          {...field}
-          {...rest}
-          fullWidth
-          label={label}
-          required={required}
-          multiline={multiline}
-          rows={rows}
-          error={meta.touched && !!meta.error}
-          helperText={meta.touched && meta.error}
-          onChange={(e) => {
-            field.onChange(e);
-            onChange?.(e);
-          }}
-        />
-      )}
-    </Field>
+    <TextField
+      name={name}
+      fullWidth
+      label={label}
+      required={required}
+      multiline={multiline}
+      rows={rows}
+      onChange={(e) => {
+        onChange?.(e);
+      }}
+    />
   );
 };
 
