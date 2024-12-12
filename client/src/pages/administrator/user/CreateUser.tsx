@@ -1,6 +1,7 @@
 import { useRef, useState, RefObject } from "react";
 import {
   useGetRolesQuery,
+  useGetCommissionsQuery,
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
 import { BooleanMap } from "../../../types/types";
@@ -36,7 +37,9 @@ const MenuProps = {
 
 export default function CreateUser() {
   const [roles, setRoles] = useState<string[]>([]);
+  const [commissions, setCommissions] = useState<string[]>([]);
   const { data: rolesData } = useGetRolesQuery();
+  const { data: commissionsData } = useGetCommissionsQuery();
   const [createNewUser] = useCreateNewUserMutation();
 
   // User feedback
@@ -50,6 +53,7 @@ export default function CreateUser() {
     password: useRef<HTMLInputElement>(null),
     passwordConfirm: useRef<HTMLInputElement>(null),
     roles: useRef<HTMLInputElement>(null),
+    commissions: useRef<HTMLInputElement>(null),
   };
 
   // Check input errors
@@ -65,6 +69,18 @@ export default function CreateUser() {
       target: { value },
     } = event;
     setRoles(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value,
+    );
+  };
+
+  const handleChangeCommissions = (
+    event: SelectChangeEvent<typeof commissions>,
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setCommissions(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value,
     );
@@ -128,8 +144,17 @@ export default function CreateUser() {
         .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
         .map((role) => ({ id: role.id }));
 
-      // Default role to commission
+      // Default role is set to commission
       if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
+
+      const selectedCommissionsObjects = commissions
+        .map((commissionLabel) =>
+          commissionsData?.getCommissions.find(
+            (commission) => commission.name === commissionLabel,
+          ),
+        )
+        .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
+        .map((commission) => ({ id: commission.id }));
 
       await createNewUser({
         variables: {
@@ -145,18 +170,22 @@ export default function CreateUser() {
               ? userRef.password.current.value
               : "",
             roles: selectedRoleObjects,
+            commissions: selectedCommissionsObjects,
           },
         },
       });
 
       notifySuccess("Utilisateur ajouté avec succès");
 
+      // Reset the form
       if (userRef.firstname.current) userRef.firstname.current.value = "";
       if (userRef.lastname.current) userRef.lastname.current.value = "";
       if (userRef.email.current) userRef.email.current.value = "";
       if (userRef.password.current) userRef.password.current.value = "";
       if (userRef.passwordConfirm.current)
         userRef.passwordConfirm.current.value = "";
+      setRoles([]);
+      setCommissions([]);
     } catch (error) {
       notifyError("Erreur lors de l'ajout de l'utilisateur");
       console.error("Erreur lors de l'ajout d'un utilisateur", error);
@@ -283,7 +312,7 @@ export default function CreateUser() {
                 multiple
                 value={roles}
                 onChange={handleChangeRoles}
-                input={<OutlinedInput label="Tag" />}
+                input={<OutlinedInput label="Roles" />}
                 renderValue={(selected) => selected.join(", ")}
                 MenuProps={MenuProps}
               >
@@ -338,6 +367,36 @@ export default function CreateUser() {
               }
             />
           </Grid>
+          <Grid size={12}>
+            Il est possible d'associer un utilisateur à une ou plusieurs
+            commissions.
+          </Grid>
+          <Grid size={12}>
+            <FormControl sx={{ width: "100%" }}>
+              <InputLabel id="commission-select-label">Commissions</InputLabel>
+              <Select
+                fullWidth
+                labelId="commission-select-label"
+                id="commissions"
+                name="commissions"
+                multiple
+                value={commissions}
+                onChange={handleChangeCommissions}
+                input={<OutlinedInput label="Commissions" />}
+                renderValue={(selected) => selected.join(", ")}
+                MenuProps={MenuProps}
+              >
+                {commissionsData &&
+                  commissionsData.getCommissions.map((comm) => (
+                    <MenuItem key={comm.id} value={comm.name}>
+                      <Checkbox checked={commissions.includes(comm.name)} />
+                      <ListItemText primary={comm.name} />
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={6}></Grid>
 
           <Grid size={4}></Grid>
           <Grid size={4} sx={{ textAlign: "center" }}>
