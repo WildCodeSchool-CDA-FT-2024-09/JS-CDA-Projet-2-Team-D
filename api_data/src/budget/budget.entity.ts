@@ -1,11 +1,18 @@
-import { Entity, ManyToOne, Column, PrimaryColumn, JoinColumn } from "typeorm";
+import {
+  Entity,
+  ManyToOne,
+  Column,
+  PrimaryColumn,
+  JoinColumn,
+  BaseEntity,
+} from "typeorm";
 import { Field } from "type-graphql";
 import { Exercise } from "../exercise/exercise.entity";
 import { Commission } from "../commission/commission.entity";
 import { IsNotEmpty } from "class-validator";
 
 @Entity()
-export class Budget {
+export class Budget extends BaseEntity {
   @Field(() => Number)
   @PrimaryColumn()
   exerciseId: number;
