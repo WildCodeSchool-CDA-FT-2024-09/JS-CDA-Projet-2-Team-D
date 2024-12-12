@@ -154,6 +154,8 @@ import { AppDataSource } from "./data-source";
     // insert budget
     await queryRunner.query(`
       INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
         ('Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
         ('Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
@@ -232,6 +234,9 @@ import { AppDataSource } from "./data-source";
         (2,	2,	12600),
         (1,	3,	15000),
         (1,	4,	9000),
+        (2,	4,	18000),
+        (3,	4,	28000),
+        (4,	4,	13000),
         (2,	5,	8000),
         (2,	6,	3000);
  `);

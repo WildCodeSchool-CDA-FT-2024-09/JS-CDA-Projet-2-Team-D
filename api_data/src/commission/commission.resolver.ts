@@ -1,6 +1,8 @@
+import { Budget } from "../budget/budget.entity";
+import { Exercise } from "../exercise/exercise.entity";
+import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "./commission.entity";
 import { Resolver, Query, Arg } from "type-graphql";
-import { Invoice } from "../invoice/invoice.entity";
 
 @Resolver(Commission)
 export default class CommissionResolver {
@@ -11,37 +13,42 @@ export default class CommissionResolver {
   @Query(() => [Invoice])
   async getInvoicesByCommissionId(
     @Arg("commissionId") commissionId: number,
-    @Arg("budgetId") budgetId: number,
     @Arg("offset", { defaultValue: 0 }) offset: number,
     @Arg("limit", { defaultValue: 10 }) limit: number
   ) {
-    //SELECT * FROM invoice WHERE commission_id = id
     try {
+      const lastExercise = await Exercise.findOne({
+        where: {},
+        order: { end_date: "DESC" },
+      });
+
+      if (!lastExercise) {
+        throw new Error("No exercise found.");
+      }
+
+      const budget = await Budget.findOne({
+        where: {
+          commissionId: commissionId,
+          exerciseId: lastExercise.id,
+        },
+      });
+
+      if (!budget) {
+        throw new Error(
+          `No budget found for commission ${commissionId} in exercise ${lastExercise.id}.`
+        );
+      }
+
       const invoices = await Invoice.find({
         where: {
-          commission: {
-            id: commissionId,
-            budgetCommissions: {
-              budget: {
-                id: budgetId,
-              },
-            },
-          },
+          commission: { id: commissionId },
         },
-        relations: [
-          "invoice",
-          "commission.budgetCommissions",
-          "commission.budgetCommissions.budget",
-          "status",
-          "vat",
-          "creditDebit",
-        ],
-        order: {
-          date: "DESC",
-        },
-        take: limit, // Nombre maximum de factures
-        skip: offset, // Déplacement dans les résultats
+        relations: ["commission", "commission.budgets", "vat", "status"],
+        order: { date: "DESC" },
+        take: limit,
+        skip: offset,
       });
+
       return invoices;
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
@@ -49,40 +56,3 @@ export default class CommissionResolver {
     }
   }
 }
-
-// query GetInvoicesByCommissionId($commissionId: Float!, $budgetId: Float!, $limit: Float!, $offset: Float!) {
-//   getInvoicesByCommissionId(commissionId: $commissionId, budgetId: $budgetId, limit: $limit, offset: $offset) {
-//     commission {
-//       budgetCommissions {
-//         amount
-//         budget {
-//           label
-//           id
-//           end_date
-//           start_date
-//         }
-//       }
-//     }
-//     id
-//     invoiceNumber
-//     label
-//     date
-//     price_without_vat
-//     vat {
-//       rate
-//       id
-//       label
-//     }
-//     status {
-//       label
-//       id
-//     }
-//   }
-// }
-
-// {
-//   "commissionId": 4,
-//   "budgetId": 1,
-//   "limit": 10,
-//   "offset": 0
-// }

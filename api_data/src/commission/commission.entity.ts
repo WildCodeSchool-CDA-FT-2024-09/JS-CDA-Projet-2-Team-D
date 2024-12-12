@@ -11,6 +11,7 @@ import { Field, ObjectType } from "type-graphql";
 import { IsNotEmpty, IsString, Length } from "class-validator";
 import { User } from "../user/user.entity";
 import { Budget } from "../budget/budget.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -33,4 +34,8 @@ export class Commission extends BaseEntity {
   @Field(() => [User])
   @ManyToMany(() => User, (user) => user.commissions)
   users: User[];
+
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.commission)
+  invoices: Invoice[];
 }
