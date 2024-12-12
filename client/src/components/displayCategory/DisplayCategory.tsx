@@ -3,6 +3,8 @@ import { useAddSubcategoryMutation } from "../../types/graphql-types";
 
 import { useState } from "react";
 
+import useNotification from "../../hooks/useNotification";
+
 import {
   Table,
   TableBody,
@@ -48,6 +50,10 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
 
   const [addASubcategory] = useAddSubcategoryMutation();
+
+  const { notifySuccess, notifyError } = useNotification();
+
+  const theme = useTheme();
 
   return (
     <>
@@ -139,9 +145,8 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                               height: "4vh",
                               fontSize: "1.1rem",
                               marginBottom: "2vh",
-                              "&::placeholder": {
-                                color: "grey",
-                              },
+                              alignItems: "center",
+                              textAlign: "center",
                             }}
                             value={newSubcategoryLabel}
                             onChange={(e) =>
@@ -162,7 +167,8 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                               height: "4vh",
                               fontSize: "1.1rem",
                               marginBottom: "2vh",
-                              border: "1px solid black",
+                              textAlign: "center",
+                              alignItems: "center",
                             }}
                             value={newSubcategoryCode}
                             onChange={(e) =>
@@ -171,37 +177,68 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                           />
                         </TableCell>
                       </TableRow>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                          marginTop: "2vh",
+                        }}
+                      >
+                        <button
+                          style={{
+                            width: "10vw",
+                            height: "5vh",
+                            fontSize: "1.1rem",
+                            marginBottom: "2vh",
+                            backgroundColor: theme.palette.success.main,
+                            color: "white",
+                            border: "none",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => {
+                            addASubcategory({
+                              variables: {
+                                label: newSubcategoryLabel,
+                                code: newSubcategoryCode,
+                                categoryId: row.categoryId,
+                              },
+                            });
+                            if (newSubcategoryLabel && newSubcategoryCode) {
+                              setNewSubcategoryLabel("");
+                              setNewSubcategoryCode("");
+                              setShowInput(!showInput);
 
-                      <button
-                        style={{
-                          width: "10vw",
-                          height: "4vh",
-                          fontSize: "1.1rem",
-                          marginBottom: "2vh",
-                        }}
-                        onClick={() => {
-                          addASubcategory({
-                            variables: {
-                              label: newSubcategoryLabel,
-                              code: newSubcategoryCode,
-                              categoryId: row.categoryId,
-                            },
-                          });
-                        }}
-                      >
-                        Valider
-                      </button>
-                      <button
-                        style={{
-                          width: "10vw",
-                          height: "4vh",
-                          fontSize: "1.1rem",
-                          marginBottom: "2vh",
-                        }}
-                        onClick={() => setShowInput(!showInput)}
-                      >
-                        Annuler
-                      </button>
+                              notifySuccess("Sous-catégorie ajoutée");
+                            }
+                            if (!newSubcategoryLabel || !newSubcategoryCode) {
+                              if (!newSubcategoryLabel) {
+                                notifyError("Veuillez renseigner un nom");
+                              }
+                            }
+                          }}
+                        >
+                          Valider
+                        </button>
+
+                        <button
+                          style={{
+                            width: "10vw",
+                            height: "5vh",
+                            fontSize: "1.1rem",
+                            marginBottom: "2vh",
+                            backgroundColor: theme.palette.error.main,
+                            color: "white",
+                            border: "none",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => setShowInput(!showInput)}
+                        >
+                          Annuler
+                        </button>
+                      </Box>
                     </Box>
                   )}
                 </TableCell>
