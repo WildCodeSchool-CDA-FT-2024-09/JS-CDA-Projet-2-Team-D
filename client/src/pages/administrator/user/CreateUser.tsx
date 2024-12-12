@@ -312,7 +312,7 @@ export default function CreateUser() {
                 multiple
                 value={roles}
                 onChange={handleChangeRoles}
-                input={<OutlinedInput label="Tag" />}
+                input={<OutlinedInput label="Roles" />}
                 renderValue={(selected) => selected.join(", ")}
                 MenuProps={MenuProps}
               >
@@ -368,9 +368,10 @@ export default function CreateUser() {
             />
           </Grid>
           <Grid size={12}>
-            Un utilisateur peut appartenir à plusieurs commissions
+            Il est possible d'associer un utilisateur à une ou plusieurs
+            commissions.
           </Grid>
-          <Grid size={6}>
+          <Grid size={12}>
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="commission-select-label">Commissions</InputLabel>
               <Select
@@ -381,7 +382,7 @@ export default function CreateUser() {
                 multiple
                 value={commissions}
                 onChange={handleChangeCommissions}
-                input={<OutlinedInput label="Tag" />}
+                input={<OutlinedInput label="Commissions" />}
                 renderValue={(selected) => selected.join(", ")}
                 MenuProps={MenuProps}
               >
