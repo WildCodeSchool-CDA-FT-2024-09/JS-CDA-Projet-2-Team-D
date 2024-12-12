@@ -2,7 +2,8 @@ import * as dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { transporter } from "./utils/transporter";
 import bodyParser from "body-parser";
-// import ejs from "ejs";
+import ejs from "ejs";
+import path from "path";
 const app = express();
 
 app.use(bodyParser.json());
@@ -11,20 +12,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
 const { PORT, EMAIL_FROM } = process.env;
 
+// Set the view engine to EJS
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 app.get("/", (_, res: Response) => {
   res.send("Hello Email!");
 });
 
-app.post("/send-email", (req: Request, res: Response) => {
-  const { recipient, subject, text_email, html_email } = req.body;
+app.post("/send-email", async (req: Request, res: Response) => {
+  const { recipient, subject, fullname, invoiceNumber } = req.body;
+
+  // Data for the template
+  const templateData = { fullname, invoiceNumber };
+
+  // Render the email template
+  const emailHtml = await ejs.renderFile(
+    path.join(__dirname, "views", "email-template.ejs"),
+    templateData
+  );
 
   transporter.sendMail(
     {
       from: EMAIL_FROM,
       to: recipient,
       subject: subject,
-      text: text_email,
-      html: html_email,
+      html: emailHtml,
     },
     (err, info) => {
       if (err) {
