@@ -6,11 +6,12 @@ import {
   JoinColumn,
   BaseEntity,
 } from "typeorm";
-import { Field } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import { Exercise } from "../exercise/exercise.entity";
 import { Commission } from "../commission/commission.entity";
 import { IsNotEmpty } from "class-validator";
 
+@ObjectType()
 @Entity()
 export class Budget extends BaseEntity {
   @Field(() => Number)
@@ -31,7 +32,7 @@ export class Budget extends BaseEntity {
     onDelete: "CASCADE",
     eager: true,
   })
-  @JoinColumn({ name: "budgetId" })
+  @JoinColumn({ name: "exerciseId" })
   exercise: Exercise;
 
   @Field(() => Commission)
@@ -40,5 +41,5 @@ export class Budget extends BaseEntity {
     eager: true,
   })
   @JoinColumn({ name: "commissionId" })
-  commission: Commission;
+  commissions: Commission;
 }
