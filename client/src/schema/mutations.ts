@@ -9,6 +9,20 @@ export const ADD_CATEGORY = gql`
   }
 `;
 
+export const ADD_SUBCATEGORY = gql`
+  mutation AddSubcategory(
+    $label: String!
+    $code: String!
+    $categoryId: Float!
+  ) {
+    addSubcategory(label: $label, code: $code, categoryId: $categoryId) {
+      id
+      label
+      code
+    }
+  }
+`;
+
 export const CREATE_NEW_USER = gql`
   mutation CreateNewUser($data: CreateUserInput!) {
     createNewUser(data: $data) {

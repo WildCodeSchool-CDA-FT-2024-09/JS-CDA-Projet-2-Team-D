@@ -1,0 +1,345 @@
+import { useGetCategoriesQuery } from "../../types/graphql-types";
+import { useAddSubcategoryMutation } from "../../types/graphql-types";
+
+import { useState } from "react";
+
+import useNotification from "../../hooks/useNotification";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  Collapse,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import CreateIcon from "@mui/icons-material/Create";
+import AddCircleOutline from "@mui/icons-material/AddCircleOutline";
+
+function createData(
+  label: string,
+  id: number,
+  subcategories: { id: number; label: string; code: string }[],
+) {
+  return {
+    categoryId: id,
+    categoryLabel: label,
+    subcategory: subcategories.map((subcategory) => ({
+      id: subcategory.id,
+      label: subcategory.label,
+      code: subcategory.code,
+    })),
+  };
+}
+
+function Row(props: { row: ReturnType<typeof createData> }) {
+  const { row } = props;
+  const [open, setOpen] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+
+  const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
+  const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
+
+  const [addASubcategory] = useAddSubcategoryMutation();
+
+  const { notifySuccess, notifyError } = useNotification();
+
+  const theme = useTheme();
+
+  const handleValidation = () => {
+    if (!newSubcategoryLabel && !newSubcategoryCode) {
+      notifyError("Veuillez remplir les champs");
+      return false;
+    }
+    if (!newSubcategoryLabel) {
+      notifyError("Veuillez remplir le champ 'Nom de la sous-catégorie'");
+      return false;
+    }
+
+    if (!newSubcategoryCode) {
+      notifyError("Veuillez remplir le champ 'Code de la sous-catégorie'");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleClick = async () => {
+    if (!handleValidation()) return;
+
+    try {
+      await addASubcategory({
+        variables: {
+          label: newSubcategoryLabel,
+          code: newSubcategoryCode,
+          categoryId: row.categoryId,
+        },
+      });
+
+      setNewSubcategoryLabel("");
+      setNewSubcategoryCode("");
+      setShowInput(!showInput);
+      notifySuccess("Sous-catégorie ajoutée avec succès");
+    } catch (err) {
+      console.info(err);
+      notifyError("Erreur lors de l'ajout de la sous-catégorie");
+    }
+  };
+  return (
+    <>
+      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? (
+              <KeyboardArrowUpIcon sx={{ fontSize: "2rem" }} />
+            ) : (
+              <KeyboardArrowDownIcon sx={{ fontSize: "2rem" }} />
+            )}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
+          {row.categoryLabel}
+        </TableCell>
+        <TableCell align="center">
+          <IconButton>{<CreateIcon />}</IconButton>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Typography
+                gutterBottom
+                component="div"
+                sx={{ fontSize: "1.3rem" }}
+              >
+                Sous-catégorie(s)
+              </Typography>
+              <Table
+                size="small"
+                aria-label="purchases"
+                sx={{ marginBottom: "4vh" }}
+              >
+                <TableHead>
+                  <TableRow sx={{ fontSize: "4rem" }}>
+                    <TableCell>
+                      <Typography
+                        sx={{
+                          fontSize: "1.2rem",
+                          fontWeight: "900",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        Label
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontSize: "1.2rem",
+                        fontWeight: "900",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      Code
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.subcategory.map((sub) => (
+                    <TableRow key={sub.id}>
+                      <TableCell component="th" scope="row">
+                        {sub.label}
+                        <IconButton>{<CreateIcon />}</IconButton>
+                      </TableCell>
+
+                      <TableCell>{sub.code}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+
+                <TableCell sx={{ paddingBottom: "5vh", fontSize: "1.1rem" }}>
+                  <Typography>
+                    {" "}
+                    <IconButton onClick={() => setShowInput(!showInput)}>
+                      {<AddCircleOutline />}
+                    </IconButton>
+                    Ajouter une sous-catégorie
+                  </Typography>
+                  {showInput && (
+                    <Box sx={{ gap: "50px", paddingTop: "1vh" }}>
+                      <TableRow
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                        }}
+                      >
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          style={{ borderBottom: 0 }}
+                        >
+                          <Box
+                            component="input"
+                            type="text"
+                            placeholder="Nom de la sous-catégorie"
+                            sx={{
+                              width: "15vw",
+                              height: "4vh",
+                              fontSize: "1.1rem",
+                              marginBottom: "2vh",
+                              alignItems: "center",
+                              textAlign: "center",
+                              padding: "0.5vh",
+                            }}
+                            value={newSubcategoryLabel}
+                            onChange={(e) =>
+                              setNewSubcategoryLabel(e.target.value)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          style={{ borderBottom: 0 }}
+                        >
+                          <Box
+                            component="input"
+                            type="text"
+                            placeholder="Code de la sous-catégorie"
+                            sx={{
+                              width: "15vw",
+                              height: "4vh",
+                              fontSize: "1.1rem",
+                              marginBottom: "2vh",
+                              textAlign: "center",
+                              alignItems: "center",
+                              padding: "0.5vh",
+                            }}
+                            value={newSubcategoryCode}
+                            onChange={(e) =>
+                              setNewSubcategoryCode(e.target.value)
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                          marginTop: "2vh",
+                        }}
+                      >
+                        <button
+                          style={{
+                            width: "10vw",
+                            height: "5vh",
+                            fontSize: "1.1rem",
+                            marginBottom: "2vh",
+                            backgroundColor: theme.palette.success.main,
+                            color: "white",
+                            border: "none",
+                            fontWeight: "bold",
+                          }}
+                          onClick={handleClick}
+                        >
+                          Valider
+                        </button>
+
+                        <button
+                          style={{
+                            width: "10vw",
+                            height: "5vh",
+                            fontSize: "1.1rem",
+                            marginBottom: "2vh",
+                            backgroundColor: theme.palette.error.main,
+                            color: "white",
+                            border: "none",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => setShowInput(!showInput)}
+                        >
+                          Annuler
+                        </button>
+                      </Box>
+                    </Box>
+                  )}
+                </TableCell>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+}
+
+function DisplayCategorySubcategory() {
+  const theme = useTheme();
+
+  const { data, loading, error } = useGetCategoriesQuery();
+
+  if (loading) return <p>🥁 Chargement...</p>;
+  if (error) return <p>☠️ Erreur: {error.message}</p>;
+
+  const rows =
+    data?.getCategories.map((category) => {
+      return createData(
+        category.label,
+        category.id,
+        category.subcategories || [],
+      );
+    }) || [];
+
+  return (
+    <TableContainer
+      component={Paper}
+      sx={{ border: 1, marginTop: 10, marginLeft: 3 }}
+    >
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow sx={{ backgroundColor: theme.palette.primary.main }}>
+            <TableCell />
+            <TableCell sx={{ color: "white", fontSize: "1.5rem" }}>
+              Catégorie
+            </TableCell>
+            <TableCell
+              align="center"
+              sx={{
+                color: "white",
+                fontSize: "1.5rem",
+              }}
+            >
+              Modifier une catégorie
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <Row key={row.categoryId} row={row} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+export default DisplayCategorySubcategory;
