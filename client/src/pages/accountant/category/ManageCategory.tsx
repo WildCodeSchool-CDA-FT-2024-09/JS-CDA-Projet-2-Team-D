@@ -1,4 +1,5 @@
 import AddCategory from "../../../components/addCategory/AddCategory";
+import DisplayCategory from "../../../components/displayCategory/DisplayCategory";
 
 function ManageCategory() {
   return (
@@ -6,6 +7,7 @@ function ManageCategory() {
       <h1>GESTION DES CATEGORIES</h1>
       <h2>Nouvelle catégorie</h2>
       <AddCategory />
+      <DisplayCategory />
     </>
   );
 }

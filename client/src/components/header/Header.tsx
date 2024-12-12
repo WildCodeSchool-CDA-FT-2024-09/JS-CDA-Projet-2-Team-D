@@ -7,7 +7,6 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
-import "./Header.css";
 
 interface HeaderProps {
   title: string;
@@ -35,7 +34,11 @@ const Header: React.FC<HeaderProps> = ({
   const avatarColor = roleColorMapping[userType || "default"];
 
   return (
-    <AppBar position="fixed" color="secondary">
+    <AppBar
+      position="fixed"
+      color="secondary"
+      sx={{ backgroundColor: "#D9D9D9" }}
+    >
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
