@@ -17,12 +17,12 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`DELETE FROM "subcategory"`);
     await queryRunner.query(`DELETE FROM "category"`);
     await queryRunner.query(`DELETE FROM "commission"`);
-    await queryRunner.query(`DELETE FROM "budget"`);
+    await queryRunner.query(`DELETE FROM "exercise"`);
     await queryRunner.query(`DELETE FROM "credit_debit"`);
     await queryRunner.query(`DELETE FROM "vat"`);
     await queryRunner.query(`DELETE FROM "status"`);
     await queryRunner.query(`DELETE FROM "invoice"`);
-    await queryRunner.query(`DELETE FROM "budget_commission"`);
+    await queryRunner.query(`DELETE FROM "budget"`);
     await queryRunner.query(`DELETE FROM "user_commissions_commission"`);
     await queryRunner.query("DELETE FROM user_roles_role");
     await queryRunner.query(`DELETE FROM "user"`);
@@ -39,7 +39,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(
       `ALTER SEQUENCE subcategory_id_seq RESTART WITH 1;`
     );
-    await queryRunner.query(`ALTER SEQUENCE budget_id_seq RESTART WITH 1;`);
+    await queryRunner.query(`ALTER SEQUENCE exercise_id_seq RESTART WITH 1;`);
     await queryRunner.query(
       `ALTER SEQUENCE credit_debit_id_seq RESTART WITH 1;`
     );
@@ -253,7 +253,7 @@ import { AppDataSource } from "./data-source";
 
     // insert budget
     await queryRunner.query(`
-      INSERT INTO "budget" ("label", "start_date", "end_date") VALUES
+      INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
         ('Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
         ('Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
@@ -305,9 +305,9 @@ import { AppDataSource } from "./data-source";
           (120, 'restaurant', '', 'repas cloture année', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-04-20', 'facture_2022_15');
     `);
 
-    //Insert budget_commission
+    //Insert budget
     await queryRunner.query(`
-      INSERT INTO "budget_commission" ("budgetId", "commissionId", "amount") VALUES
+      INSERT INTO "budget" ("budgetId", "commissionId", "amount") VALUES
         (1,	1,	50500),
         (2,	2,	12600),
         (1,	3,	15000),
