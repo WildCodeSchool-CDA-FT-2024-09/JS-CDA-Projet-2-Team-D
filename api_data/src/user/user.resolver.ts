@@ -99,35 +99,21 @@ export default class UserResolver {
           `Erreur dans la validation des données utilisateur : ${error}`
         );
 
-      await user.save();
-
       // Attach roles
-      data.roles.map(async (roleInput) => {
-        const roleSelected = await Role.findOneOrFail({
-          where: { id: roleInput.id },
-        });
-        if (roleSelected) {
-          user.roles = [...(user.roles || []), roleSelected];
-          await user.save();
-        }
-      });
+      const roles = await Role.find();
+      user.roles = roles.filter((role) =>
+        data.roles.some((el) => el.id === role.id)
+      );
 
       // Attach commissions
-      data.commissions.map(async (commissionInput) => {
-        const commissionSelected = await Commission.findOneOrFail({
-          where: { id: commissionInput.id },
-        });
-        if (commissionSelected) {
-          user.commissions = [...(user.commissions || []), commissionSelected];
-          //await user.save(); // Don't understand why the save is not mandatory here...
-        }
-      });
+      const commissions = await Commission.find();
+      user.commissions = commissions.filter((commission) =>
+        data.commissions.some((el) => el.id === commission.id)
+      );
 
-      // Return user with associated roles
-      return await User.findOneOrFail({
-        where: { id: user.id },
-        relations: ["roles", "commissions"],
-      });
+      const newUser = await user.save();
+
+      return newUser;
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
