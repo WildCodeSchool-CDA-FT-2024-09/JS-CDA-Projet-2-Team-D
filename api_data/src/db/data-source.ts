@@ -8,11 +8,11 @@ import { CreditDebit } from "../creditDebit/creditDebit.entity";
 import { Vat } from "../vat/vat.entity";
 import { Category } from "../category/category.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
-import { Budget } from "../budget/budget.entity";
+import { Exercise } from "../exercise/exercise.entity";
 import { Status } from "../status/status.entity";
 import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "../commission/commission.entity";
-import { BudgetCommission } from "../budgetCommission/budgetCommission.entity";
+import { Budget } from "../budget/budget.entity";
 
 dotenv.config();
 const { POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_HOST } =
@@ -33,12 +33,12 @@ export const AppDataSource = new DataSource({
     Category,
     Subcategory,
     CreditDebit,
-    Budget,
+    Exercise,
     Vat,
     Status,
     Invoice,
     Commission,
-    BudgetCommission,
+    Budget,
   ],
   synchronize: true, // /!\ only in dev
 });

@@ -1,42 +1,44 @@
-import "reflect-metadata";
 import {
   Entity,
+  ManyToOne,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
+  JoinColumn,
   BaseEntity,
-  OneToMany,
 } from "typeorm";
-import { Field, ObjectType, Int, GraphQLISODateTime } from "type-graphql";
-import { IsNotEmpty, IsString, Length } from "class-validator";
+import { Field } from "type-graphql";
+import { Exercise } from "../exercise/exercise.entity";
 import { Commission } from "../commission/commission.entity";
-import { BudgetCommission } from "../budgetCommission/budgetCommission.entity";
+import { IsNotEmpty } from "class-validator";
 
-@ObjectType()
 @Entity()
 export class Budget extends BaseEntity {
-  @Field(() => Int)
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Field(() => Number)
+  @PrimaryColumn()
+  exerciseId: number;
 
-  @Field(() => String)
-  @IsString()
+  @Field(() => Number)
+  @PrimaryColumn()
+  commissionId: number;
+
+  @Field(() => Number)
+  @Column({ nullable: false, type: "float" })
   @IsNotEmpty()
-  @Length(1, 100)
-  @Column({ nullable: false, unique: true, type: "varchar", length: 100 })
-  label: string;
+  amount: number;
 
-  @Field(() => GraphQLISODateTime) // Expose as a GraphQL ISO 8601 DateTime
-  @Column({ type: "timestamp" })
-  start_date: Date;
+  @Field(() => Exercise)
+  @ManyToOne(() => Exercise, (exercise) => exercise.budgets, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn({ name: "budgetId" })
+  exercise: Exercise;
 
-  @Field(() => GraphQLISODateTime) // Expose as a GraphQL ISO 8601 DateTime
-  @Column({ type: "timestamp" })
-  end_date: Date;
-
-  // @Field(() => [Commission])
-  @OneToMany(
-    () => BudgetCommission,
-    (budgetCommission) => budgetCommission.budget
-  )
-  commissions: Commission[];
+  @Field(() => Commission)
+  @ManyToOne(() => Commission, (commission) => commission.budgets, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn({ name: "commissionId" })
+  commission: Commission;
 }
