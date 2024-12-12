@@ -121,13 +121,16 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                   ))}
                 </TableBody>
 
-                <TableCell sx={{ paddingBottom: "2vh", fontSize: "1.1rem" }}>
-                  <IconButton onClick={() => setShowInput(!showInput)}>
-                    {<AddCircleOutline />}
-                  </IconButton>
-                  Ajouter une sous-catégorie
+                <TableCell sx={{ paddingBottom: "5vh", fontSize: "1.1rem" }}>
+                  <Typography>
+                    {" "}
+                    <IconButton onClick={() => setShowInput(!showInput)}>
+                      {<AddCircleOutline />}
+                    </IconButton>
+                    Ajouter une sous-catégorie
+                  </Typography>
                   {showInput && (
-                    <Box sx={{ gap: "50px" }}>
+                    <Box sx={{ gap: "50px", paddingTop: "1vh" }}>
                       <TableRow
                         sx={{
                           display: "flex",
@@ -135,7 +138,11 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                           gap: "10px",
                         }}
                       >
-                        <TableCell component="th" scope="row">
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          style={{ borderBottom: 0 }}
+                        >
                           <Box
                             component="input"
                             type="text"
@@ -147,6 +154,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                               marginBottom: "2vh",
                               alignItems: "center",
                               textAlign: "center",
+                              padding: "0.5vh",
                             }}
                             value={newSubcategoryLabel}
                             onChange={(e) =>
@@ -157,18 +165,20 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                         <TableCell
                           component="th"
                           scope="row"
-                          sx={{ alignItems: "right" }}
+                          style={{ borderBottom: 0 }}
                         >
-                          <input
+                          <Box
+                            component="input"
                             type="text"
                             placeholder="Code de la sous-catégorie"
-                            style={{
+                            sx={{
                               width: "15vw",
                               height: "4vh",
                               fontSize: "1.1rem",
                               marginBottom: "2vh",
                               textAlign: "center",
                               alignItems: "center",
+                              padding: "0.5vh",
                             }}
                             value={newSubcategoryCode}
                             onChange={(e) =>
