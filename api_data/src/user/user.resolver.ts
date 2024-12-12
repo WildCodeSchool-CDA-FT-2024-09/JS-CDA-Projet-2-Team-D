@@ -17,10 +17,17 @@ import {
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
+import { Commission } from "../commission/commission.entity";
 import { PaginatedUsers } from "./user.type";
 
 @InputType()
 class RolesInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class CommissionsInput {
   @Field()
   id: number;
 }
@@ -56,6 +63,9 @@ class CreateUserInput {
 
   @Field(() => [RolesInput])
   roles: RolesInput[];
+
+  @Field(() => [CommissionsInput])
+  commissions: CommissionsInput[];
 }
 
 @Resolver(User)
@@ -66,7 +76,7 @@ export default class UserResolver {
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
     const [users, totalCount] = await User.findAndCount({
-      relations: ["roles"],
+      relations: ["roles", "commissions"],
       skip: offset,
       take: limit,
     });
@@ -102,10 +112,21 @@ export default class UserResolver {
         }
       });
 
+      // Attach commissions
+      data.commissions.map(async (commissionInput) => {
+        const commissionSelected = await Commission.findOneOrFail({
+          where: { id: commissionInput.id },
+        });
+        if (commissionSelected) {
+          user.commissions = [...(user.commissions || []), commissionSelected];
+          //await user.save(); // Don't understand why the save is not mandatory here...
+        }
+      });
+
       // Return user with associated roles
-      return User.findOneOrFail({
+      return await User.findOneOrFail({
         where: { id: user.id },
-        relations: ["roles"],
+        relations: ["roles", "commissions"],
       });
     } catch (error) {
       console.error(error);

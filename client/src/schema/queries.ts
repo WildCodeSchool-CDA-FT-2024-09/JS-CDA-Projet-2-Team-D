@@ -13,6 +13,10 @@ export const GET_USERS = gql`
           id
           label
         }
+        commissions {
+          id
+          name
+        }
       }
       totalCount
     }

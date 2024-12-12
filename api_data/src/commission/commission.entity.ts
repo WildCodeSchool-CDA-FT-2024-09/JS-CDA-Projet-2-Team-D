@@ -34,7 +34,7 @@ export class Commission extends BaseEntity {
   )
   budgets: Budget[];
 
-  @Field(() => [User])
+  @Field(() => [User], { nullable: true })
   @ManyToMany(() => User, (user) => user.commissions)
-  users: User[];
+  users?: User[];
 }
