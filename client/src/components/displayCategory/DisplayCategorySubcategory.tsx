@@ -55,6 +55,45 @@ function Row(props: { row: ReturnType<typeof createData> }) {
 
   const theme = useTheme();
 
+  const handleValidation = () => {
+    if (!newSubcategoryLabel && !newSubcategoryCode) {
+      notifyError("Veuillez remplir les champs");
+      return false;
+    }
+    if (!newSubcategoryLabel) {
+      notifyError("Veuillez remplir le champ 'Nom de la sous-catégorie'");
+      return false;
+    }
+
+    if (!newSubcategoryCode) {
+      notifyError("Veuillez remplir le champ 'Code de la sous-catégorie'");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleClick = async () => {
+    if (!handleValidation()) return;
+
+    try {
+      await addASubcategory({
+        variables: {
+          label: newSubcategoryLabel,
+          code: newSubcategoryCode,
+          categoryId: row.categoryId,
+        },
+      });
+
+      setNewSubcategoryLabel("");
+      setNewSubcategoryCode("");
+      setShowInput(!showInput);
+      notifySuccess("Sous-catégorie ajoutée avec succès");
+    } catch (err) {
+      console.info(err);
+      notifyError("Erreur lors de l'ajout de la sous-catégorie");
+    }
+  };
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -98,12 +137,24 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                   <TableRow sx={{ fontSize: "4rem" }}>
                     <TableCell>
                       <Typography
-                        sx={{ fontSize: "1.2rem", fontWeight: "900" }}
+                        sx={{
+                          fontSize: "1.2rem",
+                          fontWeight: "900",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
                       >
                         Label
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ fontSize: "1.2rem", fontWeight: "900" }}>
+                    <TableCell
+                      sx={{
+                        fontSize: "1.2rem",
+                        fontWeight: "900",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
                       Code
                     </TableCell>
                   </TableRow>
@@ -208,27 +259,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                             border: "none",
                             fontWeight: "bold",
                           }}
-                          onClick={() => {
-                            addASubcategory({
-                              variables: {
-                                label: newSubcategoryLabel,
-                                code: newSubcategoryCode,
-                                categoryId: row.categoryId,
-                              },
-                            });
-                            if (newSubcategoryLabel && newSubcategoryCode) {
-                              setNewSubcategoryLabel("");
-                              setNewSubcategoryCode("");
-                              setShowInput(!showInput);
-
-                              notifySuccess("Sous-catégorie ajoutée");
-                            }
-                            if (!newSubcategoryLabel || !newSubcategoryCode) {
-                              if (!newSubcategoryLabel) {
-                                notifyError("Veuillez renseigner un nom");
-                              }
-                            }
-                          }}
+                          onClick={handleClick}
                         >
                           Valider
                         </button>
@@ -261,7 +292,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   );
 }
 
-function DisplayCategory2() {
+function DisplayCategorySubcategory() {
   const theme = useTheme();
 
   const { data, loading, error } = useGetCategoriesQuery();
@@ -292,7 +323,10 @@ function DisplayCategory2() {
             </TableCell>
             <TableCell
               align="center"
-              sx={{ color: "white", fontSize: "1.5rem" }}
+              sx={{
+                color: "white",
+                fontSize: "1.5rem",
+              }}
             >
               Modifier une catégorie
             </TableCell>
@@ -308,4 +342,4 @@ function DisplayCategory2() {
   );
 }
 
-export default DisplayCategory2;
+export default DisplayCategorySubcategory;
