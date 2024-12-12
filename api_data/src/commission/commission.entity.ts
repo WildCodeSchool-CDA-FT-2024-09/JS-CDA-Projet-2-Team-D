@@ -31,9 +31,9 @@ export class Commission extends BaseEntity {
   @OneToMany(() => Budget, (budget) => budget.commissions)
   budgets: Budget[];
 
-  @Field(() => [User])
+  @Field(() => [User], { nullable: true })
   @ManyToMany(() => User, (user) => user.commissions)
-  users: User[];
+  users?: User[];
 
   @Field(() => [Invoice])
   @OneToMany(() => Invoice, (invoice) => invoice.commission)

@@ -17,10 +17,17 @@ import {
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
+import { Commission } from "../commission/commission.entity";
 import { PaginatedUsers } from "./user.type";
 
 @InputType()
 class RolesInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class CommissionsInput {
   @Field()
   id: number;
 }
@@ -56,6 +63,9 @@ class CreateUserInput {
 
   @Field(() => [RolesInput])
   roles: RolesInput[];
+
+  @Field(() => [CommissionsInput])
+  commissions: CommissionsInput[];
 }
 
 @Resolver(User)
@@ -66,7 +76,7 @@ export default class UserResolver {
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
     const [users, totalCount] = await User.findAndCount({
-      relations: ["roles"],
+      relations: ["roles", "commissions"],
       skip: offset,
       take: limit,
     });
@@ -89,24 +99,21 @@ export default class UserResolver {
           `Erreur dans la validation des données utilisateur : ${error}`
         );
 
-      await user.save();
-
       // Attach roles
-      data.roles.map(async (roleInput) => {
-        const roleSelected = await Role.findOneOrFail({
-          where: { id: roleInput.id },
-        });
-        if (roleSelected) {
-          user.roles = [...(user.roles || []), roleSelected];
-          await user.save();
-        }
-      });
+      const roles = await Role.find();
+      user.roles = roles.filter((role) =>
+        data.roles.some((el) => el.id === role.id)
+      );
 
-      // Return user with associated roles
-      return User.findOneOrFail({
-        where: { id: user.id },
-        relations: ["roles"],
-      });
+      // Attach commissions
+      const commissions = await Commission.find();
+      user.commissions = commissions.filter((commission) =>
+        data.commissions.some((el) => el.id === commission.id)
+      );
+
+      const newUser = await user.save();
+
+      return newUser;
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
