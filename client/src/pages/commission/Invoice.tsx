@@ -10,21 +10,12 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
-// import { Formik } from "formik";
 
 import FormSelect from "../../components/FormSelect";
 import FormTextField from "../../components/FormTextField";
 import { FormSelectVat, Invoice } from "../../components/FormSelectVat";
-import {
-  InvoiceState,
-  initialValues,
-  // invoiceValidationSchema,
-} from "../../types/InvoiceInputType";
-import {
-  useGetVatsQuery,
-  // useGetCategoriesQuery,
-  // useGetCommissionsQuery,
-} from "../../types/graphql-types";
+import { InvoiceState, initialValues } from "../../types/InvoiceInputType";
+import { useGetVatsQuery } from "../../types/graphql-types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -52,7 +43,7 @@ const InvoiceForm: React.FC = () => {
       | React.ChangeEvent<
           HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
         >,
-    options: number,
+    options?: number,
   ) => {
     const { name, value } = event.target;
 
@@ -63,7 +54,7 @@ const InvoiceForm: React.FC = () => {
         ...prevState,
         [name]: value,
       }));
-    } else if (name === "category_id") {
+    } else if (name === "category_id" && options) {
       // Cas particulier pour "category_id"
       setInvoice((prevState) => ({
         ...prevState,
@@ -84,14 +75,6 @@ const InvoiceForm: React.FC = () => {
       }));
     }
   };
-
-  // Function to obtain credit/debit ID based on category
-  // const getCreditDebitId = (categoryId: number): number => {
-  //   const selectedCategory = categoriesData?.getCategories.find(
-  //     (category) => category.id === categoryId
-  //   );
-  //   return selectedCategory?.creditDebit?.id || invoice.credit_debit_id;
-  // };
 
   const handleDateChange = (date: Date | null) => {
     setInvoice((prevState) => ({
@@ -132,7 +115,7 @@ const InvoiceForm: React.FC = () => {
               property="name"
               label="Commissions"
               value={invoice.commission_id}
-              onChange={handleInvoiceChange}
+              handleSelect={handleInvoiceChange}
             />
           </Grid>
 
@@ -159,37 +142,24 @@ const InvoiceForm: React.FC = () => {
               label="Catégories"
               property="label"
               value={invoice.category_id.toString()}
-              onChange={handleInvoiceChange}
+              handleSelect={handleInvoiceChange}
             />
           </Grid>
           <Grid size={6}>
             <FormSelect
-              name="category_id"
+              name="subcategory_id"
               label="Sous-catégories"
               property="label"
               value={invoice.category_id.toString()}
-              onChange={handleInvoiceChange}
+              subValue={invoice.category_id}
+              handleSelect={handleInvoiceChange}
             />
-            {/*<FormSelect
-                  name="subcategory_id"
-                  label="Sous-catégories"
-                  value={invoice.subcategory_id.toString()}
-                  onChange={handleChange}
-                  options={
-                    categoriesData?.getCategories.find(
-                      (category) => category.id === invoice.category_id
-                    )?.subcategories || []
-                  }
-                  error={errors["subcategory_id"]}
-                />*/}
           </Grid>
           <FormTextField
             name="label"
             label="Libellé"
             value={invoice.label}
             onChange={handleInvoiceChange}
-            // error={touched.label && !!errors.label}
-            // helperText={touched.label && errors.label}
           />
           <Grid size={6}>
             <FormTextField
@@ -257,7 +227,7 @@ const InvoiceForm: React.FC = () => {
               control={
                 <Checkbox
                   checked={invoice.paid}
-                  onChange={handleInvoiceChange}
+                  onChange={(e) => handleInvoiceChange(e)}
                   name="paid"
                   aria-checked={invoice.paid ? "true" : "false"}
                 />

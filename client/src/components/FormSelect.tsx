@@ -16,32 +16,33 @@ interface FormSelectProps {
   name: string;
   label: string;
   value: string | number;
+  subValue?: number;
   property: string;
-  onChange: (event: SelectChangeEvent<string | number>) => void;
+  handleSelect: (event: SelectChangeEvent<string | number>) => void;
   error?: string;
   required?: boolean;
-  subOptions?: { id: number; label: string }[];
 }
 
 const FormSelect: React.FC<FormSelectProps> = ({
   name,
   label,
   value,
+  subValue,
   property,
-  onChange,
+  handleSelect,
 }) => {
   const [getCommissions] = useGetCommissionsLazyQuery();
   const [getCategory] = useGetCategoriesLazyQuery();
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<unknown[]>([]);
 
   useEffect(() => {
     const getItems = async () => {
-      let result = [];
+      let result: unknown[] = [];
       if (name === "commission_id") {
         const { data } = await getCommissions();
-        result = data?.getCommissions;
+        result = data?.getCommissions || [];
       }
-      if (name === "category_id") {
+      if (name === "category_id" || name === "subcategory_id") {
         const { data } = await getCategory();
         result = data?.getCategories;
       }
@@ -52,17 +53,27 @@ const FormSelect: React.FC<FormSelectProps> = ({
 
   const getCreditDebitId = (categoryId: number): number => {
     const selectedCategory = items.find(
-      (category) => category.id === +categoryId,
+      (category) => category.id === categoryId,
     );
     return selectedCategory?.creditDebit?.id || 0;
   };
 
-  const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const launchSelect = (
+    event:
+      | SelectChangeEvent<string | number>
+      | React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     if (name === "category_id") {
-      onChange(event, getCreditDebitId(event.target.value));
+      const credit_debit_id = getCreditDebitId(+event.target.value);
+      handleSelect(event, credit_debit_id);
     } else {
-      onChange(event);
+      handleSelect(event);
     }
+  };
+
+  const getItemsToDisplay = () => {
+    const subOptions = items.find((item) => item.id === subValue);
+    return subOptions?.subcategories || [];
   };
 
   return (
@@ -72,20 +83,21 @@ const FormSelect: React.FC<FormSelectProps> = ({
         name={name}
         label={label}
         value={value.toString()}
-        onChange={handleSelect}
+        onChange={launchSelect}
         aria-label={`${label} sélectionné : ${items.find((item) => item.id.toString() === value.toString())?.name || "Non sélectionné"}`}
       >
-        {items.map((item) => (
-          <MenuItem key={item.id} value={item.id.toString()}>
-            {item[property]}
-          </MenuItem>
-        ))}
-        {/* {subOptions &&
-            subOptions.map((subOption) => (
-              <MenuItem key={subOption.id} value={subOption.id.toString()}>
-                {subOption.label}
-              </MenuItem>
-            ))} */}
+        {name !== "subcategory_id" &&
+          items.map((item) => (
+            <MenuItem key={item.id} value={item.id.toString()}>
+              {item[property]}
+            </MenuItem>
+          ))}
+        {name === "subcategory_id" &&
+          getItemsToDisplay().map((subOption) => (
+            <MenuItem key={subOption.id} value={subOption.id.toString()}>
+              {subOption.label}
+            </MenuItem>
+          ))}
       </Select>
       {/* {typeof error === "string" && error && (
         <Typography color="error" variant="body2">
