@@ -22,7 +22,7 @@ import {
 } from "../../types/InvoiceInputType";
 import {
   useGetVatsQuery,
-  useGetCategoriesQuery,
+  // useGetCategoriesQuery,
   // useGetCommissionsQuery,
 } from "../../types/graphql-types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -31,12 +31,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
 
 const InvoiceForm: React.FC = () => {
-  const {
-    data: categoriesData,
-    loading: loadingCategories,
-    error: categoriesError,
-  } = useGetCategoriesQuery();
-
   const {
     data: vatRatesData,
     loading: loadingVatRates,
@@ -58,31 +52,9 @@ const InvoiceForm: React.FC = () => {
       | React.ChangeEvent<
           HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
         >,
+    options: number,
   ) => {
     const { name, value } = event.target;
-
-    // let parsedValue: string | number | boolean | Date = value;
-
-    // if (event.target instanceof HTMLInputElement) {
-    //   const { type, checked } = event.target;
-    //   if (type === "checkbox" || type === "radio") {
-    //     parsedValue = checked; // Gestion des cases à cocher et des boutons radio
-    //   }
-    // } else if (value === "") {
-    //   // Si la valeur est vide, on assigne une valeur par défaut pour certains champs
-    //   if (
-    //     [
-    //       "price_without_vat",
-    //       "commission_id",
-    //       "category_id",
-    //       "subcategory_id",
-    //     ].includes(name)
-    //   ) {
-    //     parsedValue = 0;
-    //   }
-    // } else if (typeof value === "string" && !isNaN(Number(value))) {
-    //   parsedValue = parseFloat(value); // Si la valeur peut être convertie en nombre, on le fait
-    // }
 
     // Séparer les cas où les types sont différents
     if (name === "price_without_vat" || name === "vat_id") {
@@ -96,7 +68,7 @@ const InvoiceForm: React.FC = () => {
       setInvoice((prevState) => ({
         ...prevState,
         [name]: +value as number,
-        credit_debit_id: getCreditDebitId(+value as number), // Update credit/debit id
+        credit_debit_id: options, // Update credit/debit id
       }));
     } else if (name === "paid") {
       // Cas particulier pour "paid" (bascule entre true/false)
@@ -114,12 +86,12 @@ const InvoiceForm: React.FC = () => {
   };
 
   // Function to obtain credit/debit ID based on category
-  const getCreditDebitId = (categoryId: number): number => {
-    const selectedCategory = categoriesData?.getCategories.find(
-      (category) => category.id === categoryId,
-    );
-    return selectedCategory?.creditDebit?.id || invoice.credit_debit_id;
-  };
+  // const getCreditDebitId = (categoryId: number): number => {
+  //   const selectedCategory = categoriesData?.getCategories.find(
+  //     (category) => category.id === categoryId
+  //   );
+  //   return selectedCategory?.creditDebit?.id || invoice.credit_debit_id;
+  // };
 
   const handleDateChange = (date: Date | null) => {
     setInvoice((prevState) => ({
@@ -128,53 +100,20 @@ const InvoiceForm: React.FC = () => {
     }));
   };
 
-  // const handleSubmit = async (values: InvoiceState) => {
-  //   console.info("Données du formulaire :", values);
-  // }
-
-  //   const input = {
-  //     commission_id: values.commission_id,
-  //     date: values.date,
-  //     category_id: values.category_id,
-  //     subcategory_id: values.subcategory_id,
-  //     invoice_id: values.invoice_id,
-  //     label: values.label,
-  //     credit_debit_id: values.credit_debit_id,
-  //     price_without_vat: values.price_without_vat,
-  //     vat_id: values.vat_id,
-  //     receipt: values.receipt,
-  //     paid: values.paid,
-  //     info: values.info,
-  //     status_id: values.status_id,
-  //     user_id: values.user_id,
-  //     total: values.total,
-  //   }
-
-  // try {
-  //   const response = await setInvoice({ variables: { input } });
-  //   console.info("Invoice created:", response.data.setInvoice);
-  // } catch (error) {
-  //   console.error("Error creating invoice:", error);
-  // }
-
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.info("Validation réussie :", invoice);
   };
 
-  const loading = loadingCategories || loadingVatRates;
-  const error = categoriesError || vatRatesError;
+  const loading = loadingVatRates;
+  const error = vatRatesError;
 
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
 
   if (error) {
-    return (
-      <Typography>
-        Error: {categoriesError?.message || vatRatesError?.message}
-      </Typography>
-    );
+    return <Typography>Error: {vatRatesError?.message}</Typography>;
   }
 
   return (
@@ -190,12 +129,10 @@ const InvoiceForm: React.FC = () => {
           <Grid size={6}>
             <FormSelect
               name="commission_id"
+              property="name"
               label="Commissions"
               value={invoice.commission_id}
               onChange={handleInvoiceChange}
-              // error={errors["commission_id"]}
-              // error={touched.commission_id && !!errors.commission_id}
-              // helperText={touched.commission_id && errors.commission_id ? errors.commission_id : ''}
             />
           </Grid>
 
@@ -217,16 +154,22 @@ const InvoiceForm: React.FC = () => {
             </LocalizationProvider>
           </Grid>
           <Grid size={6}>
-            {/*<FormSelect
-                  name="category_id"
-                  label="Catégories"
-                  value={invoice.category_id.toString()}
-                  onChange={handleChange}
-                  options={categoriesData?.getCategories || []}
-                  error={errors["category_id"]}
-                />*/}
+            <FormSelect
+              name="category_id"
+              label="Catégories"
+              property="label"
+              value={invoice.category_id.toString()}
+              onChange={handleInvoiceChange}
+            />
           </Grid>
           <Grid size={6}>
+            <FormSelect
+              name="category_id"
+              label="Sous-catégories"
+              property="label"
+              value={invoice.category_id.toString()}
+              onChange={handleInvoiceChange}
+            />
             {/*<FormSelect
                   name="subcategory_id"
                   label="Sous-catégories"
