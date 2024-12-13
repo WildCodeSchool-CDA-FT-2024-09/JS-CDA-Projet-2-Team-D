@@ -12,9 +12,9 @@ export default class CommissionResolver {
   }
   @Query(() => [Invoice])
   async getInvoicesByCommissionId(
-    @Arg("commissionId") commissionId: number
-    // @Arg("offset", { defaultValue: 0 }) offset: number,
-    // @Arg("limit", { defaultValue: 5 }) limit: number
+    @Arg("commissionId") commissionId: number,
+    @Arg("offset", { defaultValue: 0 }) offset: number,
+    @Arg("limit", { defaultValue: 5 }) limit: number
   ) {
     try {
       const [lastExercise] = await Exercise.find({
@@ -32,8 +32,8 @@ export default class CommissionResolver {
         },
         relations: ["commission", "vat", "status", "creditDebit"],
         order: { date: "DESC" },
-        // take: limit,
-        // skip: offset,
+        take: limit,
+        skip: offset,
       });
       if (!invoices.length) {
         throw new Error("No invoices found for the given commission.");
