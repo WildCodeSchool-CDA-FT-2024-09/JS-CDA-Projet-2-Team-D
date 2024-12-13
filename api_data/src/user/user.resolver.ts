@@ -134,4 +134,52 @@ export default class UserResolver {
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
     }
   }
+
+  @Mutation(() => User)
+  async updateUser(
+    @Arg("userId") userId: number,
+    @Arg("data") data: UserInput
+  ) {
+    try {
+      const user = await User.findOneOrFail({
+        where: { id: userId },
+        relations: ["roles", "commissions"],
+      });
+
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.email = data.email;
+
+      // Update password only if it is not empty in the request
+      if (data.password) {
+        user.password = await argon2.hash(data.password);
+      }
+
+      const error = await validate(user);
+
+      if (error.length > 0)
+        throw new Error(
+          `Erreur dans la validation des données utilisateur : ${error}`
+        );
+
+      // Attach roles
+      const roles = await Role.find();
+      user.roles = roles.filter((role) =>
+        data.roles.some((el) => el.id === role.id)
+      );
+
+      // Attach commissions
+      const commissions = await Commission.find();
+      user.commissions = commissions.filter((commission) =>
+        data.commissions.some((el) => el.id === commission.id)
+      );
+
+      const newUser = await user.save();
+
+      return newUser;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+    }
+  }
 }
