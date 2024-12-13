@@ -24,6 +24,13 @@ export default class SubcategoryResolver {
     subcategory.code = code;
     subcategory.category = category;
 
+    const existingSubcategory = await Subcategory.findOneBy({
+      label: subcategory.label,
+    });
+    if (existingSubcategory) {
+      throw new Error(`Subcategory with label ${label} already exists`);
+    }
+
     await subcategory.save();
     return subcategory;
   }
