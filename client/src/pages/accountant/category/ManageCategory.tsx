@@ -1,5 +1,5 @@
 import AddCategory from "../../../components/addCategory/AddCategory";
-import DisplayCategory from "../../../components/displayCategory/DisplayCategorySubcategory";
+import DisplayCategory from "../../../components/displayCategorySubcategory/DisplayCategorySubcategory";
 
 function ManageCategory() {
   return (
