@@ -150,7 +150,7 @@ const InvoiceForm: React.FC = () => {
               name="subcategory_id"
               label="Sous-catégories"
               property="label"
-              value={invoice.category_id.toString()}
+              value={invoice.subcategory_id?.toString()}
               subValue={invoice.category_id}
               handleSelect={handleInvoiceChange}
             />

@@ -111,12 +111,29 @@ const FormSelect: React.FC<FormSelectProps> = ({
               </MenuItem>
             ))}
 
-          {name === "subcategory_id" &&
+          {/* {name === "subcategory_id" &&
             getItemsToDisplay().map((subOption) => (
               <MenuItem key={subOption.id} value={subOption.id.toString()}>
                 {subOption.label}
               </MenuItem>
-            ))}
+            ))} */}
+
+          {name === "subcategory_id" &&
+            (() => {
+              const subcategories = getItemsToDisplay();
+              if (subcategories.length === 0) {
+                return (
+                  <MenuItem disabled>
+                    Veuillez choisir avant une catégorie
+                  </MenuItem>
+                );
+              }
+              return subcategories.map((subOption) => (
+                <MenuItem key={subOption.id} value={subOption.id.toString()}>
+                  {subOption.label}
+                </MenuItem>
+              ));
+            })()}
         </Select>
         {/* {typeof error === "string" && error && (
         <Typography color="error" variant="body2">
