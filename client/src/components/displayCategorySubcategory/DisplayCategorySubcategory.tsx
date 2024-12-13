@@ -25,6 +25,8 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CreateIcon from "@mui/icons-material/Create";
 import AddCircleOutline from "@mui/icons-material/AddCircleOutline";
 
+import { Button } from "@mui/material";
+
 function createData(
   label: string,
   id: number,
@@ -69,7 +71,10 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       notifyError("Veuillez remplir le champ 'Code de la sous-catégorie'");
       return false;
     }
-
+    if (row.subcategory.find((sub) => sub.label === newSubcategoryLabel)) {
+      notifyError("Cette sous-catégorie existe déjà");
+      return false;
+    }
     return true;
   };
 
@@ -118,7 +123,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography
@@ -134,14 +139,13 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 sx={{ marginBottom: "4vh" }}
               >
                 <TableHead>
-                  <TableRow sx={{ fontSize: "4rem" }}>
+                  <TableRow sx={{ fontSize: "4rem", gap: "1vw" }}>
                     <TableCell>
                       <Typography
                         sx={{
                           fontSize: "1.2rem",
                           fontWeight: "900",
                           display: "flex",
-                          justifyContent: "space-between",
                         }}
                       >
                         Label
@@ -152,7 +156,9 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                         fontSize: "1.2rem",
                         fontWeight: "900",
                         display: "flex",
-                        justifyContent: "space-between",
+                        alignItems: "center",
+                        paddingRight: 0,
+                        paddingTop: 1.5,
                       }}
                     >
                       Code
@@ -162,127 +168,136 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 <TableBody>
                   {row.subcategory.map((sub) => (
                     <TableRow key={sub.id}>
-                      <TableCell component="th" scope="row">
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                          verticalAlign: "middle", // Assure l'alignement vertical au centre
+                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          width: "50%",
+                        }}
+                      >
                         {sub.label}
                         <IconButton>{<CreateIcon />}</IconButton>
                       </TableCell>
 
-                      <TableCell>{sub.code}</TableCell>
+                      <TableCell
+                        sx={{
+                          verticalAlign: "middle", // Assure l'alignement vertical au centre
+                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          width: "50%",
+                        }}
+                      >
+                        {sub.code}
+                      </TableCell>
                     </TableRow>
                   ))}
+
+                  <TableRow>
+                    <TableCell
+                      sx={{ paddingBottom: "5vh", fontSize: "1.1rem" }}
+                    >
+                      <Typography>
+                        <IconButton onClick={() => setShowInput(!showInput)}>
+                          <AddCircleOutline />
+                        </IconButton>
+                        Ajouter une sous-catégorie
+                      </Typography>
+                      {showInput && (
+                        <Box
+                          sx={{
+                            marginTop: "2rem",
+                            padding: "1rem",
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "1rem",
+                            }}
+                          >
+                            <Box
+                              component="input"
+                              type="text"
+                              placeholder="Nom de la sous-catégorie"
+                              sx={{
+                                width: "100%",
+                                maxWidth: "300px",
+                                height: "4vh",
+                                fontSize: "1.1rem",
+                                textAlign: "center",
+                                padding: "0.5vh",
+                              }}
+                              value={newSubcategoryLabel}
+                              onChange={(e) =>
+                                setNewSubcategoryLabel(e.target.value)
+                              }
+                            />
+                            <Box
+                              component="input"
+                              type="text"
+                              placeholder="Code de la sous-catégorie"
+                              sx={{
+                                width: "100%",
+                                maxWidth: "300px",
+                                height: "4vh",
+                                fontSize: "1.1rem",
+                                textAlign: "center",
+                                padding: "0.5vh",
+                              }}
+                              value={newSubcategoryCode}
+                              onChange={(e) =>
+                                setNewSubcategoryCode(e.target.value)
+                              }
+                            />
+                            <Box
+                              sx={{
+                                display: "flex",
+                                gap: "1rem",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Button
+                                sx={{
+                                  width: "100%",
+                                  maxWidth: "120px",
+                                  height: "4vh",
+                                  fontSize: "1.1rem",
+                                  backgroundColor: theme.palette.success.main,
+                                  color: "white",
+                                  border: "none",
+                                  fontWeight: "bold",
+                                }}
+                                onClick={handleClick}
+                              >
+                                Valider
+                              </Button>
+                              <Button
+                                sx={{
+                                  width: "100%",
+                                  maxWidth: "120px",
+                                  height: "4vh",
+                                  fontSize: "1.1rem",
+                                  backgroundColor: theme.palette.error.main,
+                                  color: "white",
+                                  border: "none",
+                                  fontWeight: "bold",
+                                }}
+                                onClick={() => setShowInput(false)}
+                              >
+                                Annuler
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Box>
+                      )}
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
-
-                <TableCell sx={{ paddingBottom: "5vh", fontSize: "1.1rem" }}>
-                  <Typography>
-                    {" "}
-                    <IconButton onClick={() => setShowInput(!showInput)}>
-                      {<AddCircleOutline />}
-                    </IconButton>
-                    Ajouter une sous-catégorie
-                  </Typography>
-                  {showInput && (
-                    <Box sx={{ gap: "50px", paddingTop: "1vh" }}>
-                      <TableRow
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          gap: "10px",
-                        }}
-                      >
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          style={{ borderBottom: 0 }}
-                        >
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Nom de la sous-catégorie"
-                            sx={{
-                              width: "15vw",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              marginBottom: "2vh",
-                              alignItems: "center",
-                              textAlign: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={newSubcategoryLabel}
-                            onChange={(e) =>
-                              setNewSubcategoryLabel(e.target.value)
-                            }
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          style={{ borderBottom: 0 }}
-                        >
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Code de la sous-catégorie"
-                            sx={{
-                              width: "15vw",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              marginBottom: "2vh",
-                              textAlign: "center",
-                              alignItems: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={newSubcategoryCode}
-                            onChange={(e) =>
-                              setNewSubcategoryCode(e.target.value)
-                            }
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: "10px",
-                          marginTop: "2vh",
-                        }}
-                      >
-                        <button
-                          style={{
-                            width: "10vw",
-                            height: "5vh",
-                            fontSize: "1.1rem",
-                            marginBottom: "2vh",
-                            backgroundColor: theme.palette.success.main,
-                            color: "white",
-                            border: "none",
-                            fontWeight: "bold",
-                          }}
-                          onClick={handleClick}
-                        >
-                          Valider
-                        </button>
-
-                        <button
-                          style={{
-                            width: "10vw",
-                            height: "5vh",
-                            fontSize: "1.1rem",
-                            marginBottom: "2vh",
-                            backgroundColor: theme.palette.error.main,
-                            color: "white",
-                            border: "none",
-                            fontWeight: "bold",
-                          }}
-                          onClick={() => setShowInput(!showInput)}
-                        >
-                          Annuler
-                        </button>
-                      </Box>
-                    </Box>
-                  )}
-                </TableCell>
               </Table>
             </Box>
           </Collapse>
@@ -312,7 +327,7 @@ function DisplayCategorySubcategory() {
   return (
     <TableContainer
       component={Paper}
-      sx={{ border: 1, marginTop: 10, marginLeft: 3 }}
+      sx={{ border: 1, marginTop: 10, marginLeft: 3, width: "100%" }}
     >
       <Table aria-label="collapsible table">
         <TableHead>
