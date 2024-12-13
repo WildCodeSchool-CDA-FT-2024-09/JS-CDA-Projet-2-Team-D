@@ -37,5 +37,5 @@ export class Commission extends BaseEntity {
 
   @Field(() => [Invoice])
   @OneToMany(() => Invoice, (invoice) => invoice.commission)
-  invoices: Invoice[];
+  invoices?: Invoice[];
 }
