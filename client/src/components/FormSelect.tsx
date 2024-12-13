@@ -4,12 +4,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  // Typography,
   SelectChangeEvent,
 } from "@mui/material";
 import {
   useGetCommissionsLazyQuery,
   useGetCategoriesLazyQuery,
+  GetCommissionsQuery,
+  GetCategoriesQuery,
 } from "../types/graphql-types";
 
 interface FormSelectProps {
@@ -28,41 +29,43 @@ const FormSelect: React.FC<FormSelectProps> = ({
   label,
   value,
   subValue,
-  property,
   handleSelect,
 }) => {
   const [getCommissions] = useGetCommissionsLazyQuery();
   const [getCategory] = useGetCategoriesLazyQuery();
-  const [items, setItems] = useState<unknown[]>([]);
+  const [items, setItems] = useState<
+    GetCommissionsQuery | GetCategoriesQuery
+  >();
 
   useEffect(() => {
     const getItems = async () => {
-      let result: unknown[] = [];
+      let result: GetCommissionsQuery | GetCategoriesQuery | null = null;
       if (name === "commission_id") {
         const { data } = await getCommissions();
-        result = data?.getCommissions || [];
+        result = data as GetCommissionsQuery;
       }
       if (name === "category_id" || name === "subcategory_id") {
         const { data } = await getCategory();
-        result = data?.getCategories;
+        result = data as GetCategoriesQuery;
       }
-      setItems(result);
+      if (result) {
+        setItems(result);
+      }
     };
     getItems();
-  }, [name]);
+  }, [name, getCategory, getCommissions]);
 
   const getCreditDebitId = (categoryId: number): number => {
-    const selectedCategory = items.find(
-      (category) => category.id === categoryId,
-    );
-    return selectedCategory?.creditDebit?.id || 0;
+    if (items && "getCategories" in items) {
+      const selectedCategory = items.getCategories.find(
+        (category) => category.id === categoryId,
+      );
+      return selectedCategory?.creditDebit?.id || 0;
+    }
+    return 0;
   };
 
-  const launchSelect = (
-    event:
-      | SelectChangeEvent<string | number>
-      | React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const launchSelect = (event: SelectChangeEvent<string | number>) => {
     if (name === "category_id") {
       const credit_debit_id = getCreditDebitId(+event.target.value);
       handleSelect(event, credit_debit_id);
@@ -72,40 +75,56 @@ const FormSelect: React.FC<FormSelectProps> = ({
   };
 
   const getItemsToDisplay = () => {
-    const subOptions = items.find((item) => item.id === subValue);
+    const subOptions =
+      items && "getCategories" in items
+        ? items.getCategories.find((item) => item.id === subValue)
+        : undefined;
     return subOptions?.subcategories || [];
   };
 
-  return (
-    <FormControl fullWidth>
-      <InputLabel>{label}</InputLabel>
-      <Select
-        name={name}
-        label={label}
-        value={value.toString()}
-        onChange={launchSelect}
-        aria-label={`${label} sélectionné : ${items.find((item) => item.id.toString() === value.toString())?.name || "Non sélectionné"}`}
-      >
-        {name !== "subcategory_id" &&
-          items.map((item) => (
-            <MenuItem key={item.id} value={item.id.toString()}>
-              {item[property]}
-            </MenuItem>
-          ))}
-        {name === "subcategory_id" &&
-          getItemsToDisplay().map((subOption) => (
-            <MenuItem key={subOption.id} value={subOption.id.toString()}>
-              {subOption.label}
-            </MenuItem>
-          ))}
-      </Select>
-      {/* {typeof error === "string" && error && (
+  if (!items) return <p>Loading</p>;
+
+  if (items)
+    return (
+      <FormControl fullWidth>
+        <InputLabel>{label}</InputLabel>
+        <Select
+          name={name}
+          label={label}
+          value={value.toString()}
+          onChange={launchSelect}
+          aria-label={`${label} sélectionné : $ ${value.toString() || "Non sélectionné"}`}
+        >
+          {name === "commission_id" &&
+            "getCommissions" in items &&
+            items.getCommissions.map((item) => (
+              <MenuItem key={item.id} value={item.id.toString()}>
+                {item.name}
+              </MenuItem>
+            ))}
+
+          {name === "category_id" &&
+            "getCategories" in items &&
+            items.getCategories.map((item) => (
+              <MenuItem key={item.id} value={item.id.toString()}>
+                {item.label}
+              </MenuItem>
+            ))}
+
+          {name === "subcategory_id" &&
+            getItemsToDisplay().map((subOption) => (
+              <MenuItem key={subOption.id} value={subOption.id.toString()}>
+                {subOption.label}
+              </MenuItem>
+            ))}
+        </Select>
+        {/* {typeof error === "string" && error && (
         <Typography color="error" variant="body2">
           {error}
         </Typography>
       )} */}
-    </FormControl>
-  );
+      </FormControl>
+    );
 };
 
 export default FormSelect;
