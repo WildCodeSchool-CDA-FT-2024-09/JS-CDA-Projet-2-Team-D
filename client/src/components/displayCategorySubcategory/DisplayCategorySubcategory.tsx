@@ -172,8 +172,8 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                         component="th"
                         scope="row"
                         sx={{
-                          verticalAlign: "middle", // Assure l'alignement vertical au centre
-                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          verticalAlign: "middle",
+                          textAlign: "left",
                           width: "50%",
                         }}
                       >
@@ -183,8 +183,8 @@ function Row(props: { row: ReturnType<typeof createData> }) {
 
                       <TableCell
                         sx={{
-                          verticalAlign: "middle", // Assure l'alignement vertical au centre
-                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          verticalAlign: "middle",
+                          textAlign: "left",
                           width: "50%",
                         }}
                       >
