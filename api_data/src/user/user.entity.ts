@@ -51,10 +51,10 @@ export class User extends BaseEntity {
   @JoinTable()
   roles: Role[];
 
-  @Field(() => [Commission])
+  @Field(() => [Commission], { nullable: true })
   @ManyToMany(() => Commission, (commission: Commission) => commission.users)
   @JoinTable()
-  commissions: Commission[];
+  commissions?: Commission[];
 
   @Field(() => [Invoice])
   @OneToMany(() => Invoice, (invoice: Invoice) => invoice.id)
