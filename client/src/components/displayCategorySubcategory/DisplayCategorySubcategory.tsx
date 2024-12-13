@@ -248,6 +248,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                                 fontSize: "1.1rem",
                                 textAlign: "center",
                                 padding: "0.5vh",
+                                textTransform: "uppercase",
                               }}
                               value={newSubcategoryCode}
                               onChange={(e) =>
