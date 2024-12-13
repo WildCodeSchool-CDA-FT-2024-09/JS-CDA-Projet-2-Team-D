@@ -31,7 +31,7 @@ export default class CommissionResolver {
           date: Between(lastExercise.start_date, lastExercise.end_date),
         },
         relations: ["commission", "vat", "status", "creditDebit"],
-        // order: { date: "DESC" },
+        order: { date: "DESC" },
         // take: limit,
         // skip: offset,
       });
