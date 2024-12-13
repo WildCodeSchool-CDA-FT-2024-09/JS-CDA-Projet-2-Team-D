@@ -33,7 +33,7 @@ class CommissionsInput {
 }
 
 @InputType()
-class CreateUserInput {
+class UserInput {
   @Field()
   @IsString()
   @IsNotEmpty()
@@ -84,8 +84,22 @@ export default class UserResolver {
     return { users, totalCount };
   }
 
+  @Query(() => User)
+  async getUserById(@Arg("userId") userId: number) {
+    const user = await User.findOneOrFail({
+      where: { id: userId },
+      relations: ["roles", "commissions"],
+    });
+
+    if (!user) {
+      throw new Error("L'utilisateur n'existe pas");
+    }
+
+    return user;
+  }
+
   @Mutation(() => User)
-  async createNewUser(@Arg("data") data: CreateUserInput) {
+  async createNewUser(@Arg("data") data: UserInput) {
     try {
       const user = new User();
       user.firstname = data.firstname;
@@ -94,6 +108,7 @@ export default class UserResolver {
       user.password = await argon2.hash(data.password);
 
       const error = await validate(user);
+
       if (error.length > 0)
         throw new Error(
           `Erreur dans la validation des données utilisateur : ${error}`
