@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGetUsersQuery } from "../../../types/graphql-types";
 import BtnCrud from "../../../components/BtnCrud";
 import BtnLink from "../../../components/BtnLink";
@@ -18,6 +19,8 @@ export default function ManageUser() {
   const [limit] = useState<number>(2);
   const offset = (page - 1) * limit;
 
+  const navigate = useNavigate();
+
   const { loading, error, data } = useGetUsersQuery({
     variables: {
       limit: limit,
@@ -31,6 +34,10 @@ export default function ManageUser() {
     value: number,
   ) => {
     setPage(value);
+  };
+
+  const handleEditUser = (userId: number) => {
+    navigate(`/administrator/user/edit/${userId}`);
   };
 
   if (loading) return <p>🥁 Chargement...</p>;
@@ -96,7 +103,7 @@ export default function ManageUser() {
                     <Stack spacing={2} direction="row">
                       <BtnCrud
                         disabled={false}
-                        handleClick={() => null}
+                        handleClick={() => handleEditUser(user.id)}
                         type={"edit"}
                       />
                       <BtnCrud
