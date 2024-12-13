@@ -7,7 +7,6 @@ import {
   InputLabel,
   SelectChangeEvent,
 } from "@mui/material";
-// import { Field, FieldProps } from "formik";
 
 export interface Invoice {
   vat_id: number;
@@ -37,16 +36,16 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
   setInvoice,
 }) => {
   useEffect(() => {
-    // Calcul de la TVA dès qu'une nouvelle option est sélectionnée
     if (value) {
-      const selectedVatId = parseInt(value, 10); // On récupère l'id de la TVA
+      const selectedVatId = parseInt(value, 10);
       const selectedVat = options.find((option) => option.id === selectedVatId);
 
       if (selectedVat) {
         const vatRate = selectedVat.rate;
-        const totalTTC = priceWithoutVat + (priceWithoutVat * vatRate) / 100;
+        const parsedPriceWithoutVat = parseFloat(priceWithoutVat) || 0;
+        const totalTTC =
+          parsedPriceWithoutVat + (parsedPriceWithoutVat * vatRate) / 100;
 
-        // Vérifier si totalTTC est un nombre valide avant de l'utiliser
         if (Number.isFinite(totalTTC)) {
           setInvoice((prevState) => ({
             ...prevState,
@@ -54,11 +53,10 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
             total: totalTTC,
           }));
         } else {
-          // Si totalTTC n'est pas un nombre valide, définir un total par défaut
           setInvoice((prevState) => ({
             ...prevState,
             vat_id: selectedVatId,
-            total: 0, // ou un autre montant par défaut
+            total: 0,
           }));
         }
       }

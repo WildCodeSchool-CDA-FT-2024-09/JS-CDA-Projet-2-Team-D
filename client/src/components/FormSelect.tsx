@@ -111,13 +111,6 @@ const FormSelect: React.FC<FormSelectProps> = ({
               </MenuItem>
             ))}
 
-          {/* {name === "subcategory_id" &&
-            getItemsToDisplay().map((subOption) => (
-              <MenuItem key={subOption.id} value={subOption.id.toString()}>
-                {subOption.label}
-              </MenuItem>
-            ))} */}
-
           {name === "subcategory_id" &&
             (() => {
               const subcategories = getItemsToDisplay();
@@ -135,11 +128,6 @@ const FormSelect: React.FC<FormSelectProps> = ({
               ));
             })()}
         </Select>
-        {/* {typeof error === "string" && error && (
-        <Typography color="error" variant="body2">
-          {error}
-        </Typography>
-      )} */}
       </FormControl>
     );
 };

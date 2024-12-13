@@ -47,28 +47,23 @@ const InvoiceForm: React.FC = () => {
   ) => {
     const { name, value } = event.target;
 
-    // Séparer les cas où les types sont différents
     if (name === "price_without_vat" || name === "vat_id") {
-      // Cas spécifiques pour "price_without_vat" et "vat_id"
       setInvoice((prevState) => ({
         ...prevState,
         [name]: value,
       }));
     } else if (name === "category_id" && options) {
-      // Cas particulier pour "category_id"
       setInvoice((prevState) => ({
         ...prevState,
         [name]: +value as number,
         credit_debit_id: options, // Update credit/debit id
       }));
     } else if (name === "paid") {
-      // Cas particulier pour "paid" (bascule entre true/false)
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: !prevState.paid, // Basculer l'état de "paid"
+        [name]: !prevState.paid,
       }));
     } else {
-      // Cas général : mise à jour de l'état pour d'autres champs
       setInvoice((prevState) => ({
         ...prevState,
         [name]: value,
@@ -171,10 +166,6 @@ const InvoiceForm: React.FC = () => {
               }
               onChange={handleInvoiceChange}
               inputProps={{ min: 0 }}
-              // error={!!errors["price_without_vat"]}
-              // helperText={errors["price_without_vat"]}
-              //verror={touched.price_without_vat && !!errors.price_without_vat}
-              //vhelperText={touched.price_without_vat && errors.price_without_vat}
             />
           </Grid>
           <Grid size={6}>
@@ -184,7 +175,6 @@ const InvoiceForm: React.FC = () => {
               value={invoice.vat_id?.toString()}
               onChange={handleInvoiceChange}
               options={vatRatesData?.getVats || []}
-              // error={!!errors["vat_id"]}
               priceWithoutVat={invoice.price_without_vat}
               setInvoice={
                 setInvoice as React.Dispatch<React.SetStateAction<Invoice>>
@@ -198,7 +188,8 @@ const InvoiceForm: React.FC = () => {
                 <span
                   style={{
                     fontWeight: "bold",
-                    color: invoice.credit_debit_id === 1 ? "green" : "red",
+                    color:
+                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
                   }}
                 >
                   {invoice.credit_debit_id === 1 ? "+" : "-"}
@@ -206,7 +197,7 @@ const InvoiceForm: React.FC = () => {
               ) : (
                 ""
               )}
-              {invoice.total.toFixed(2)} €
+              {(invoice.total || 0).toFixed(2)} €
               {invoice.category_id !== 0 && (
                 <span
                   style={{
