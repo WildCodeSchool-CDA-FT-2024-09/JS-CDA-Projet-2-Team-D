@@ -5,6 +5,7 @@ import {
   useGetUserByIdQuery,
 } from "../../../types/graphql-types";
 // import { BooleanMap } from "../../../types/types";
+// import { useFormik } from 'formik';
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import {
@@ -53,6 +54,8 @@ export default function UpdateUser() {
     firstname: "",
     lastname: "",
     email: "",
+    password: "",
+    passwordConfirm: "",
   });
 
   // Update initial values when data is loaded
@@ -62,6 +65,8 @@ export default function UpdateUser() {
         firstname: data.getUserById.firstname || "",
         lastname: data.getUserById.lastname || "",
         email: data.getUserById.email || "",
+        password: "",
+        passwordConfirm: "",
       });
 
       // Set initial roles
@@ -175,16 +180,12 @@ export default function UpdateUser() {
       //   .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
       //   .map((commission) => ({ id: commission.id }));
 
-      // await createNewUser({
+      // await UpdateUser({
       //   variables: {
       //     data: {
-      //       firstname: userRef.firstname.current
-      //         ? userRef.firstname.current.value
-      //         : "",
-      //       lastname: userRef.lastname.current
-      //         ? userRef.lastname.current.value
-      //         : "",
-      //       email: userRef.email.current ? userRef.email.current.value : "",
+      //       firstname: initialValues.firstname ? initialValues.firstname : "",
+      //       lastname: initialValues.lastname ? initialValues.lastname : "",
+      //       email: initialValues.email,
       //       password: userRef.password.current
       //         ? userRef.password.current.value
       //         : "",
