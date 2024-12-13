@@ -40,3 +40,21 @@ export const CREATE_NEW_USER = gql`
     }
   }
 `;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser($data: UserInput!, $userId: Float!) {
+    updateUser(data: $data, userId: $userId) {
+      id
+      firstname
+      lastname
+      email
+      password
+      roles {
+        id
+      }
+      commissions {
+        id
+      }
+    }
+  }
+`;

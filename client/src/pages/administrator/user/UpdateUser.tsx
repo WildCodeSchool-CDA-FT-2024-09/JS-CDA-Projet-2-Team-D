@@ -3,6 +3,7 @@ import {
   useGetRolesQuery,
   useGetCommissionsQuery,
   useGetUserByIdQuery,
+  useUpdateUserMutation,
 } from "../../../types/graphql-types";
 // import { BooleanMap } from "../../../types/types";
 // import { useFormik } from 'formik';
@@ -46,6 +47,7 @@ export default function UpdateUser() {
   const { data, loading, error } = useGetUserByIdQuery({
     variables: { userId: parseInt(userId as string) },
   });
+  const [updateUserMutation] = useUpdateUserMutation();
 
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
@@ -171,29 +173,28 @@ export default function UpdateUser() {
       // Default role is set to commission
       if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
 
-      // const selectedCommissionsObjects = commissions
-      //   .map((commissionLabel) =>
-      //     commissionsData?.getCommissions.find(
-      //       (commission) => commission.name === commissionLabel,
-      //     ),
-      //   )
-      //   .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
-      //   .map((commission) => ({ id: commission.id }));
+      const selectedCommissionsObjects = commissions
+        .map((commissionLabel) =>
+          commissionsData?.getCommissions.find(
+            (commission) => commission.name === commissionLabel,
+          ),
+        )
+        .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
+        .map((commission) => ({ id: commission.id }));
 
-      // await UpdateUser({
-      //   variables: {
-      //     data: {
-      //       firstname: initialValues.firstname ? initialValues.firstname : "",
-      //       lastname: initialValues.lastname ? initialValues.lastname : "",
-      //       email: initialValues.email,
-      //       password: userRef.password.current
-      //         ? userRef.password.current.value
-      //         : "",
-      //       roles: selectedRoleObjects,
-      //       commissions: selectedCommissionsObjects,
-      //     },
-      //   },
-      // });
+      await updateUserMutation({
+        variables: {
+          data: {
+            firstname: initialValues.firstname ? initialValues.firstname : "",
+            lastname: initialValues.lastname ? initialValues.lastname : "",
+            email: initialValues.email,
+            password: initialValues.password ? initialValues.password : "",
+            roles: selectedRoleObjects,
+            commissions: selectedCommissionsObjects,
+          },
+          userId: parseInt(userId as string),
+        },
+      });
 
       notifySuccess("Utilisateur mis à jour avec succès");
     } catch (error) {
