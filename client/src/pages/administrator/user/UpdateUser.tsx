@@ -1,11 +1,10 @@
-import { useRef, useState, RefObject } from "react";
+import { useEffect, useState } from "react";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
   useGetUserByIdQuery,
 } from "../../../types/graphql-types";
-import { BooleanMap } from "../../../types/types";
-import { RefMap } from "../../../types/types";
+// import { BooleanMap } from "../../../types/types";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import {
@@ -50,24 +49,38 @@ export default function UpdateUser() {
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
 
-  // used instead of states to avoid multiple re-renders when typing
-  const userRef: RefMap = {
-    firstname: useRef<HTMLInputElement>(null),
-    lastname: useRef<HTMLInputElement>(null),
-    email: useRef<HTMLInputElement>(null),
-    password: useRef<HTMLInputElement>(null),
-    passwordConfirm: useRef<HTMLInputElement>(null),
-    roles: useRef<HTMLInputElement>(null),
-    commissions: useRef<HTMLInputElement>(null),
-  };
+  const [initialValues, setInitialValues] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+  });
+
+  // Update initial values when data is loaded
+  useEffect(() => {
+    if (data?.getUserById) {
+      setInitialValues({
+        firstname: data.getUserById.firstname || "",
+        lastname: data.getUserById.lastname || "",
+        email: data.getUserById.email || "",
+      });
+
+      // Set initial roles
+      setRoles(data.getUserById.roles?.map((role) => role.label) || []);
+
+      // Set initial commissions
+      setCommissions(
+        data.getUserById.commissions?.map((comm) => comm.name) || [],
+      );
+    }
+  }, [data]);
 
   // Check input errors
-  const [inputError, setInputError] = useState<BooleanMap>({
-    firstname: false,
-    lastname: false,
-    email: false,
-    password: false,
-  });
+  // const [inputError, setInputError] = useState<BooleanMap>({
+  //   firstname: false,
+  //   lastname: false,
+  //   email: false,
+  //   password: false,
+  // });
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -91,65 +104,54 @@ export default function UpdateUser() {
     );
   };
 
-  const handleInputChange = (
-    field: string,
-    inputRef: RefObject<HTMLInputElement>,
-  ) => {
-    if (field === "firstname" || field === "lastname") {
-      const isValid = validateNameInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "email") {
-      const isValid = validateEmailInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "password") {
-      const isValid = validatePasswordInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "passwordConfirm") {
-      const isValid = validatePasswordConfirmInput();
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    }
-  };
+  // const handleInputChange = (
+  //   field: string,
+  //   inputRef: RefObject<HTMLInputElement>,
+  // ) => {
+  //   if (field === "firstname" || field === "lastname") {
+  //     const isValid = validateNameInput(inputRef);
+  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+  //   } else if (field === "email") {
+  //     const isValid = validateEmailInput(inputRef);
+  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+  //   } else if (field === "password") {
+  //     const isValid = validatePasswordInput(inputRef);
+  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+  //   } else if (field === "passwordConfirm") {
+  //     const isValid = validatePasswordConfirmInput();
+  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
+  //   }
+  // };
 
-  const validateNameInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    return value
-      ? /^.{1,50}$/.test(value) && /^[A-Za-z0-9À-ÖØ-öø-ÿ@_-\s]+$/.test(value)
-      : false;
-  };
+  // const validateNameInput = (inputRef: RefObject<HTMLInputElement>) => {
+  //   const value = inputRef.current && inputRef.current.value;
+  //   return value
+  //     ? /^.{1,50}$/.test(value) && /^[A-Za-z0-9À-ÖØ-öø-ÿ@_-\s]+$/.test(value)
+  //     : false;
+  // };
 
-  const validateEmailInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    return value
-      ? /^.{5,150}$/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      : false;
-  };
+  // const validateEmailInput = (inputRef: RefObject<HTMLInputElement>) => {
+  //   const value = inputRef.current && inputRef.current.value;
+  //   return value
+  //     ? /^.{5,150}$/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  //     : false;
+  // };
 
-  const validatePasswordInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    // At least one uppercase letter, one number, one special character, minimum of 8 characters
-    return value
-      ? /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-      : false;
-  };
+  // const validatePasswordInput = (inputRef: RefObject<HTMLInputElement>) => {
+  //   const value = inputRef.current && inputRef.current.value;
+  //   // At least one uppercase letter, one number, one special character, minimum of 8 characters
+  //   return value
+  //     ? /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+  //     : false;
+  // };
 
-  const validatePasswordConfirmInput = () => {
-    return userRef.password.current?.value !==
-      userRef.passwordConfirm.current?.value
-      ? false
-      : true;
-  };
-
-  // Assign values to fields
-  if (userRef.firstname.current) {
-    userRef.firstname.current.value = data?.getUserById.firstname as string;
-    //handleInputChange("firstname", userRef.firstname);
-  }
-
-  if (userRef.lastname.current)
-    userRef.lastname.current.value = data?.getUserById.lastname as string;
-
-  if (userRef.email.current)
-    userRef.email.current.value = data?.getUserById.email as string;
+  // const validatePasswordConfirmInput = () => {
+  //   // return userRef.password.current?.value !==
+  //   //   userRef.passwordConfirm.current?.value
+  //   //   ? false
+  //   //   : true;
+  //   return;
+  // };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -200,14 +202,14 @@ export default function UpdateUser() {
   };
 
   // Disable add button if errors
-  const handleDisabledButton = (): boolean => {
-    return (
-      Object.values(inputError).some((el) => el) ||
-      Object.values(userRef).some(
-        (el) => el.current != null && el.current.value == "",
-      )
-    );
-  };
+  // const handleDisabledButton = (): boolean => {
+  //   return (
+  //     Object.values(inputError).some((el) => el) ||
+  //     Object.values(userRef).some(
+  //       (el) => el.current != null && el.current.value == "",
+  //     )
+  //   );
+  // };
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
@@ -261,14 +263,19 @@ export default function UpdateUser() {
               label="Prénom"
               name="firstname"
               variant="outlined"
-              inputRef={userRef.firstname}
-              onChange={() => handleInputChange("firstname", userRef.firstname)}
-              error={inputError.firstname}
-              helperText={
-                inputError.firstname
-                  ? "Uniquement des caractères alphanumériques (max 50)"
-                  : ""
+              value={initialValues.firstname}
+              onChange={(e) =>
+                setInitialValues((prev) => ({
+                  ...prev,
+                  firstname: e.target.value,
+                }))
               }
+              // error={inputError.firstname}
+              // helperText={
+              //   inputError.firstname
+              //     ? "Uniquement des caractères alphanumériques (max 50)"
+              //     : ""
+              // }
             />
           </Grid>
           <Grid size={6}>
@@ -279,15 +286,19 @@ export default function UpdateUser() {
               label="Nom"
               name="lastname"
               variant="outlined"
-              inputRef={userRef.lastname}
-              onChange={() => handleInputChange("lastname", userRef.lastname)}
-              onBlur={() => handleInputChange("lastname", userRef.lastname)}
-              error={inputError.lastname}
-              helperText={
-                inputError.lastname
-                  ? "Uniquement des caractères alphanumériques (max 50)"
-                  : ""
+              value={initialValues.lastname}
+              onChange={(e) =>
+                setInitialValues((prev) => ({
+                  ...prev,
+                  lastname: e.target.value,
+                }))
               }
+              // error={inputError.lastname}
+              // helperText={
+              //   inputError.lastname
+              //     ? "Uniquement des caractères alphanumériques (max 50)"
+              //     : ""
+              // }
             />
           </Grid>
           <Grid size={6}>
@@ -299,15 +310,19 @@ export default function UpdateUser() {
               name="email"
               type="email"
               variant="outlined"
-              inputRef={userRef.email}
-              onChange={() => handleInputChange("email", userRef.email)}
-              onBlur={() => handleInputChange("email", userRef.email)}
-              error={inputError.email}
-              helperText={
-                inputError.email
-                  ? "Ceci n'est pas une adresse email valide"
-                  : ""
+              value={initialValues.email}
+              onChange={(e) =>
+                setInitialValues((prev) => ({
+                  ...prev,
+                  email: e.target.value,
+                }))
               }
+              // error={inputError.email}
+              // helperText={
+              //   inputError.email
+              //     ? "Ceci n'est pas une adresse email valide"
+              //     : ""
+              // }
             />
           </Grid>
           <Grid size={6}>
@@ -345,15 +360,15 @@ export default function UpdateUser() {
               name="password"
               type="password"
               variant="outlined"
-              inputRef={userRef.password}
-              onChange={() => handleInputChange("password", userRef.password)}
-              onBlur={() => handleInputChange("password", userRef.password)}
-              error={inputError.password}
-              helperText={
-                inputError.password
-                  ? "Le mot de passe doit contenir au minimum 8 caractères, dont au moins 1 chiffre, 1 majuscule et 1 caractère spécial"
-                  : ""
-              }
+              // inputRef={userRef.password}
+              // onChange={() => handleInputChange("password", userRef.password)}
+              // onBlur={() => handleInputChange("password", userRef.password)}
+              // error={inputError.password}
+              // helperText={
+              //   inputError.password
+              //     ? "Le mot de passe doit contenir au minimum 8 caractères, dont au moins 1 chiffre, 1 majuscule et 1 caractère spécial"
+              //     : ""
+              // }
             />
           </Grid>
           <Grid size={6}>
@@ -365,16 +380,16 @@ export default function UpdateUser() {
               name="passwordConfirm"
               type="password"
               variant="outlined"
-              inputRef={userRef.passwordConfirm}
-              onChange={() =>
-                handleInputChange("passwordConfirm", userRef.passwordConfirm)
-              }
-              error={inputError.passwordConfirm}
-              helperText={
-                inputError.passwordConfirm
-                  ? "La confirmation de mot de passe ne correspond pas"
-                  : ""
-              }
+              // inputRef={userRef.passwordConfirm}
+              // onChange={() =>
+              //   handleInputChange("passwordConfirm", userRef.passwordConfirm)
+              // }
+              // error={inputError.passwordConfirm}
+              // helperText={
+              //   inputError.passwordConfirm
+              //     ? "La confirmation de mot de passe ne correspond pas"
+              //     : ""
+              // }
             />
           </Grid>
           <Grid size={12}>
@@ -411,7 +426,7 @@ export default function UpdateUser() {
           <Grid size={4}></Grid>
           <Grid size={4} sx={{ textAlign: "center" }}>
             <Button
-              disabled={handleDisabledButton()}
+              // disabled={handleDisabledButton()}
               type="submit"
               variant="contained"
               startIcon={<EditIcon />}
