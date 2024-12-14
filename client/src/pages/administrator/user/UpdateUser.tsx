@@ -362,6 +362,13 @@ export default function UpdateUser() {
               name="password"
               type="password"
               variant="outlined"
+              value={initialValues.password}
+              onChange={(e) =>
+                setInitialValues((prev) => ({
+                  ...prev,
+                  password: e.target.value,
+                }))
+              }
               // inputRef={userRef.password}
               // onChange={() => handleInputChange("password", userRef.password)}
               // onBlur={() => handleInputChange("password", userRef.password)}
