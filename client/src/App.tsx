@@ -3,14 +3,30 @@ import { UserProvider } from "./context/UserContext";
 import NotificationProvider from "./context/NotificationContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-import Container from "@mui/material/Container";
+// import Container from "@mui/material/Container";
 import MenuSideBar from "./components/menuSideBar/MenuSideBar";
 import Home from "./pages/Home";
 import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Toolbar } from "@mui/material";
-import { Grid2 } from "@mui/material";
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+} from "@mui/material";
+// import { Grid2 } from "@mui/material";
 import "./global.css";
+
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import GroupIcon from "@mui/icons-material/Group";
+import TableIcon from "@mui/icons-material/TableChart";
 
 const theme = createTheme({
   typography: {
@@ -55,6 +71,8 @@ const theme = createTheme({
   },
 });
 
+const drawerWidth = 300;
+
 function App() {
   const location = useLocation();
   const currentPage = location.pathname;
@@ -66,27 +84,79 @@ function App() {
           <NotificationProvider>
             {currentPage !== "/" ? (
               <>
-                <Header
-                  title="ClubCompta"
-                  subtitle="Budget 2024/2025"
-                  userType="Responsable"
-                  logoUrl="/Logo.svg"
-                  avatarColor="#6EBF8B"
-                />
-                <Toolbar />
-
-                <Container maxWidth="xl">
-                  <Grid2 container spacing={2}>
-                    <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
+                <Box sx={{ display: "flex" }}>
+                  <CssBaseline />
+                  <Header
+                    title="ClubCompta"
+                    subtitle="Budget 2024/2025"
+                    userType="Responsable"
+                    logoUrl="/Logo.svg"
+                    avatarColor="#6EBF8B"
+                  />
+                  <Drawer
+                    sx={{
+                      width: drawerWidth,
+                      flexShrink: 0,
+                      "& .MuiDrawer-paper": {
+                        backgroundColor: "#f3f3f3",
+                        width: drawerWidth,
+                        boxSizing: "border-box",
+                      },
+                    }}
+                    variant="permanent"
+                    anchor="left"
+                  >
+                    <Toolbar />
+                    <Divider />
+                    <List>
                       <MenuSideBar />
-                    </Grid2>
-                    <Grid2 size={10}>
-                      <UserBar />
-                      <Outlet />
-                    </Grid2>
-                  </Grid2>
-                  <Footer />
-                </Container>
+                    </List>
+                    <List>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <TableIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Opérations" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <AnalyticsIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Statistiques" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                    <Divider />
+                    <List>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <GroupIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Gestion des utilisateurs" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <InboxIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Gestion du budget" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                  </Drawer>
+
+                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                    {/* <MenuSideBar /> */}
+                    <UserBar />
+                    <Outlet />
+                    <Footer />
+                  </Box>
+                </Box>
               </>
             ) : (
               <Home />

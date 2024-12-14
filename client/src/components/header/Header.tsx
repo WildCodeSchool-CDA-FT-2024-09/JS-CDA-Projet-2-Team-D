@@ -37,7 +37,10 @@ const Header: React.FC<HeaderProps> = ({
     <AppBar
       position="fixed"
       color="secondary"
-      sx={{ backgroundColor: "#D9D9D9" }}
+      sx={{
+        backgroundColor: "#D9D9D9",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
     >
       <Container maxWidth="xl">
         <Toolbar
