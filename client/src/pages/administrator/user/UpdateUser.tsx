@@ -1,12 +1,15 @@
+import * as React from "react";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
   useGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../../../types/graphql-types";
-// import { BooleanMap } from "../../../types/types";
-// import { useFormik } from 'formik';
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import {
@@ -14,6 +17,8 @@ import {
   Button,
   Checkbox,
   FormControl,
+  FormHelperText,
+  IconButton,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -24,7 +29,9 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Grid from "@mui/material/Grid2";
-import { useParams } from "react-router-dom";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -36,6 +43,48 @@ const MenuProps = {
     },
   },
 };
+
+// Validation Schema
+const updateUserSchema = z
+  .object({
+    firstname: z
+      .string()
+      .min(1, { message: "Prénom requis" })
+      .max(50, { message: "Prénom trop long (max 50 caractères)" })
+      .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, { message: "Prénom invalide" }),
+
+    lastname: z
+      .string()
+      .min(1, { message: "Nom requis" })
+      .max(50, { message: "Nom trop long (max 50 caractères)" })
+      .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, { message: "Nom invalide" }),
+
+    email: z
+      .string()
+      .min(1, { message: "Email requis" })
+      .email({ message: "Adresse email invalide" }),
+
+    password: z
+      .string()
+      .min(8, {
+        message: "Le mot de passe doit contenir au moins 8 caractères",
+      })
+      .regex(/^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9])/, {
+        message:
+          "Le mot de passe doit contenir au moins 1 majuscule, 1 chiffre et 1 caractère spécial",
+      })
+      .optional(),
+
+    passwordConfirm: z.string().optional(),
+
+    roles: z.array(z.string()).optional(),
+
+    commissions: z.array(z.string()).optional(),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["passwordConfirm"],
+  });
 
 export default function UpdateUser() {
   const { userId } = useParams();
@@ -49,54 +98,102 @@ export default function UpdateUser() {
   });
   const [updateUserMutation] = useUpdateUserMutation();
 
+  // Password texfield
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseDownConfirmPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpConfirmPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
 
-  const [initialValues, setInitialValues] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: "",
-    passwordConfirm: "",
+  // Zod
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    trigger, // Manual validation trigger
+    watch,
+    formState: {
+      errors, // Contains validation errors
+      // isValid, // Indicates if the entire form is valid
+      // isDirty, // Indicates if the form has been modified
+    },
+  } = useForm({
+    resolver: zodResolver(updateUserSchema),
+    mode: "onChange", // Validate on every change
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      roles: [],
+      commissions: [],
+    },
   });
 
-  // Update initial values when data is loaded
+  // Watch form values for dynamic validation
+  const watchPassword = watch("password");
+  const watchPasswordConfirm = watch("passwordConfirm");
+
+  // Trigger validation for password confirmation when password changes
+  useEffect(() => {
+    if (watchPassword || watchPasswordConfirm) {
+      trigger("passwordConfirm");
+    }
+  }, [watchPassword, watchPasswordConfirm, trigger]);
+
+  // Populate form with existing values
   useEffect(() => {
     if (data?.getUserById) {
-      setInitialValues({
-        firstname: data.getUserById.firstname || "",
-        lastname: data.getUserById.lastname || "",
-        email: data.getUserById.email || "",
-        password: "",
-        passwordConfirm: "",
-      });
+      const userData = data.getUserById;
+      setValue("firstname", userData.firstname || "");
+      setValue("lastname", userData.lastname || "");
+      setValue("email", userData.email || "");
 
-      // Set initial roles
-      setRoles(data.getUserById.roles?.map((role) => role.label) || []);
+      // Set roles and commissions
+      const userRoles = userData.roles?.map((role) => role.label) || [];
+      const userCommissions =
+        userData.commissions?.map((comm) => comm.name) || [];
 
-      // Set initial commissions
-      setCommissions(
-        data.getUserById.commissions?.map((comm) => comm.name) || [],
-      );
+      setRoles(userRoles);
+      setCommissions(userCommissions);
     }
-  }, [data]);
-
-  // Check input errors
-  // const [inputError, setInputError] = useState<BooleanMap>({
-  //   firstname: false,
-  //   lastname: false,
-  //   email: false,
-  //   password: false,
-  // });
+  }, [data, setValue]);
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
       target: { value },
     } = event;
-    setRoles(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value,
-    );
+    // On autofill we get a stringified value
+    const selectedRoles = typeof value === "string" ? value.split(",") : value;
+    setRoles(selectedRoles);
   };
 
   const handleChangeCommissions = (
@@ -105,90 +202,51 @@ export default function UpdateUser() {
     const {
       target: { value },
     } = event;
-    setCommissions(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value,
-    );
+    // On autofill we get a stringified value
+    const selectedCommissions =
+      typeof value === "string" ? value.split(",") : value;
+    setCommissions(selectedCommissions);
   };
 
-  // const handleInputChange = (
-  //   field: string,
-  //   inputRef: RefObject<HTMLInputElement>,
-  // ) => {
-  //   if (field === "firstname" || field === "lastname") {
-  //     const isValid = validateNameInput(inputRef);
-  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-  //   } else if (field === "email") {
-  //     const isValid = validateEmailInput(inputRef);
-  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-  //   } else if (field === "password") {
-  //     const isValid = validatePasswordInput(inputRef);
-  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-  //   } else if (field === "passwordConfirm") {
-  //     const isValid = validatePasswordConfirmInput();
-  //     setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-  //   }
-  // };
-
-  // const validateNameInput = (inputRef: RefObject<HTMLInputElement>) => {
-  //   const value = inputRef.current && inputRef.current.value;
-  //   return value
-  //     ? /^.{1,50}$/.test(value) && /^[A-Za-z0-9À-ÖØ-öø-ÿ@_-\s]+$/.test(value)
-  //     : false;
-  // };
-
-  // const validateEmailInput = (inputRef: RefObject<HTMLInputElement>) => {
-  //   const value = inputRef.current && inputRef.current.value;
-  //   return value
-  //     ? /^.{5,150}$/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  //     : false;
-  // };
-
-  // const validatePasswordInput = (inputRef: RefObject<HTMLInputElement>) => {
-  //   const value = inputRef.current && inputRef.current.value;
-  //   // At least one uppercase letter, one number, one special character, minimum of 8 characters
-  //   return value
-  //     ? /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-  //     : false;
-  // };
-
-  // const validatePasswordConfirmInput = () => {
-  //   // return userRef.password.current?.value !==
-  //   //   userRef.passwordConfirm.current?.value
-  //   //   ? false
-  //   //   : true;
-  //   return;
-  // };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // Form submission handler
+  const onSubmit = async (formData: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    roles: string[];
+    commissions?: string[];
+  }) => {
     try {
-      const selectedRoleObjects = roles
-        .map((roleLabel) =>
+      const selectedRoleObjects: { id: number }[] = formData.roles
+        .map((roleLabel: string) =>
           rolesData?.getRoles.find((role) => role.label === roleLabel),
         )
-        .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
+        .filter((role) => role !== undefined)
         .map((role) => ({ id: role.id }));
 
-      // Default role is set to commission
-      if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
+      // Default role is set to commission if no roles selected
+      if (selectedRoleObjects.length === 0) {
+        selectedRoleObjects.push({ id: 3 });
+      }
 
-      const selectedCommissionsObjects = commissions
-        .map((commissionLabel) =>
-          commissionsData?.getCommissions.find(
-            (commission) => commission.name === commissionLabel,
-          ),
-        )
-        .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
-        .map((commission) => ({ id: commission.id }));
+      const selectedCommissionsObjects: { id: number }[] =
+        formData.commissions
+          ?.map((commissionLabel: string) =>
+            commissionsData?.getCommissions.find(
+              (commission) => commission.name === commissionLabel,
+            ),
+          )
+          .filter((commission) => commission !== undefined)
+          .map((commission) => ({ id: commission.id as number })) || [];
 
       await updateUserMutation({
         variables: {
           data: {
-            firstname: initialValues.firstname ? initialValues.firstname : "",
-            lastname: initialValues.lastname ? initialValues.lastname : "",
-            email: initialValues.email,
-            password: initialValues.password ? initialValues.password : "",
+            firstname: formData.firstname,
+            lastname: formData.lastname,
+            email: formData.email,
+            password: formData.password,
             roles: selectedRoleObjects,
             commissions: selectedCommissionsObjects,
           },
@@ -202,16 +260,6 @@ export default function UpdateUser() {
       console.error("Erreur lors de la mise à jour de l'utilisateur", error);
     }
   };
-
-  // Disable add button if errors
-  // const handleDisabledButton = (): boolean => {
-  //   return (
-  //     Object.values(inputError).some((el) => el) ||
-  //     Object.values(userRef).some(
-  //       (el) => el.current != null && el.current.value == "",
-  //     )
-  //   );
-  // };
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
@@ -245,9 +293,15 @@ export default function UpdateUser() {
         </BtnLink>
       </Box>
 
+      {Object.keys(errors).length > 0 && (
+        <Box sx={{ color: "red", mt: 2, textAlign: "center" }}>
+          Veuillez corriger les erreurs dans le formulaire
+        </Box>
+      )}
+
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           border: "1px solid #f3f3f3",
           padding: "1em",
@@ -259,52 +313,41 @@ export default function UpdateUser() {
         <Grid container spacing={2}>
           <Grid size={6}>
             <TextField
+              {...register("firstname")}
               fullWidth
               required
               id="firstname"
               label="Prénom"
               name="firstname"
               variant="outlined"
-              value={initialValues.firstname}
-              onChange={(e) =>
-                setInitialValues((prev) => ({
-                  ...prev,
-                  firstname: e.target.value,
-                }))
-              }
-              // error={inputError.firstname}
-              // helperText={
-              //   inputError.firstname
-              //     ? "Uniquement des caractères alphanumériques (max 50)"
-              //     : ""
-              // }
+              error={!!errors.firstname}
+              helperText={errors.firstname?.message}
+              onChange={async (e) => {
+                setValue("firstname", e.target.value, { shouldValidate: true });
+                await trigger("firstname");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <TextField
+              {...register("lastname")}
               fullWidth
               required
               id="lastname"
               label="Nom"
               name="lastname"
               variant="outlined"
-              value={initialValues.lastname}
-              onChange={(e) =>
-                setInitialValues((prev) => ({
-                  ...prev,
-                  lastname: e.target.value,
-                }))
-              }
-              // error={inputError.lastname}
-              // helperText={
-              //   inputError.lastname
-              //     ? "Uniquement des caractères alphanumériques (max 50)"
-              //     : ""
-              // }
+              error={!!errors.lastname}
+              helperText={errors.lastname?.message}
+              onChange={async (e) => {
+                setValue("lastname", e.target.value, { shouldValidate: true });
+                await trigger("lastname");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <TextField
+              {...register("email")}
               fullWidth
               required
               id="email"
@@ -312,25 +355,19 @@ export default function UpdateUser() {
               name="email"
               type="email"
               variant="outlined"
-              value={initialValues.email}
-              onChange={(e) =>
-                setInitialValues((prev) => ({
-                  ...prev,
-                  email: e.target.value,
-                }))
-              }
-              // error={inputError.email}
-              // helperText={
-              //   inputError.email
-              //     ? "Ceci n'est pas une adresse email valide"
-              //     : ""
-              // }
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              onChange={async (e) => {
+                setValue("email", e.target.value, { shouldValidate: true });
+                await trigger("email");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="role-select-label">Roles</InputLabel>
               <Select
+                {...register("roles")}
                 fullWidth
                 required
                 labelId="role-select-label"
@@ -351,37 +388,95 @@ export default function UpdateUser() {
                     </MenuItem>
                   ))}
               </Select>
+              {errors.roles && (
+                <p style={{ color: "red", margin: "4px 14px 0" }}>
+                  {errors.roles.message}
+                </p>
+              )}
             </FormControl>
           </Grid>
           <Grid size={6}>
-            <TextField
-              fullWidth
-              required
-              id="password"
-              label="Mot de passe"
-              name="password"
-              type="password"
-              variant="outlined"
-              value={initialValues.password}
-              onChange={(e) =>
-                setInitialValues((prev) => ({
-                  ...prev,
-                  password: e.target.value,
-                }))
-              }
-              // inputRef={userRef.password}
-              // onChange={() => handleInputChange("password", userRef.password)}
-              // onBlur={() => handleInputChange("password", userRef.password)}
-              // error={inputError.password}
-              // helperText={
-              //   inputError.password
-              //     ? "Le mot de passe doit contenir au minimum 8 caractères, dont au moins 1 chiffre, 1 majuscule et 1 caractère spécial"
-              //     : ""
-              // }
-            />
+            <FormControl error={!!errors.password} fullWidth>
+              <InputLabel htmlFor="password">Mot de passe</InputLabel>
+              <OutlinedInput
+                {...register("password")}
+                fullWidth
+                required
+                id="password"
+                name="password"
+                label="Mot de passe"
+                type={showPassword ? "text" : "password"}
+                error={!!errors.password}
+                onChange={async (e) => {
+                  setValue("password", e.target.value, {
+                    shouldValidate: true,
+                  });
+                  await trigger(["password", "passwordConfirm"]);
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword
+                          ? "Cacher le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      onMouseUp={handleMouseUpPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+              <FormHelperText>{errors.password?.message}</FormHelperText>
+            </FormControl>
           </Grid>
           <Grid size={6}>
-            <TextField
+            <FormControl error={!!errors.passwordConfirm} fullWidth>
+              <InputLabel htmlFor="passwordConfirm">
+                Confirmer le mot de passe
+              </InputLabel>
+              <OutlinedInput
+                {...register("passwordConfirm")}
+                fullWidth
+                required
+                id="passwordConfirm"
+                name="passwordConfirm"
+                label="Confirmer le mot de passe"
+                type={showConfirmPassword ? "text" : "password"}
+                error={!!errors.passwordConfirm}
+                onChange={async (e) => {
+                  setValue("passwordConfirm", e.target.value, {
+                    shouldValidate: true,
+                  });
+                  await trigger(["password", "passwordConfirm"]);
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showConfirmPassword
+                          ? "Cacher le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                      onClick={handleClickShowConfirmPassword}
+                      onMouseDown={handleMouseDownConfirmPassword}
+                      onMouseUp={handleMouseUpConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+              <FormHelperText>{errors.password?.message}</FormHelperText>
+            </FormControl>
+
+            {/* <TextField
+              {...register("passwordConfirm")}
               fullWidth
               required
               id="passwordConfirm"
@@ -389,17 +484,15 @@ export default function UpdateUser() {
               name="passwordConfirm"
               type="password"
               variant="outlined"
-              // inputRef={userRef.passwordConfirm}
-              // onChange={() =>
-              //   handleInputChange("passwordConfirm", userRef.passwordConfirm)
-              // }
-              // error={inputError.passwordConfirm}
-              // helperText={
-              //   inputError.passwordConfirm
-              //     ? "La confirmation de mot de passe ne correspond pas"
-              //     : ""
-              // }
-            />
+              error={!!errors.passwordConfirm}
+              helperText={errors.passwordConfirm?.message}
+              onChange={async (e) => {
+                setValue("passwordConfirm", e.target.value, {
+                  shouldValidate: true,
+                });
+                await trigger("passwordConfirm");
+              }}
+            /> */}
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs
@@ -409,6 +502,7 @@ export default function UpdateUser() {
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="commission-select-label">Commissions</InputLabel>
               <Select
+                {...register("commissions")}
                 fullWidth
                 labelId="commission-select-label"
                 id="commissions"
@@ -435,7 +529,7 @@ export default function UpdateUser() {
           <Grid size={4}></Grid>
           <Grid size={4} sx={{ textAlign: "center" }}>
             <Button
-              // disabled={handleDisabledButton()}
+              disabled={Object.keys(errors).length > 0}
               type="submit"
               variant="contained"
               startIcon={<EditIcon />}
