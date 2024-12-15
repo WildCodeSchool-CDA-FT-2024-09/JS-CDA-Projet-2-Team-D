@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-import { useAddCategoryMutation } from "../../types/graphql-types";
+import {
+  useAddCategoryMutation,
+  useGetCategoriesQuery,
+} from "../../types/graphql-types";
+
+import useNotification from "../../hooks/useNotification";
 
 import Grid from "@mui/material/Grid2";
 import {
@@ -27,10 +32,38 @@ const Item = styled(Paper)(({ theme }) => ({
 function AddCategory() {
   const [category, setCategory] = useState<string>("");
   const [creditDebitId, setCreditDebitId] = useState<number>(0);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [addCategoryMutation, { loading, error }] = useAddCategoryMutation();
 
+  const { notifyError, notifySuccess } = useNotification();
+
+  const existingCategories = useGetCategoriesQuery();
+
+  const handleValidation = (): boolean => {
+    if (category.trim() === "") {
+      notifyError("Veuillez entrer un libellé de catégorie !");
+      return false;
+    }
+    if (creditDebitId === 0) {
+      notifyError("Veuillez sélectionner un type de crédit/débit valide !");
+      return false;
+    }
+
+    if (
+      existingCategories.data?.getCategories.find(
+        (c) => c.label.toLowerCase() === category,
+      )
+    ) {
+      notifyError("Cette catégorie existe déjà !");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleAddCategory = async (): Promise<void> => {
+    if (!handleValidation()) {
+      return;
+    }
     if (category.trim() !== "") {
       try {
         const result = await addCategoryMutation({
@@ -40,11 +73,12 @@ function AddCategory() {
           },
         });
         console.info("Nouvelle catégorie ajoutée :", result.data);
-        setSuccessMessage("La catégorie a été créée avec succès !");
+        notifySuccess("Catégorie ajoutée avec succès !");
         setCategory("");
+        setCreditDebitId(0);
       } catch (err) {
         console.error("Erreur lors de l'ajout de la catégorie :", err);
-        setSuccessMessage(null);
+        notifyError("Erreur lors de l'ajout de la catégorie : " + err);
       }
     } else {
       alert("Veuillez entrer une catégorie !");
@@ -139,11 +173,6 @@ function AddCategory() {
                 </Typography>
               )}
             </Button>
-            {successMessage && (
-              <Typography color="success" sx={{ marginTop: 2 }}>
-                {successMessage}
-              </Typography>
-            )}
           </Item>
         </Grid>
       </Grid>
