@@ -133,10 +133,10 @@ export default function UpdateUser() {
 
   const handleGeneratePassword = () => {
     const pwd = generatePassword(12);
-    setValue("password", pwd);
-    trigger("password");
-    setValue("passwordConfirm", pwd);
-    trigger("passwordConfirm");
+    setValue("password", pwd, { shouldValidate: true });
+    setValue("passwordConfirm", pwd, { shouldValidate: true });
+
+    trigger(["password", "passwordConfirm"]);
   };
 
   // User feedback
@@ -414,6 +414,7 @@ export default function UpdateUser() {
                 name="password"
                 label="Mot de passe"
                 type={showPassword ? "text" : "password"}
+                value={watch("password")} // Explicitly set value using watch
                 error={!!errors.password}
                 onChange={async (e) => {
                   setValue("password", e.target.value, {
@@ -455,6 +456,7 @@ export default function UpdateUser() {
                 name="passwordConfirm"
                 label="Confirmer le mot de passe"
                 type={showConfirmPassword ? "text" : "password"}
+                value={watch("passwordConfirm")} // Explicitly set value using watch
                 error={!!errors.passwordConfirm}
                 onChange={async (e) => {
                   setValue("passwordConfirm", e.target.value, {
