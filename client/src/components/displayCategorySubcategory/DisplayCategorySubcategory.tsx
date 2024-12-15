@@ -53,6 +53,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   const [editCategory, setEditCategory] = useState(false);
 
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
+  const [creditDebitId, setCreditDebitId] = useState<number>(0);
 
   const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
@@ -115,6 +116,24 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       );
       return false;
     }
+
+    if (row.categoryLabel === newCategoryLabel) {
+      notifyError("Le nom de la catégorie n'a pas changé");
+      return false;
+    }
+
+    if (creditDebitId === 0) {
+      notifyError("Veuillez sélectionner un type de crédit/débit valide !");
+      return false;
+    }
+
+    // if (
+    //   row.categoryLabel === newCategoryLabel &&
+    //   data.creditDebitId === creditDebitId
+    // ) {
+    //   notifyError("Aucune modification n'a été apportée");
+    //   return false;
+    // }
     return true;
   };
 
@@ -157,18 +176,37 @@ function Row(props: { row: ReturnType<typeof createData> }) {
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
           {editCategory ? (
-            <Box
-              component="input"
-              type="text"
-              value={newCategoryLabel}
-              onChange={(e) => setNewCategoryLabel(e.target.value)}
-              onBlur={handleUpdateCategory}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  handleUpdateCategory();
-                }
-              }}
-            />
+            <>
+              <Box
+                component="input"
+                type="text"
+                value={newCategoryLabel}
+                onChange={(e) => setNewCategoryLabel(e.target.value)}
+                onBlur={handleUpdateCategory}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    handleUpdateCategory();
+                  }
+                  if (e.key === "Escape") {
+                    setEditCategory(false);
+                  }
+                }}
+              />
+              <Box
+                component="select"
+                value={creditDebitId}
+                onChange={(e) => setCreditDebitId(Number(e.target.value))}
+                sx={{ display: "block", width: "100%", padding: "0.5rem" }}
+              >
+                <option value="0">Crédit ou Débit</option>
+                <option value="1">Débit</option>
+                <option value="2">Crédit</option>
+              </Box>
+              <div>
+                <Button onClick={() => handleUpdateCategory()}>Valider</Button>
+                <Button onClick={() => setEditCategory(false)}>Annuler</Button>
+              </div>
+            </>
           ) : (
             row.categoryLabel
           )}
