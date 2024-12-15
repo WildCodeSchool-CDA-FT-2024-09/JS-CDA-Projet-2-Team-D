@@ -79,6 +79,10 @@ export default class UserResolver {
       relations: ["roles", "commissions"],
       skip: offset,
       take: limit,
+      order: {
+        id: "DESC",
+        lastname: "ASC",
+      },
     });
 
     return { users, totalCount };

@@ -16,7 +16,7 @@ import Box from "@mui/material/Box";
 
 export default function ManageUser() {
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(2);
+  const [limit] = useState<number>(10);
   const offset = (page - 1) * limit;
 
   const navigate = useNavigate();
