@@ -441,7 +441,7 @@ export default function UpdateUser() {
                   </InputAdornment>
                 }
               />
-              <FormHelperText>{errors.password?.message}</FormHelperText>
+              <FormHelperText>{errors.passwordConfirm?.message}</FormHelperText>
             </FormControl>
           </Grid>
           <Grid size={12}>
