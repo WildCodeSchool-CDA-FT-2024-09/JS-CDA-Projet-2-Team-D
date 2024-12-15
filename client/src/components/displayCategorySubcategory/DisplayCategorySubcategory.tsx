@@ -1,4 +1,7 @@
-import { useGetCategoriesQuery } from "../../types/graphql-types";
+import {
+  useGetCategoriesQuery,
+  useUpdateCategoryMutation,
+} from "../../types/graphql-types";
 import { useAddSubcategoryMutation } from "../../types/graphql-types";
 
 import { useState } from "react";
@@ -47,17 +50,22 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   const { row } = props;
   const [open, setOpen] = useState(false);
   const [showInput, setShowInput] = useState(false);
+  const [editCategory, setEditCategory] = useState(false);
+
+  const [newCategoryLabel, setNewCategoryLabel] = useState("");
 
   const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
 
   const [addASubcategory] = useAddSubcategoryMutation();
 
+  const [updateCategory] = useUpdateCategoryMutation();
+
   const { notifySuccess, notifyError } = useNotification();
 
   const theme = useTheme();
 
-  const handleValidation = () => {
+  const handleValidation = (): boolean => {
     if (!newSubcategoryLabel && !newSubcategoryCode) {
       notifyError("Veuillez remplir les champs");
       return false;
@@ -99,6 +107,38 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       notifyError("Erreur lors de l'ajout de la sous-catégorie");
     }
   };
+
+  const handleValidationCategory = (): boolean => {
+    if (!newCategoryLabel) {
+      notifyError(
+        "Veuillez mettre mettre à jour le champ 'Nom de la catégorie'",
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!handleValidationCategory()) return;
+    try {
+      await updateCategory({
+        variables: {
+          id: row.categoryId,
+          label: newCategoryLabel,
+          creditDebitId: 1,
+        },
+      });
+      notifySuccess("Catégorie modifiée avec succès");
+    } catch (err) {
+      console.info(err);
+      notifyError("Erreur lors de la modification de la catégorie");
+    }
+  };
+
+  const handleClickCategory = () => {
+    setEditCategory(true);
+  };
+
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -116,10 +156,27 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
-          {row.categoryLabel}
+          {editCategory ? (
+            <Box
+              component="input"
+              type="text"
+              value={newCategoryLabel}
+              onChange={(e) => setNewCategoryLabel(e.target.value)}
+              onBlur={handleUpdateCategory}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  handleUpdateCategory();
+                }
+              }}
+            />
+          ) : (
+            row.categoryLabel
+          )}
         </TableCell>
         <TableCell align="center">
-          <IconButton>{<CreateIcon />}</IconButton>
+          <IconButton onClick={handleClickCategory}>
+            {<CreateIcon />}
+          </IconButton>
         </TableCell>
       </TableRow>
       <TableRow>

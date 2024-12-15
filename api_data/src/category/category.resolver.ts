@@ -71,6 +71,10 @@ export default class CategoryResolver {
       throw new Error("Le libellé de la catégorie est identique !");
     }
 
+    if (await Category.findOneBy({ label })) {
+      throw new Error("Cette catégorie existe déjà !");
+    }
+
     category.label = label;
     category.creditDebit = creditDebit;
 

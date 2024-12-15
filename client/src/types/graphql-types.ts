@@ -48,6 +48,15 @@ export type BankAccount = {
   name: Scalars["String"]["output"];
 };
 
+export type Budget = {
+  __typename?: "Budget";
+  amount: Scalars["Float"]["output"];
+  commissionId: Scalars["Float"]["output"];
+  commissions: Commission;
+  exercise: Exercise;
+  exerciseId: Scalars["Float"]["output"];
+};
+
 export type Category = {
   __typename?: "Category";
   creditDebit: CreditDebit;
@@ -58,12 +67,18 @@ export type Category = {
 
 export type Commission = {
   __typename?: "Commission";
+  budgets: Array<Budget>;
   id: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
-  users: Array<User>;
+  users?: Maybe<Array<User>>;
+};
+
+export type CommissionsInput = {
+  id: Scalars["Float"]["input"];
 };
 
 export type CreateUserInput = {
+  commissions: Array<CommissionsInput>;
   email: Scalars["String"]["input"];
   firstname: Scalars["String"]["input"];
   lastname: Scalars["String"]["input"];
@@ -77,6 +92,15 @@ export type CreditDebit = {
   id: Scalars["Float"]["output"];
   invoices: Array<Invoice>;
   label: Scalars["String"]["output"];
+};
+
+export type Exercise = {
+  __typename?: "Exercise";
+  budgets: Array<Budget>;
+  end_date: Scalars["String"]["output"];
+  id: Scalars["Int"]["output"];
+  label: Scalars["String"]["output"];
+  start_date: Scalars["String"]["output"];
 };
 
 export type Invoice = {
@@ -103,6 +127,7 @@ export type Mutation = {
   addCategory: Category;
   addSubcategory: Subcategory;
   createNewUser: User;
+  updateCategory: Category;
 };
 
 export type MutationAddCategoryArgs = {
@@ -118,6 +143,12 @@ export type MutationAddSubcategoryArgs = {
 
 export type MutationCreateNewUserArgs = {
   data: CreateUserInput;
+};
+
+export type MutationUpdateCategoryArgs = {
+  creditDebitId: Scalars["Float"]["input"];
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
 };
 
 export type PaginatedUsers = {
@@ -180,7 +211,7 @@ export type Subcategory = {
 
 export type User = {
   __typename?: "User";
-  commissions: Array<Commission>;
+  commissions?: Maybe<Array<Commission>>;
   email: Scalars["String"]["output"];
   firstname: Scalars["String"]["output"];
   id: Scalars["Int"]["output"];
@@ -205,7 +236,27 @@ export type AddCategoryMutationVariables = Exact<{
 
 export type AddCategoryMutation = {
   __typename?: "Mutation";
-  addCategory: { __typename?: "Category"; id: number; label: string };
+  addCategory: {
+    __typename?: "Category";
+    label: string;
+    creditDebit: { __typename?: "CreditDebit"; id: number };
+  };
+};
+
+export type UpdateCategoryMutationVariables = Exact<{
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
+  creditDebitId: Scalars["Float"]["input"];
+}>;
+
+export type UpdateCategoryMutation = {
+  __typename?: "Mutation";
+  updateCategory: {
+    __typename?: "Category";
+    id: number;
+    label: string;
+    creditDebit: { __typename?: "CreditDebit"; id: number };
+  };
 };
 
 export type AddSubcategoryMutationVariables = Exact<{
@@ -238,6 +289,7 @@ export type CreateNewUserMutation = {
     email: string;
     password: string;
     roles: Array<{ __typename?: "Role"; id: number }>;
+    commissions?: Array<{ __typename?: "Commission"; id: number }> | null;
   };
 };
 
@@ -259,6 +311,11 @@ export type GetUsersQuery = {
       email: string;
       password: string;
       roles: Array<{ __typename?: "Role"; id: number; label: string }>;
+      commissions?: Array<{
+        __typename?: "Commission";
+        id: number;
+        name: string;
+      }> | null;
     }>;
   };
 };
@@ -371,7 +428,9 @@ export type GetInvoicesByCommissionIdQuery = {
 export const AddCategoryDocument = gql`
   mutation AddCategory($label: String!, $creditDebitId: Float!) {
     addCategory(label: $label, creditDebitId: $creditDebitId) {
-      id
+      creditDebit {
+        id
+      }
       label
     }
   }
@@ -384,9 +443,9 @@ export type AddCategoryMutationFn = Apollo.MutationFunction<
 /**
  * __useAddCategoryMutation__
  *
- * To run a mutation, you first call `useAddCategoryMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useAddCategoryMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useAddCategoryMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -420,6 +479,66 @@ export type AddCategoryMutationOptions = Apollo.BaseMutationOptions<
   AddCategoryMutation,
   AddCategoryMutationVariables
 >;
+export const UpdateCategoryDocument = gql`
+  mutation UpdateCategory(
+    $id: Float!
+    $label: String!
+    $creditDebitId: Float!
+  ) {
+    updateCategory(id: $id, label: $label, creditDebitId: $creditDebitId) {
+      id
+      label
+      creditDebit {
+        id
+      }
+    }
+  }
+`;
+export type UpdateCategoryMutationFn = Apollo.MutationFunction<
+  UpdateCategoryMutation,
+  UpdateCategoryMutationVariables
+>;
+
+/**
+ * __useUpdateCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryMutation, { data, loading, error }] = useUpdateCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      label: // value for 'label'
+ *      creditDebitId: // value for 'creditDebitId'
+ *   },
+ * });
+ */
+export function useUpdateCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateCategoryMutation,
+    UpdateCategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateCategoryMutation,
+    UpdateCategoryMutationVariables
+  >(UpdateCategoryDocument, options);
+}
+export type UpdateCategoryMutationHookResult = ReturnType<
+  typeof useUpdateCategoryMutation
+>;
+export type UpdateCategoryMutationResult =
+  Apollo.MutationResult<UpdateCategoryMutation>;
+export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<
+  UpdateCategoryMutation,
+  UpdateCategoryMutationVariables
+>;
 export const AddSubcategoryDocument = gql`
   mutation AddSubcategory(
     $label: String!
@@ -441,9 +560,9 @@ export type AddSubcategoryMutationFn = Apollo.MutationFunction<
 /**
  * __useAddSubcategoryMutation__
  *
- * To run a mutation, you first call `useAddSubcategoryMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useAddSubcategoryMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useAddSubcategoryMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -489,6 +608,9 @@ export const CreateNewUserDocument = gql`
       roles {
         id
       }
+      commissions {
+        id
+      }
     }
   }
 `;
@@ -500,9 +622,9 @@ export type CreateNewUserMutationFn = Apollo.MutationFunction<
 /**
  * __useCreateNewUserMutation__
  *
- * To run a mutation, you first call `useCreateNewUserMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useCreateNewUserMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useCreateNewUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -548,6 +670,10 @@ export const GetUsersDocument = gql`
           id
           label
         }
+        commissions {
+          id
+          name
+        }
       }
       totalCount
     }
@@ -557,7 +683,7 @@ export const GetUsersDocument = gql`
 /**
  * __useGetUsersQuery__
  *
- * To run a query within a React component, call `useGetUsersQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -630,7 +756,7 @@ export const GetRolesDocument = gql`
 /**
  * __useGetRolesQuery__
  *
- * To run a query within a React component, call `useGetRolesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -735,7 +861,7 @@ export const GetInvoicesDocument = gql`
 /**
  * __useGetInvoicesQuery__
  *
- * To run a query within a React component, call `useGetInvoicesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetInvoicesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetInvoicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -820,7 +946,7 @@ export const GetCategoriesDocument = gql`
 /**
  * __useGetCategoriesQuery__
  *
- * To run a query within a React component, call `useGetCategoriesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -903,7 +1029,7 @@ export const GetVatsDocument = gql`
 /**
  * __useGetVatsQuery__
  *
- * To run a query within a React component, call `useGetVatsQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetVatsQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetVatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -971,7 +1097,7 @@ export const GetCommissionsDocument = gql`
 /**
  * __useGetCommissionsQuery__
  *
- * To run a query within a React component, call `useGetCommissionsQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetCommissionsQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetCommissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -1068,7 +1194,7 @@ export const GetInvoicesByCommissionIdDocument = gql`
 /**
  * __useGetInvoicesByCommissionIdQuery__
  *
- * To run a query within a React component, call `useGetInvoicesByCommissionIdQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetInvoicesByCommissionIdQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetInvoicesByCommissionIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -1151,6 +1277,7 @@ export const namedOperations = {
   },
   Mutation: {
     AddCategory: "AddCategory",
+    UpdateCategory: "UpdateCategory",
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
   },
