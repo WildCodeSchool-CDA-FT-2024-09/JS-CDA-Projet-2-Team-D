@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { generatePassword } from "../../../services/generatePassword";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
@@ -32,6 +33,7 @@ import Grid from "@mui/material/Grid2";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -129,6 +131,14 @@ export default function UpdateUser() {
     event.preventDefault();
   };
 
+  const handleGeneratePassword = () => {
+    const pwd = generatePassword(12);
+    setValue("password", pwd);
+    trigger("password");
+    setValue("passwordConfirm", pwd);
+    trigger("passwordConfirm");
+  };
+
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
 
@@ -141,8 +151,6 @@ export default function UpdateUser() {
     watch,
     formState: {
       errors, // Contains validation errors
-      // isValid, // Indicates if the entire form is valid
-      // isDirty, // Indicates if the form has been modified
     },
   } = useForm({
     resolver: zodResolver(updateUserSchema),
@@ -474,25 +482,14 @@ export default function UpdateUser() {
               />
               <FormHelperText>{errors.password?.message}</FormHelperText>
             </FormControl>
-
-            {/* <TextField
-              {...register("passwordConfirm")}
-              fullWidth
-              required
-              id="passwordConfirm"
-              label="Confirmer le mot de passe"
-              name="passwordConfirm"
-              type="password"
-              variant="outlined"
-              error={!!errors.passwordConfirm}
-              helperText={errors.passwordConfirm?.message}
-              onChange={async (e) => {
-                setValue("passwordConfirm", e.target.value, {
-                  shouldValidate: true,
-                });
-                await trigger("passwordConfirm");
-              }}
-            /> */}
+          </Grid>
+          <Grid size={12}>
+            <Button
+              startIcon={<SyncLockIcon />}
+              onClick={handleGeneratePassword}
+            >
+              Générer un mot de passe
+            </Button>
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs
