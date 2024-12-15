@@ -1,11 +1,13 @@
-import { useRef, useState, RefObject } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateUserSchema } from "../../../utils/userValidation";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
-import { BooleanMap } from "../../../types/types";
-import { RefMap } from "../../../types/types";
+import { generatePassword } from "../../../utils/generatePassword";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import {
@@ -13,6 +15,9 @@ import {
   Button,
   Checkbox,
   FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -21,8 +26,11 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import Grid from "@mui/material/Grid2";
+import AddIcon from "@mui/icons-material/Add";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -42,36 +50,91 @@ export default function CreateUser() {
   const { data: commissionsData } = useGetCommissionsQuery();
   const [createNewUser] = useCreateNewUserMutation();
 
+  // Password texfield
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseDownConfirmPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpConfirmPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleGeneratePassword = () => {
+    const pwd = generatePassword(12);
+    setValue("password", pwd, { shouldValidate: true });
+    setValue("passwordConfirm", pwd, { shouldValidate: true });
+
+    trigger(["password", "passwordConfirm"]);
+  };
+
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
 
-  // used instead of states to avoid multiple re-renders when typing
-  const userRef: RefMap = {
-    firstname: useRef<HTMLInputElement>(null),
-    lastname: useRef<HTMLInputElement>(null),
-    email: useRef<HTMLInputElement>(null),
-    password: useRef<HTMLInputElement>(null),
-    passwordConfirm: useRef<HTMLInputElement>(null),
-    roles: useRef<HTMLInputElement>(null),
-    commissions: useRef<HTMLInputElement>(null),
-  };
-
-  // Check input errors
-  const [inputError, setInputError] = useState<BooleanMap>({
-    firstname: false,
-    lastname: false,
-    email: false,
-    password: false,
+  // Zod
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    trigger, // Manual validation trigger
+    watch,
+    formState: {
+      errors, // Contains validation errors
+    },
+  } = useForm({
+    resolver: zodResolver(updateUserSchema),
+    mode: "onChange", // Validate on every change
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      roles: [],
+      commissions: [],
+    },
   });
+
+  // Watch form values for dynamic validation
+  const watchPassword = watch("password");
+  const watchPasswordConfirm = watch("passwordConfirm");
+
+  // Trigger validation for password confirmation when password changes
+  useEffect(() => {
+    if (watchPassword || watchPasswordConfirm) {
+      trigger("passwordConfirm");
+    }
+  }, [watchPassword, watchPasswordConfirm, trigger]);
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
       target: { value },
     } = event;
-    setRoles(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value,
-    );
+    // On autofill we get a stringified value
+    const selectedRoles = typeof value === "string" ? value.split(",") : value;
+    setRoles(selectedRoles);
   };
 
   const handleChangeCommissions = (
@@ -80,65 +143,24 @@ export default function CreateUser() {
     const {
       target: { value },
     } = event;
-    setCommissions(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value,
-    );
+    // On autofill we get a stringified value
+    const selectedCommissions =
+      typeof value === "string" ? value.split(",") : value;
+    setCommissions(selectedCommissions);
   };
 
-  const handleInputChange = (
-    field: string,
-    inputRef: RefObject<HTMLInputElement>,
-  ) => {
-    if (field === "firstname" || field === "lastname") {
-      const isValid = validateNameInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "email") {
-      const isValid = validateEmailInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "password") {
-      const isValid = validatePasswordInput(inputRef);
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    } else if (field === "passwordConfirm") {
-      const isValid = validatePasswordConfirmInput();
-      setInputError((prevErrors) => ({ ...prevErrors, [field]: !isValid }));
-    }
-  };
-
-  const validateNameInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    return value
-      ? /^.{1,50}$/.test(value) && /^[A-Za-z0-9À-ÖØ-öø-ÿ@_-\s]+$/.test(value)
-      : false;
-  };
-
-  const validateEmailInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    return value
-      ? /^.{5,150}$/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      : false;
-  };
-
-  const validatePasswordInput = (inputRef: RefObject<HTMLInputElement>) => {
-    const value = inputRef.current && inputRef.current.value;
-    // At least one uppercase letter, one number, one special character, minimum of 8 characters
-    return value
-      ? /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-      : false;
-  };
-
-  const validatePasswordConfirmInput = () => {
-    return userRef.password.current?.value !==
-      userRef.passwordConfirm.current?.value
-      ? false
-      : true;
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // Form submission handler
+  const onSubmit = async (formData: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    roles: string[];
+    commissions?: string[];
+  }) => {
     try {
-      const selectedRoleObjects = roles
-        .map((roleLabel) =>
+      const selectedRoleObjects: { id: number }[] = roles
+        .map((roleLabel: string) =>
           rolesData?.getRoles.find((role) => role.label === roleLabel),
         )
         .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
@@ -147,8 +169,8 @@ export default function CreateUser() {
       // Default role is set to commission
       if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
 
-      const selectedCommissionsObjects = commissions
-        .map((commissionLabel) =>
+      const selectedCommissionsObjects: { id: number }[] = commissions
+        .map((commissionLabel: string) =>
           commissionsData?.getCommissions.find(
             (commission) => commission.name === commissionLabel,
           ),
@@ -159,16 +181,10 @@ export default function CreateUser() {
       await createNewUser({
         variables: {
           data: {
-            firstname: userRef.firstname.current
-              ? userRef.firstname.current.value
-              : "",
-            lastname: userRef.lastname.current
-              ? userRef.lastname.current.value
-              : "",
-            email: userRef.email.current ? userRef.email.current.value : "",
-            password: userRef.password.current
-              ? userRef.password.current.value
-              : "",
+            firstname: formData.firstname,
+            lastname: formData.lastname,
+            email: formData.email,
+            password: formData.password,
             roles: selectedRoleObjects,
             commissions: selectedCommissionsObjects,
           },
@@ -178,28 +194,16 @@ export default function CreateUser() {
       notifySuccess("Utilisateur ajouté avec succès");
 
       // Reset the form
-      if (userRef.firstname.current) userRef.firstname.current.value = "";
-      if (userRef.lastname.current) userRef.lastname.current.value = "";
-      if (userRef.email.current) userRef.email.current.value = "";
-      if (userRef.password.current) userRef.password.current.value = "";
-      if (userRef.passwordConfirm.current)
-        userRef.passwordConfirm.current.value = "";
+      if (formData.firstname) setValue("firstname", "");
+      if (formData.lastname) setValue("lastname", "");
+      if (formData.email) setValue("email", "");
+      if (formData.password) setValue("password", "");
       setRoles([]);
       setCommissions([]);
     } catch (error) {
       notifyError("Erreur lors de l'ajout de l'utilisateur");
       console.error("Erreur lors de l'ajout d'un utilisateur", error);
     }
-  };
-
-  // Disable add button if errors
-  const handleDisabledButton = (): boolean => {
-    return (
-      Object.values(inputError).some((el) => el) ||
-      Object.values(userRef).some(
-        (el) => el.current != null && el.current.value == "",
-      )
-    );
   };
 
   return (
@@ -233,7 +237,7 @@ export default function CreateUser() {
 
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           border: "1px solid #f3f3f3",
           padding: "1em",
@@ -245,43 +249,41 @@ export default function CreateUser() {
         <Grid container spacing={2}>
           <Grid size={6}>
             <TextField
+              {...register("firstname")}
               fullWidth
               required
               id="firstname"
               label="Prénom"
               name="firstname"
               variant="outlined"
-              inputRef={userRef.firstname}
-              onChange={() => handleInputChange("firstname", userRef.firstname)}
-              error={inputError.firstname}
-              helperText={
-                inputError.firstname
-                  ? "Uniquement des caractères alphanumériques (max 50)"
-                  : ""
-              }
+              error={!!errors.firstname}
+              helperText={errors.firstname?.message}
+              onChange={async (e) => {
+                setValue("firstname", e.target.value, { shouldValidate: true });
+                await trigger("firstname");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <TextField
+              {...register("lastname")}
               fullWidth
               required
               id="lastname"
               label="Nom"
               name="lastname"
               variant="outlined"
-              inputRef={userRef.lastname}
-              onChange={() => handleInputChange("lastname", userRef.lastname)}
-              onBlur={() => handleInputChange("lastname", userRef.lastname)}
-              error={inputError.lastname}
-              helperText={
-                inputError.lastname
-                  ? "Uniquement des caractères alphanumériques (max 50)"
-                  : ""
-              }
+              error={!!errors.lastname}
+              helperText={errors.lastname?.message}
+              onChange={async (e) => {
+                setValue("lastname", e.target.value, { shouldValidate: true });
+                await trigger("lastname");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <TextField
+              {...register("email")}
               fullWidth
               required
               id="email"
@@ -289,21 +291,19 @@ export default function CreateUser() {
               name="email"
               type="email"
               variant="outlined"
-              inputRef={userRef.email}
-              onChange={() => handleInputChange("email", userRef.email)}
-              onBlur={() => handleInputChange("email", userRef.email)}
-              error={inputError.email}
-              helperText={
-                inputError.email
-                  ? "Ceci n'est pas une adresse email valide"
-                  : ""
-              }
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              onChange={async (e) => {
+                setValue("email", e.target.value, { shouldValidate: true });
+                await trigger("email");
+              }}
             />
           </Grid>
           <Grid size={6}>
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="role-select-label">Roles</InputLabel>
               <Select
+                {...register("roles")}
                 fullWidth
                 required
                 labelId="role-select-label"
@@ -324,48 +324,102 @@ export default function CreateUser() {
                     </MenuItem>
                   ))}
               </Select>
+              {errors.roles && (
+                <p style={{ color: "red", margin: "4px 14px 0" }}>
+                  {errors.roles.message}
+                </p>
+              )}
             </FormControl>
           </Grid>
           <Grid size={6}>
-            <TextField
-              fullWidth
-              required
-              id="password"
-              label="Mot de passe"
-              name="password"
-              type="password"
-              variant="outlined"
-              inputRef={userRef.password}
-              onChange={() => handleInputChange("password", userRef.password)}
-              onBlur={() => handleInputChange("password", userRef.password)}
-              error={inputError.password}
-              helperText={
-                inputError.password
-                  ? "Le mot de passe doit contenir au minimum 8 caractères, dont au moins 1 chiffre, 1 majuscule et 1 caractère spécial"
-                  : ""
-              }
-            />
+            <FormControl error={!!errors.password} fullWidth>
+              <InputLabel htmlFor="password">Mot de passe</InputLabel>
+              <OutlinedInput
+                {...register("password")}
+                fullWidth
+                required
+                id="password"
+                name="password"
+                label="Mot de passe"
+                type={showPassword ? "text" : "password"}
+                value={watch("password")} // Explicitly set value using watch
+                error={!!errors.password}
+                onChange={async (e) => {
+                  setValue("password", e.target.value, {
+                    shouldValidate: true,
+                  });
+                  await trigger(["password", "passwordConfirm"]);
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword
+                          ? "Cacher le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      onMouseUp={handleMouseUpPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+              <FormHelperText>{errors.password?.message}</FormHelperText>
+            </FormControl>
           </Grid>
           <Grid size={6}>
-            <TextField
-              fullWidth
-              required
-              id="passwordConfirm"
-              label="Confirmer le mot de passe"
-              name="passwordConfirm"
-              type="password"
-              variant="outlined"
-              inputRef={userRef.passwordConfirm}
-              onChange={() =>
-                handleInputChange("passwordConfirm", userRef.passwordConfirm)
-              }
-              error={inputError.passwordConfirm}
-              helperText={
-                inputError.passwordConfirm
-                  ? "La confirmation de mot de passe ne correspond pas"
-                  : ""
-              }
-            />
+            <FormControl error={!!errors.passwordConfirm} fullWidth>
+              <InputLabel htmlFor="passwordConfirm">
+                Confirmer le mot de passe
+              </InputLabel>
+              <OutlinedInput
+                {...register("passwordConfirm")}
+                fullWidth
+                required
+                id="passwordConfirm"
+                name="passwordConfirm"
+                label="Confirmer le mot de passe"
+                type={showConfirmPassword ? "text" : "password"}
+                value={watch("passwordConfirm")} // Explicitly set value using watch
+                error={!!errors.passwordConfirm}
+                onChange={async (e) => {
+                  setValue("passwordConfirm", e.target.value, {
+                    shouldValidate: true,
+                  });
+                  await trigger(["password", "passwordConfirm"]);
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showConfirmPassword
+                          ? "Cacher le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                      onClick={handleClickShowConfirmPassword}
+                      onMouseDown={handleMouseDownConfirmPassword}
+                      onMouseUp={handleMouseUpConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+              <FormHelperText>{errors.password?.message}</FormHelperText>
+            </FormControl>
+          </Grid>
+          <Grid size={12}>
+            <Button
+              startIcon={<SyncLockIcon />}
+              onClick={handleGeneratePassword}
+            >
+              Générer un mot de passe
+            </Button>
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs
@@ -375,6 +429,7 @@ export default function CreateUser() {
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="commission-select-label">Commissions</InputLabel>
               <Select
+                {...register("commissions")}
                 fullWidth
                 labelId="commission-select-label"
                 id="commissions"
@@ -401,7 +456,7 @@ export default function CreateUser() {
           <Grid size={4}></Grid>
           <Grid size={4} sx={{ textAlign: "center" }}>
             <Button
-              disabled={handleDisabledButton()}
+              disabled={Object.keys(errors).length > 0}
               type="submit"
               variant="contained"
               startIcon={<AddIcon />}

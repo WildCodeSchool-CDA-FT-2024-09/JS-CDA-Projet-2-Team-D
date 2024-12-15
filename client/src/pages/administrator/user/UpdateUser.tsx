@@ -59,9 +59,10 @@ export default function UpdateUser() {
   const [updateUserMutation] = useUpdateUserMutation();
 
   // Password texfield
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const handleClickShowConfirmPassword = () =>
     setShowConfirmPassword((show) => !show);
 
