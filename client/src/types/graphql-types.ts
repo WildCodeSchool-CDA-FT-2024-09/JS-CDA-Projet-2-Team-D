@@ -145,6 +145,12 @@ export type MutationCreateNewUserArgs = {
   data: CreateUserInput;
 };
 
+export type PaginatedInvoices = {
+  __typename?: "PaginatedInvoices";
+  invoices: Array<Invoice>;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type PaginatedUsers = {
   __typename?: "PaginatedUsers";
   totalCount: Scalars["Int"]["output"];
@@ -159,7 +165,7 @@ export type Query = {
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
   getInvoices: Array<Invoice>;
-  getInvoicesByCommissionId: Array<Invoice>;
+  getInvoicesByCommissionId: PaginatedInvoices;
   getRoles: Array<Role>;
   getStatuss: Array<Status>;
   getSubcategories: Array<Subcategory>;
@@ -384,23 +390,27 @@ export type GetCommissionsQuery = {
 
 export type GetInvoicesByCommissionIdQueryVariables = Exact<{
   commissionId: Scalars["Float"]["input"];
-  limit: Scalars["Float"]["input"];
   offset: Scalars["Float"]["input"];
+  limit: Scalars["Float"]["input"];
 }>;
 
 export type GetInvoicesByCommissionIdQuery = {
   __typename?: "Query";
-  getInvoicesByCommissionId: Array<{
-    __typename?: "Invoice";
-    id: number;
-    date: string;
-    invoiceNumber: string;
-    label: string;
-    price_without_vat: number;
-    status: { __typename?: "Status"; label: string; id: number };
-    vat: { __typename?: "Vat"; rate: number; label: string; id: number };
-    creditDebit: { __typename?: "CreditDebit"; label: string; id: number };
-  }>;
+  getInvoicesByCommissionId: {
+    __typename?: "PaginatedInvoices";
+    totalCount: number;
+    invoices: Array<{
+      __typename?: "Invoice";
+      date: string;
+      id: number;
+      invoiceNumber: string;
+      label: string;
+      price_without_vat: number;
+      status: { __typename?: "Status"; label: string; id: number };
+      vat: { __typename?: "Vat"; rate: number; label: string; id: number };
+      creditDebit: { __typename?: "CreditDebit"; label: string; id: number };
+    }>;
+  };
 };
 
 export const AddCategoryDocument = gql`
@@ -1082,32 +1092,35 @@ export type GetCommissionsQueryResult = Apollo.QueryResult<
 export const GetInvoicesByCommissionIdDocument = gql`
   query GetInvoicesByCommissionId(
     $commissionId: Float!
-    $limit: Float!
     $offset: Float!
+    $limit: Float!
   ) {
     getInvoicesByCommissionId(
       commissionId: $commissionId
       offset: $offset
       limit: $limit
     ) {
-      id
-      date
-      invoiceNumber
-      label
-      price_without_vat
-      status {
-        label
+      invoices {
+        date
         id
-      }
-      vat {
-        rate
+        invoiceNumber
         label
-        id
+        price_without_vat
+        status {
+          label
+          id
+        }
+        vat {
+          rate
+          label
+          id
+        }
+        creditDebit {
+          label
+          id
+        }
       }
-      creditDebit {
-        label
-        id
-      }
+      totalCount
     }
   }
 `;
@@ -1125,8 +1138,8 @@ export const GetInvoicesByCommissionIdDocument = gql`
  * const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
  *   variables: {
  *      commissionId: // value for 'commissionId'
- *      limit: // value for 'limit'
  *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
  *   },
  * });
  */

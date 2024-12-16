@@ -9,22 +9,38 @@ import {
   Paper,
   Typography,
   Chip,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import { useMediaQuery, useTheme } from "@mui/material";
 import BudgetGauge from "../../components/budgetGaugeChart/BudgetGaugeChart";
 import { useGetInvoicesByCommissionIdQuery } from "../../types/graphql-types";
 import { formatDate } from "../../utils/dateUtils";
+import { useState } from "react";
 
 const HomePageCommission = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+  // État pour gérer la pagination
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(5); // Nombre d'éléments par page
+  const offset = (page - 1) * limit;
+
+  // Gestion du changement de page
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value);
+  };
+
   // Appel de la requête GraphQL avec les paramètres donnés
   const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
     variables: {
       commissionId: 4,
-      limit: 5,
-      offset: 0,
+      limit: limit,
+      offset: offset,
     },
   });
 
@@ -38,7 +54,9 @@ const HomePageCommission = () => {
     );
 
   // Extraction des données depuis la réponse GraphQL
-  const invoices = data?.getInvoicesByCommissionId || [];
+  const invoices = data?.getInvoicesByCommissionId.invoices || [];
+  const totalCount = data?.getInvoicesByCommissionId?.totalCount || 0;
+  const totalPages = Math.ceil(totalCount / limit);
 
   const budgetActuel = invoices.reduce(
     (sum, row) => sum + (row.price_without_vat || 0),
@@ -123,6 +141,23 @@ const HomePageCommission = () => {
             ))}
           </TableBody>
         </Table>
+        <Stack
+          spacing={2}
+          sx={{
+            marginBottom: "1em",
+            marginTop: "1em",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
       </TableContainer>
     </Box>
   );

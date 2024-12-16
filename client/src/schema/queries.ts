@@ -120,32 +120,35 @@ export const GET_COMMISSIONS = gql`
 export const GET_INVOICE_BY_COMMISSION = gql`
   query GetInvoicesByCommissionId(
     $commissionId: Float!
-    $limit: Float!
     $offset: Float!
+    $limit: Float!
   ) {
     getInvoicesByCommissionId(
       commissionId: $commissionId
       offset: $offset
       limit: $limit
     ) {
-      id
-      date
-      invoiceNumber
-      label
-      price_without_vat
-      status {
-        label
+      invoices {
+        date
         id
-      }
-      vat {
-        rate
+        invoiceNumber
         label
-        id
+        price_without_vat
+        status {
+          label
+          id
+        }
+        vat {
+          rate
+          label
+          id
+        }
+        creditDebit {
+          label
+          id
+        }
       }
-      creditDebit {
-        label
-        id
-      }
+      totalCount
     }
   }
 `;
