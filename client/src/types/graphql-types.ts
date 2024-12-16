@@ -28,7 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: unknown; output: unknown };
+  DateTimeISO: { input: string; output: string };
 };
 
 export type Bank = {
@@ -48,6 +48,15 @@ export type BankAccount = {
   name: Scalars["String"]["output"];
 };
 
+export type Budget = {
+  __typename?: "Budget";
+  amount: Scalars["Float"]["output"];
+  commissionId: Scalars["Float"]["output"];
+  commissions: Commission;
+  exercise: Exercise;
+  exerciseId: Scalars["Float"]["output"];
+};
+
 export type Category = {
   __typename?: "Category";
   creditDebit: CreditDebit;
@@ -58,12 +67,19 @@ export type Category = {
 
 export type Commission = {
   __typename?: "Commission";
+  budgets: Array<Budget>;
   id: Scalars["Float"]["output"];
+  invoices: Array<Invoice>;
   name: Scalars["String"]["output"];
-  users: Array<User>;
+  users?: Maybe<Array<User>>;
+};
+
+export type CommissionsInput = {
+  id: Scalars["Float"]["input"];
 };
 
 export type CreateUserInput = {
+  commissions: Array<CommissionsInput>;
   email: Scalars["String"]["input"];
   firstname: Scalars["String"]["input"];
   lastname: Scalars["String"]["input"];
@@ -77,6 +93,15 @@ export type CreditDebit = {
   id: Scalars["Float"]["output"];
   invoices: Array<Invoice>;
   label: Scalars["String"]["output"];
+};
+
+export type Exercise = {
+  __typename?: "Exercise";
+  budgets: Array<Budget>;
+  end_date: Scalars["String"]["output"];
+  id: Scalars["Int"]["output"];
+  label: Scalars["String"]["output"];
+  start_date: Scalars["String"]["output"];
 };
 
 export type Invoice = {
@@ -144,6 +169,8 @@ export type Query = {
 
 export type QueryGetInvoicesByCommissionIdArgs = {
   commissionId: Scalars["Float"]["input"];
+  limit?: Scalars["Float"]["input"];
+  offset?: Scalars["Float"]["input"];
 };
 
 export type QueryGetUsersArgs = {
@@ -180,7 +207,7 @@ export type Subcategory = {
 
 export type User = {
   __typename?: "User";
-  commissions: Array<Commission>;
+  commissions?: Maybe<Array<Commission>>;
   email: Scalars["String"]["output"];
   firstname: Scalars["String"]["output"];
   id: Scalars["Int"]["output"];
@@ -238,6 +265,7 @@ export type CreateNewUserMutation = {
     email: string;
     password: string;
     roles: Array<{ __typename?: "Role"; id: number }>;
+    commissions?: Array<{ __typename?: "Commission"; id: number }> | null;
   };
 };
 
@@ -259,6 +287,11 @@ export type GetUsersQuery = {
       email: string;
       password: string;
       roles: Array<{ __typename?: "Role"; id: number; label: string }>;
+      commissions?: Array<{
+        __typename?: "Commission";
+        id: number;
+        name: string;
+      }> | null;
     }>;
   };
 };
@@ -282,7 +315,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: unknown;
+    date: string;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -351,20 +384,22 @@ export type GetCommissionsQuery = {
 
 export type GetInvoicesByCommissionIdQueryVariables = Exact<{
   commissionId: Scalars["Float"]["input"];
+  limit: Scalars["Float"]["input"];
+  offset: Scalars["Float"]["input"];
 }>;
 
 export type GetInvoicesByCommissionIdQuery = {
   __typename?: "Query";
   getInvoicesByCommissionId: Array<{
     __typename?: "Invoice";
-    date: unknown;
     id: number;
+    date: string;
+    invoiceNumber: string;
     label: string;
     price_without_vat: number;
-    commission?: { __typename?: "Commission"; name: string; id: number } | null;
+    status: { __typename?: "Status"; label: string; id: number };
+    vat: { __typename?: "Vat"; rate: number; label: string; id: number };
     creditDebit: { __typename?: "CreditDebit"; label: string; id: number };
-    status: { __typename?: "Status"; id: number; label: string };
-    vat: { __typename?: "Vat"; id: number; rate: number; label: string };
   }>;
 };
 
@@ -384,9 +419,9 @@ export type AddCategoryMutationFn = Apollo.MutationFunction<
 /**
  * __useAddCategoryMutation__
  *
- * To run a mutation, you first call `useAddCategoryMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useAddCategoryMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useAddCategoryMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -441,9 +476,9 @@ export type AddSubcategoryMutationFn = Apollo.MutationFunction<
 /**
  * __useAddSubcategoryMutation__
  *
- * To run a mutation, you first call `useAddSubcategoryMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useAddSubcategoryMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useAddSubcategoryMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -489,6 +524,9 @@ export const CreateNewUserDocument = gql`
       roles {
         id
       }
+      commissions {
+        id
+      }
     }
   }
 `;
@@ -500,9 +538,9 @@ export type CreateNewUserMutationFn = Apollo.MutationFunction<
 /**
  * __useCreateNewUserMutation__
  *
- * To run a mutation, you first call `useCreateNewUserMutation` within a React component and pass it unknown options that fit your needs.
+ * To run a mutation, you first call `useCreateNewUserMutation` within a React component and pass it any options that fit your needs.
  * When your component renders, `useCreateNewUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at unknown time to execute the mutation
+ * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
@@ -548,6 +586,10 @@ export const GetUsersDocument = gql`
           id
           label
         }
+        commissions {
+          id
+          name
+        }
       }
       totalCount
     }
@@ -557,7 +599,7 @@ export const GetUsersDocument = gql`
 /**
  * __useGetUsersQuery__
  *
- * To run a query within a React component, call `useGetUsersQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -630,7 +672,7 @@ export const GetRolesDocument = gql`
 /**
  * __useGetRolesQuery__
  *
- * To run a query within a React component, call `useGetRolesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -735,7 +777,7 @@ export const GetInvoicesDocument = gql`
 /**
  * __useGetInvoicesQuery__
  *
- * To run a query within a React component, call `useGetInvoicesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetInvoicesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetInvoicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -820,7 +862,7 @@ export const GetCategoriesDocument = gql`
 /**
  * __useGetCategoriesQuery__
  *
- * To run a query within a React component, call `useGetCategoriesQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -903,7 +945,7 @@ export const GetVatsDocument = gql`
 /**
  * __useGetVatsQuery__
  *
- * To run a query within a React component, call `useGetVatsQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetVatsQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetVatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -971,7 +1013,7 @@ export const GetCommissionsDocument = gql`
 /**
  * __useGetCommissionsQuery__
  *
- * To run a query within a React component, call `useGetCommissionsQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetCommissionsQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetCommissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -1038,29 +1080,34 @@ export type GetCommissionsQueryResult = Apollo.QueryResult<
   GetCommissionsQueryVariables
 >;
 export const GetInvoicesByCommissionIdDocument = gql`
-  query GetInvoicesByCommissionId($commissionId: Float!) {
-    getInvoicesByCommissionId(commissionId: $commissionId) {
-      commission {
-        name
+  query GetInvoicesByCommissionId(
+    $commissionId: Float!
+    $limit: Float!
+    $offset: Float!
+  ) {
+    getInvoicesByCommissionId(
+      commissionId: $commissionId
+      offset: $offset
+      limit: $limit
+    ) {
+      id
+      date
+      invoiceNumber
+      label
+      price_without_vat
+      status {
+        label
+        id
+      }
+      vat {
+        rate
+        label
         id
       }
       creditDebit {
         label
         id
       }
-      date
-      id
-      label
-      status {
-        id
-        label
-      }
-      vat {
-        id
-        rate
-        label
-      }
-      price_without_vat
     }
   }
 `;
@@ -1068,7 +1115,7 @@ export const GetInvoicesByCommissionIdDocument = gql`
 /**
  * __useGetInvoicesByCommissionIdQuery__
  *
- * To run a query within a React component, call `useGetInvoicesByCommissionIdQuery` and pass it unknown options that fit your needs.
+ * To run a query within a React component, call `useGetInvoicesByCommissionIdQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetInvoicesByCommissionIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
@@ -1078,6 +1125,8 @@ export const GetInvoicesByCommissionIdDocument = gql`
  * const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
  *   variables: {
  *      commissionId: // value for 'commissionId'
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
  *   },
  * });
  */
