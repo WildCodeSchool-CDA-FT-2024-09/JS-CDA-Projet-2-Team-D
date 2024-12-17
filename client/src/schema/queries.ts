@@ -118,29 +118,37 @@ export const GET_COMMISSIONS = gql`
 `;
 
 export const GET_INVOICE_BY_COMMISSION = gql`
-  query GetInvoicesByCommissionId($commissionId: Float!) {
-    getInvoicesByCommissionId(commissionId: $commissionId) {
-      commission {
-        name
+  query GetInvoicesByCommissionId(
+    $commissionId: Float!
+    $offset: Float!
+    $limit: Float!
+  ) {
+    getInvoicesByCommissionId(
+      commissionId: $commissionId
+      offset: $offset
+      limit: $limit
+    ) {
+      invoices {
+        date
         id
-      }
-      creditDebit {
+        invoiceNumber
         label
-        id
+        price_without_vat
+        status {
+          label
+          id
+        }
+        vat {
+          rate
+          label
+          id
+        }
+        creditDebit {
+          label
+          id
+        }
       }
-      date
-      id
-      label
-      status {
-        id
-        label
-      }
-      vat {
-        id
-        rate
-        label
-      }
-      price_without_vat
+      totalCount
     }
   }
 `;

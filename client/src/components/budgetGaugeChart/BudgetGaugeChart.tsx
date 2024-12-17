@@ -1,4 +1,3 @@
-import React from "react";
 import { Gauge } from "@mui/x-charts";
 import { useTheme } from "@mui/material";
 
@@ -42,7 +41,7 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
             fill: getColor(pourcentage),
           },
           "& .MuiGauge-referenceArc": {
-            fill: theme.palette.primary.main,
+            fill: "#DADBBD",
           },
         }}
       />

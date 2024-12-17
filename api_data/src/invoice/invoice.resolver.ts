@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
@@ -106,18 +106,6 @@ export default class InvoiceResolver {
     } catch (error) {
       console.error("Erreur lors de la récupération des factures:", error);
       throw new Error("Erreur lors de la récupération des factures");
-    }
-  }
-  @Query(() => [Invoice])
-  async getInvoicesByCommissionId(@Arg("commissionId") commissionId: number) {
-    try {
-      return await Invoice.find({
-        where: { commission: { id: commissionId } }, //budget, limit 20
-        relations: ["commission", "status", "vat", "creditDebit"],
-      });
-    } catch (error) {
-      console.error("Error fetching invoices by commission ID:", error);
-      throw new Error("Unable to fetch invoices for the given commission ID.");
     }
   }
 }

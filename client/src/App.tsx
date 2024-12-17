@@ -37,11 +37,15 @@ const theme = createTheme({
     },
     success: {
       main: "#6EBF8B", // Green
-      contrastText: "#FFFFFF",
+      contrastText: "#1F1F1F",
+    },
+    warning: {
+      main: "#FFDD83", // yellow
+      contrastText: "#1F1F1F",
     },
     error: {
       main: "#E21818", // Red
-      contrastText: "#FFFFFF",
+      contrastText: "#1F1F1F",
     },
   },
   breakpoints: {

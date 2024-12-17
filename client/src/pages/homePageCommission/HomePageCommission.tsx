@@ -9,72 +9,59 @@ import {
   Paper,
   Typography,
   Chip,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import { useMediaQuery, useTheme } from "@mui/material";
 import BudgetGauge from "../../components/budgetGaugeChart/BudgetGaugeChart";
-
-const data = [
-  {
-    id: 1,
-    price_without_vat: 400,
-    label: "essence",
-    vatRate: 20,
-    ttc: 480,
-    status: "Validé",
-    date: "2024/12/01",
-  },
-  {
-    id: 2,
-    price_without_vat: 50,
-    label: "cigarette",
-    vatRate: 10,
-    ttc: 55,
-    status: "Refusé",
-    date: "2024/12/02",
-  },
-  {
-    id: 3,
-    price_without_vat: 60,
-    label: "chaussure",
-    vatRate: 5,
-    ttc: 63,
-    status: "En attente",
-    date: "2024/12/03",
-  },
-  {
-    id: 4,
-    price_without_vat: 500,
-    label: "chocolat",
-    vatRate: 20,
-    ttc: 600,
-    status: "Validé",
-    date: "2024/12/04",
-  },
-  {
-    id: 5,
-    price_without_vat: 30,
-    label: "bijoux",
-    vatRate: 10,
-    ttc: 33,
-    status: "Refusé",
-    date: "2024/12/05",
-  },
-  {
-    id: 6,
-    price_without_vat: 600,
-    label: "Lego",
-    vatRate: 5,
-    ttc: 630,
-    status: "En attente",
-    date: "2024/12/06",
-  },
-];
+import { useGetInvoicesByCommissionIdQuery } from "../../types/graphql-types";
+import { formatDate } from "../../utils/dateUtils";
+import { useState } from "react";
 
 const HomePageCommission = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const budgetActuel = data.reduce((sum, row) => sum + row.ttc, 0);
+  // État pour gérer la pagination
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(5); // Nombre d'éléments par page
+  const offset = (page - 1) * limit;
+
+  // Gestion du changement de page
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value);
+  };
+
+  // Appel de la requête GraphQL avec les paramètres donnés
+  const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
+    variables: {
+      commissionId: 4,
+      limit: limit,
+      offset: offset,
+    },
+  });
+
+  // Gestion des états de chargement et d'erreur
+  if (loading) return <Typography>Chargement des factures...</Typography>;
+  if (error)
+    return (
+      <Typography>
+        Erreur lors de la récupération des factures : {error.message}
+      </Typography>
+    );
+
+  // Extraction des données depuis la réponse GraphQL
+  const invoices = data?.getInvoicesByCommissionId.invoices || [];
+  const totalCount = data?.getInvoicesByCommissionId?.totalCount || 0;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const budgetActuel = invoices.reduce(
+    (sum, row) => sum + (row.price_without_vat || 0),
+    0,
+  );
   const budgetGlobal = 4000;
 
   const getChipStyles = (status: string) => {
@@ -84,7 +71,7 @@ const HomePageCommission = () => {
         backgroundColor = theme.palette.success.main;
         break;
       case "En attente":
-        backgroundColor = theme.palette.secondary.main;
+        backgroundColor = theme.palette.warning.main;
         break;
       case "Refusé":
         backgroundColor = theme.palette.error.main;
@@ -126,10 +113,10 @@ const HomePageCommission = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
+            {invoices.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>{row.date}</TableCell>
+                <TableCell>{row.invoiceNumber}</TableCell>
+                <TableCell>{formatDate(row.date)}</TableCell>
                 <TableCell>{row.label}</TableCell>
                 {!isMobile && (
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
@@ -138,20 +125,39 @@ const HomePageCommission = () => {
                 )}
                 {!isMobile && (
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {row.vatRate}%
+                    {row.vat?.rate}%
                   </TableCell>
                 )}
-                <TableCell sx={{ whiteSpace: "nowrap" }}>{row.ttc} €</TableCell>
+                <TableCell sx={{ whiteSpace: "nowrap" }}>
+                  {row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)} €
+                </TableCell>
                 <TableCell>
                   <Chip
-                    label={isMobile ? row.status[0] : row.status}
-                    sx={getChipStyles(row.status)}
+                    label={isMobile ? row.status?.label[0] : row.status?.label}
+                    sx={getChipStyles(row.status?.label)}
                   />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        <Stack
+          spacing={2}
+          sx={{
+            marginBottom: "1em",
+            marginTop: "1em",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
       </TableContainer>
     </Box>
   );
