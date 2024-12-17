@@ -144,3 +144,22 @@ export const GET_INVOICE_BY_COMMISSION = gql`
     }
   }
 `;
+
+export const GET_USER_BY_ID = gql`
+  query GetUserById($userId: Float!) {
+    getUserById(userId: $userId) {
+      id
+      email
+      firstname
+      lastname
+      roles {
+        id
+        label
+      }
+      commissions {
+        id
+        name
+      }
+    }
+  }
+`;
