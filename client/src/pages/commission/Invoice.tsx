@@ -250,7 +250,8 @@ const InvoiceForm: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
-          <Grid size={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            {" "}
             <FormControl fullWidth>
               <InputLabel>Commissions</InputLabel>
               <Select
@@ -280,7 +281,7 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          <Grid size={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
@@ -296,7 +297,7 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl fullWidth>
               <InputLabel>Catégorie</InputLabel>
               <Select
@@ -323,7 +324,8 @@ const InvoiceForm: React.FC = () => {
               )}
             </FormControl>
           </Grid>
-          <Grid size={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            {" "}
             <FormControl fullWidth>
               <InputLabel>Sous-catégorie</InputLabel>
               <Select
@@ -372,7 +374,7 @@ const InvoiceForm: React.FC = () => {
               }}
             ></div>
           </Grid>
-          <Grid size={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <TextField
               fullWidth
               label="Prix HT"
@@ -388,7 +390,7 @@ const InvoiceForm: React.FC = () => {
               aria-label="Montant du prix hors taxe, à remplir sans la TVA"
             />
           </Grid>
-          <Grid size={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl fullWidth>
               <Select
                 name="vat_id"

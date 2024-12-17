@@ -254,6 +254,8 @@ import { AppDataSource } from "./data-source";
     // insert budget
     await queryRunner.query(`
       INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
         ('Budget 2022',	'2022-02-01 00:00:00',	'2023-01-31 00:00:00'),
         ('Super Budget 2023',	'2023-02-01 00:00:00',	'2024-01-31 00:00:00');
     `);
@@ -288,21 +290,41 @@ import { AppDataSource } from "./data-source";
     // insert invoice
     await queryRunner.query(`
       INSERT INTO "invoice" ("price_without_vat", "label", "receipt", "info", "paid", "statusId", "vatId", "creditDebitId", "subcategoryId", "commissionId", "bankAccountId", "userId", "date", "invoiceNumber") VALUES
-          (400, 'essence', '', 'reçu plein scooter livraison', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-03-02', 'facture_2022_1'),
-          (50, 'cigarette', '', 'cartouche à la frontière', 'f', 2, 3, 2, 4, 6, NULL, 4, '2022-04-05', 'facture_2022_2'),
-          (60, 'chaussure', '', 'chaussure de sécurité', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-08-11', 'facture_2022_3'),
-          (500, 'chocolat', '', 'goûter', 'f', 1, 1, 2, 3, 4, 4, 4, '2022-07-11', 'facture_2022_4'),
-          (30, 'bijoux', '', 'chaine en toc', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-03-24', 'facture_2022_5'),
-          (600, 'Lego', '', 'cadeaux', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-04-09', 'facture_2022_6'),
-          (450, 'entretien', '', 'nettoyage voiture', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-06-15', 'facture_2022_7'),
-          (550, 'transport', '', 'billet train', 'f', 1, 2, 2, 4, 6, 3, 3, '2022-07-10', 'facture_2022_8'),
-          (90, 'outillage', '', 'outil professionnel', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-09-18', 'facture_2022_9'),
-          (200, 'électronique', '', 'accessoire bureau', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-11-05', 'facture_2022_10'),
-          (80, 'livre', '', 'achat livre technique', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-12-01', 'facture_2022_11'),
-          (300, 'vêtements', '', 'achat uniforme', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-01-10', 'facture_2022_12'),
-          (100, 'frais divers', '', 'facture générique 1', 'f', 1, 1, 2, 3, 4, 1, 2, '2023-02-05', 'facture_2022_13'),
-          (70, 'services', '', 'abonnement mensuel', 'f', 3, 4, 1, 3, 5, 3, 1, '2023-03-15', 'facture_2022_14'),
-          (120, 'restaurant', '', 'repas cloture année', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-04-20', 'facture_2022_15');
+        (400, 'essence', '', 'reçu plein scooter livraison', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-03-02', 'facture_2022_1'),
+        (50, 'cigarette', '', 'cartouche à la frontière', 'f', 2, 3, 2, 4, 6, NULL, 4, '2022-04-05', 'facture_2022_2'),
+        (60, 'chaussure', '', 'chaussure de sécurité', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-08-11', 'facture_2022_3'),
+        (500, 'chocolat', '', 'goûter', 'f', 1, 1, 2, 3, 4, 4, 4, '2022-07-11', 'facture_2022_4'),
+        (30, 'bijoux', '', 'chaine en toc', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-03-24', 'facture_2022_5'),
+        (600, 'Lego', '', 'cadeaux', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-04-09', 'facture_2022_6'),
+        (450, 'entretien', '', 'nettoyage voiture', 'f', 1, 1, 2, 3, 4, 1, 2, '2022-06-15', 'facture_2022_7'),
+        (550, 'transport', '', 'billet train', 'f', 1, 2, 2, 4, 6, 3, 3, '2022-07-10', 'facture_2022_8'),
+        (90, 'outillage', '', 'outil professionnel', 'f', 3, 4, 1, 3, 5, 3, 1, '2022-09-18', 'facture_2022_9'),
+        (200, 'électronique', '', 'accessoire bureau', 'f', 3, 4, 1, 3, 5, 6, 2, '2022-11-05', 'facture_2022_10'),
+        (80, 'livre', '', 'achat livre technique', 'f', 2, 3, 2, 4, 6, NULL, 1, '2022-12-01', 'facture_2022_11'),
+        (300, 'vêtements', '', 'achat uniforme', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-01-10', 'facture_2022_12'),
+        (100, 'frais divers', '', 'facture générique 1', 'f', 1, 1, 2, 3, 4, 1, 2, '2023-02-05', 'facture_2022_13'),
+        (70, 'services', '', 'abonnement mensuel', 'f', 3, 4, 1, 3, 5, 3, 1, '2023-03-15', 'facture_2022_14'),
+        (120, 'restaurant', '', 'repas cloture année', 'f', 2, 3, 2, 4, 6, NULL, 4, '2023-04-20', 'facture_2022_15'),
+        (400,	'essence',	'',	'reçu plein scooter livraison',	'f',	1,	1,	2,	3,	4,	1, 2, '2022-03-02', 'facture_2022_1'),
+        (50,	'cigarette',	'',	'cartouche à la frontière',	'f',	2,	3,	2,	4,	6,	2, 4, '2022-04-05', 'facture_2022_2'),
+        (60,	'chaussure',	'',	'chaussure de sécurité',	'f',	3,	4,	1,	3,	5,	3, 1, '2022-08-11', 'facture_2022_3'),
+        (500,	'chocolat',	'',	'goûter',	'f',	1,	1,	2,	3,	4,	4, 4, '2022-07-11', 'facture_2022_4'),
+        (30,	'bijoux',	'',	'chaine en toc',	'f',	2,	3,	2,	4,	6,	5, 1, '2022-03-24', 'facture_2022_5'),
+        (600,	'Lego',	'',	'cadeaux',	'f',	3,	4,	1,	3,	5,	6, 2 , '2022-04-09', 'facture_2022_6'),
+        (45, 'café', '', 'capsules café', 'f', 1, 2, 1, 3, 4, 6, 2, '2022-02-10', 'facture_2022_7'),
+        (250, 'équipement', '', 'matériel sportif', 'f', 2, 3, 2, 4, 4, 6, 4, '2022-05-15', 'facture_2022_8'),
+        (70, 'restaurant', '', 'repas réunion', 'f', 3, 1, 2, 3, 4, 6, 1, '2022-06-20', 'facture_2022_9'),
+        (100, 'livres', '', 'documents formation', 'f', 1, 1, 2, 3, 4, 6, 2, '2022-03-14', 'facture_2022_10'),
+        (90, 'papeterie', '', 'matériel bureau', 'f', 2, 2, 2, 4, 4, 6, 4, '2022-09-05', 'facture_2022_11'),
+        (200, 'logiciels', '', 'achat logiciel', 'f', 3, 3, 1, 3, 4, 6, 1, '2022-11-12', 'facture_2022_12'),
+        (80, 'impression', '', 'cartouches imprimante', 'f', 1, 4, 2, 3, 4, 6, 2, '2022-01-19', 'facture_2022_13'),
+        (400, 'transport', '', 'déplacement équipe', 'f', 2, 1, 2, 4, 4, 6, 4, '2023-12-25', 'facture_2023_14'),
+        (35, 'fournitures', '', 'accessoires divers', 'f', 3, 3, 2, 3, 4, 6, 1, '2023-04-17', 'facture_2023_15'),
+        (300, 'animation', '', 'services animation', 'f', 1, 2, 1, 4, 4, 6, 2, '2023-07-03', 'facture_2023_16'),
+        (120, 'sécurité', '', 'alarme bureau', 'f', 2, 1, 2, 3, 4, 6, 4, '2023-10-10', 'facture_2023_17'),
+        (65, 'nettoyage', '', 'produits ménagers', 'f', 3, 4, 1, 3, 4, 6, 1, '2023-08-25', 'facture_2023_18'),
+        (75, 'décoration', '', 'plantes bureau', 'f', 1, 1, 2, 3, 4, 6, 2, '2023-09-08', 'facture_2023_19'),
+        (150, 'publicité', '', 'flyers événement', 'f', 2, 2, 2, 4, 4, 6, 4, '2023-05-21', 'facture_2023_20');
     `);
 
     //Insert budget
@@ -312,6 +334,9 @@ import { AppDataSource } from "./data-source";
         (2,	2,	12600),
         (1,	3,	15000),
         (1,	4,	9000),
+        (2,	4,	18000),
+        (3,	4,	28000),
+        (4,	4,	13000),
         (2,	5,	8000),
         (2,	6,	3000);
  `);

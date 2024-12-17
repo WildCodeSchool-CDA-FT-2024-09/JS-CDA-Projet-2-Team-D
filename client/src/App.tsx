@@ -3,13 +3,11 @@ import { UserProvider } from "./context/UserContext";
 import NotificationProvider from "./context/NotificationContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-import Container from "@mui/material/Container";
-import MenuSideBar from "./components/menuSideBar/MenuSideBar";
+import Drawer from "./components/drawer/Drawer";
 import Home from "./pages/Home";
 import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Toolbar } from "@mui/material";
-import { Grid2 } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
 
 const theme = createTheme({
@@ -37,11 +35,15 @@ const theme = createTheme({
     },
     success: {
       main: "#6EBF8B", // Green
-      contrastText: "#FFFFFF",
+      contrastText: "#1F1F1F",
+    },
+    warning: {
+      main: "#FFDD83", // yellow
+      contrastText: "#1F1F1F",
     },
     error: {
       main: "#E21818", // Red
-      contrastText: "#FFFFFF",
+      contrastText: "#1F1F1F",
     },
   },
   breakpoints: {
@@ -66,27 +68,23 @@ function App() {
           <NotificationProvider>
             {currentPage !== "/" ? (
               <>
-                <Header
-                  title="ClubCompta"
-                  subtitle="Budget 2024/2025"
-                  userType="Responsable"
-                  logoUrl="/Logo.svg"
-                  avatarColor="#6EBF8B"
-                />
-                <Toolbar />
-
-                <Container maxWidth="xl">
-                  <Grid2 container spacing={2}>
-                    <Grid2 size={2} sx={{ backgroundColor: "#f3f3f3" }}>
-                      <MenuSideBar />
-                    </Grid2>
-                    <Grid2 size={10}>
-                      <UserBar />
-                      <Outlet />
-                    </Grid2>
-                  </Grid2>
-                  <Footer />
-                </Container>
+                <Box sx={{ display: "flex" }}>
+                  <CssBaseline />
+                  <Header
+                    title="ClubCompta"
+                    subtitle="Budget 2024/2025"
+                    userType="Responsable"
+                    logoUrl="/Logo.svg"
+                    avatarColor="#6EBF8B"
+                  />
+                  <Drawer />
+                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                    {/* <MenuSideBar /> */}
+                    <UserBar />
+                    <Outlet />
+                    <Footer />
+                  </Box>
+                </Box>
               </>
             ) : (
               <Home />

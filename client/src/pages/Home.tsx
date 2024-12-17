@@ -93,7 +93,6 @@ export default function Home() {
               justifyContent="center"
               alignItems="center"
               size={6}
-              spacing={2}
             >
               <BtnLink
                 sx={buttonStyle}
@@ -112,7 +111,7 @@ export default function Home() {
                 Login Administrateur
               </BtnLink>
             </Grid2>
-            <Grid2 size={6} spacing={2}>
+            <Grid2 size={6}>
               <BtnLink to="/administrator" sx={buttonStyle}>
                 Administrateur
               </BtnLink>

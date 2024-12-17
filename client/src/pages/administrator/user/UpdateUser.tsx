@@ -1,13 +1,16 @@
+import * as React from "react";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../../../utils/userValidation";
+import { generatePassword } from "../../../utils/generatePassword";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
-  useCreateNewUserMutation,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
 } from "../../../types/graphql-types";
-import { generatePassword } from "../../../utils/generatePassword";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import {
@@ -17,7 +20,6 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -26,8 +28,9 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import Grid from "@mui/material/Grid2";
-import AddIcon from "@mui/icons-material/Add";
+import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SyncLockIcon from "@mui/icons-material/SyncLock";
@@ -43,12 +46,17 @@ const MenuProps = {
   },
 };
 
-export default function CreateUser() {
+export default function UpdateUser() {
+  const { userId } = useParams();
+
   const [roles, setRoles] = useState<string[]>([]);
   const [commissions, setCommissions] = useState<string[]>([]);
   const { data: rolesData } = useGetRolesQuery();
   const { data: commissionsData } = useGetCommissionsQuery();
-  const [createNewUser] = useCreateNewUserMutation();
+  const { data, loading, error } = useGetUserByIdQuery({
+    variables: { userId: parseInt(userId as string) },
+  });
+  const [updateUserMutation] = useUpdateUserMutation();
 
   // Password texfield
   const [showPassword, setShowPassword] = useState(false);
@@ -128,6 +136,24 @@ export default function CreateUser() {
     }
   }, [watchPassword, watchPasswordConfirm, trigger]);
 
+  // Populate form with existing values
+  useEffect(() => {
+    if (data?.getUserById) {
+      const userData = data.getUserById;
+      setValue("firstname", userData.firstname || "");
+      setValue("lastname", userData.lastname || "");
+      setValue("email", userData.email || "");
+
+      // Set roles and commissions
+      const userRoles = userData.roles?.map((role) => role.label) || [];
+      const userCommissions =
+        userData.commissions?.map((comm) => comm.name) || [];
+
+      setRoles(userRoles);
+      setCommissions(userCommissions);
+    }
+  }, [data, setValue]);
+
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
       target: { value },
@@ -159,26 +185,29 @@ export default function CreateUser() {
     commissions?: string[];
   }) => {
     try {
-      const selectedRoleObjects: { id: number }[] = roles
+      const selectedRoleObjects: { id: number }[] = formData.roles
         .map((roleLabel: string) =>
           rolesData?.getRoles.find((role) => role.label === roleLabel),
         )
-        .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
+        .filter((role) => role !== undefined)
         .map((role) => ({ id: role.id }));
 
-      // Default role is set to commission
-      if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
+      // Default role is set to commission if no roles selected
+      if (selectedRoleObjects.length === 0) {
+        selectedRoleObjects.push({ id: 3 });
+      }
 
-      const selectedCommissionsObjects: { id: number }[] = commissions
-        .map((commissionLabel: string) =>
-          commissionsData?.getCommissions.find(
-            (commission) => commission.name === commissionLabel,
-          ),
-        )
-        .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
-        .map((commission) => ({ id: commission.id }));
+      const selectedCommissionsObjects: { id: number }[] =
+        formData.commissions
+          ?.map((commissionLabel: string) =>
+            commissionsData?.getCommissions.find(
+              (commission) => commission.name === commissionLabel,
+            ),
+          )
+          .filter((commission) => commission !== undefined)
+          .map((commission) => ({ id: commission.id as number })) || [];
 
-      await createNewUser({
+      await updateUserMutation({
         variables: {
           data: {
             firstname: formData.firstname,
@@ -188,23 +217,19 @@ export default function CreateUser() {
             roles: selectedRoleObjects,
             commissions: selectedCommissionsObjects,
           },
+          userId: parseInt(userId as string),
         },
       });
 
-      notifySuccess("Utilisateur ajouté avec succès");
-
-      // Reset the form
-      if (formData.firstname) setValue("firstname", "");
-      if (formData.lastname) setValue("lastname", "");
-      if (formData.email) setValue("email", "");
-      if (formData.password) setValue("password", "");
-      setRoles([]);
-      setCommissions([]);
+      notifySuccess("Utilisateur mis à jour avec succès");
     } catch (error) {
-      notifyError("Erreur lors de l'ajout de l'utilisateur");
-      console.error("Erreur lors de l'ajout d'un utilisateur", error);
+      notifyError("Erreur lors de la mise à jour de l'utilisateur");
+      console.error("Erreur lors de la mise à jour de l'utilisateur", error);
     }
   };
+
+  if (loading) return <p>🥁 Chargement...</p>;
+  if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   return (
     <div>
@@ -214,7 +239,7 @@ export default function CreateUser() {
           alignItems: "center",
         }}
       >
-        <h1>Ajouter un utilisateur</h1>
+        <h1>Editer un utilisateur</h1>
         <BtnLink
           to="/administrator/user"
           sx={{
@@ -234,6 +259,12 @@ export default function CreateUser() {
           Liste des utilisateurs
         </BtnLink>
       </Box>
+
+      {Object.keys(errors).length > 0 && (
+        <Box sx={{ color: "red", mt: 2, textAlign: "center" }}>
+          Veuillez corriger les erreurs dans le formulaire
+        </Box>
+      )}
 
       <Box
         component="form"
@@ -459,9 +490,9 @@ export default function CreateUser() {
               disabled={Object.keys(errors).length > 0}
               type="submit"
               variant="contained"
-              startIcon={<AddIcon />}
+              startIcon={<EditIcon />}
             >
-              Ajouter
+              Mettre à jour
             </Button>
           </Grid>
           <Grid size={4}></Grid>

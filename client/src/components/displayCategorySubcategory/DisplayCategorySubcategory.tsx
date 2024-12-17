@@ -33,11 +33,13 @@ import { Button } from "@mui/material";
 function createData(
   label: string,
   id: number,
+  creditDebit: { label: string },
   subcategories: { id: number; label: string; code: string }[],
 ) {
   return {
     categoryId: id,
     categoryLabel: label,
+    creditDebitLabel: creditDebit.label,
     subcategory: subcategories.map((subcategory) => ({
       id: subcategory.id,
       label: subcategory.label,
@@ -208,9 +210,26 @@ function Row(props: { row: ReturnType<typeof createData> }) {
               </div>
             </>
           ) : (
-            row.categoryLabel
+            <>
+              <TableCell sx={{ border: "none" }}>
+                <div>
+                  {/* Catégorie principale */}
+                  <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
+                  {/* Crédit/Débit en plus petit */}
+                  <div
+                    style={{
+                      fontSize: "1.2rem",
+                      color: theme.palette.primary.main,
+                    }}
+                  >
+                    {row.creditDebitLabel}
+                  </div>
+                </div>
+              </TableCell>
+            </>
           )}
         </TableCell>
+
         <TableCell align="center">
           <IconButton onClick={handleClickCategory}>
             {<CreateIcon />}
@@ -418,6 +437,7 @@ function DisplayCategorySubcategory() {
       return createData(
         category.label,
         category.id,
+        { label: category.creditDebit.label },
         category.subcategories || [],
       );
     }) || [];
