@@ -54,7 +54,15 @@ export default function ManageUser() {
         variables: {
           data: { id: userId },
         },
-        refetchQueries: [{ query: GetUsersDocument }],
+        refetchQueries: [
+          {
+            query: GetUsersDocument,
+            variables: {
+              limit: limit,
+              offset: offset,
+            },
+          },
+        ],
       });
 
       notifySuccess("Utilisateur désactivé avec succès");
@@ -70,7 +78,15 @@ export default function ManageUser() {
         variables: {
           data: { id: userId },
         },
-        refetchQueries: [{ query: GetUsersDocument }],
+        refetchQueries: [
+          {
+            query: GetUsersDocument,
+            variables: {
+              limit: limit,
+              offset: offset,
+            },
+          },
+        ],
       });
 
       notifySuccess("Utilisateur réactivé avec succès");
