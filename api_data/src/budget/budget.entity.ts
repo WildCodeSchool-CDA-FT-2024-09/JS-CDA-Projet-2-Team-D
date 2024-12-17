@@ -15,15 +15,15 @@ import { IsNotEmpty } from "class-validator";
 @Entity()
 export class Budget extends BaseEntity {
   @Field(() => Number)
-  @PrimaryColumn()
+  @PrimaryColumn({ name: "exerciseId" })
   exerciseId: number;
 
   @Field(() => Number)
-  @PrimaryColumn()
+  @PrimaryColumn({ name: "commissionId" })
   commissionId: number;
 
   @Field(() => Number)
-  @Column({ nullable: false, type: "float" })
+  @Column({ name: "amount", nullable: false, type: "float" })
   @IsNotEmpty()
   amount: number;
 
