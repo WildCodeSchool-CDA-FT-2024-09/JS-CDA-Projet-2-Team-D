@@ -10,6 +10,7 @@ import StatusResolver from "./status/status.resolver";
 import CommissionResolver from "./commission/commission.resolver";
 import InvoiceResolver from "./invoice/invoice.resolver";
 import RoleResolver from "./role/role.resolver";
+import { BudgetResolver } from "./budget/budget.resolver";
 
 const getSchema = async () => {
   return await buildSchema({
@@ -25,6 +26,7 @@ const getSchema = async () => {
       CommissionResolver,
       InvoiceResolver,
       RoleResolver,
+      BudgetResolver,
     ],
     validate: true,
   });

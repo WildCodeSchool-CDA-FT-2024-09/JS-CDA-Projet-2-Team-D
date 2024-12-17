@@ -331,8 +331,17 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`
       INSERT INTO "budget" ("exerciseId", "commissionId", "amount") VALUES
         (1,	1,	50500),
+        (2,	1,	50500),
+        (3,	1,	50500),
+        (4,	1,	50500),
+        (1,	2,	12600),
         (2,	2,	12600),
+        (3,	2,	12600),
+        (4,	2,	12600),
         (1,	3,	15000),
+        (2,	3,	15000),
+        (3,	3,	15000),
+        (4,	3,	15000),
         (1,	4,	9000),
         (2,	4,	18000),
         (3,	4,	28000),

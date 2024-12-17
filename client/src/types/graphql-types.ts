@@ -78,15 +78,6 @@ export type CommissionsInput = {
   id: Scalars["Float"]["input"];
 };
 
-export type CreateUserInput = {
-  commissions: Array<CommissionsInput>;
-  email: Scalars["String"]["input"];
-  firstname: Scalars["String"]["input"];
-  lastname: Scalars["String"]["input"];
-  password: Scalars["String"]["input"];
-  roles: Array<RolesInput>;
-};
-
 export type CreditDebit = {
   __typename?: "CreditDebit";
   categories: Category;
@@ -128,6 +119,7 @@ export type Mutation = {
   addCategory: Category;
   addSubcategory: Subcategory;
   createNewUser: User;
+  updateUser: User;
 };
 
 export type MutationAddCategoryArgs = {
@@ -142,7 +134,12 @@ export type MutationAddSubcategoryArgs = {
 };
 
 export type MutationCreateNewUserArgs = {
-  data: CreateUserInput;
+  data: UserInput;
+};
+
+export type MutationUpdateUserArgs = {
+  data: UserInput;
+  userId: Scalars["Float"]["input"];
 };
 
 export type PaginatedInvoices = {
@@ -169,6 +166,7 @@ export type Query = {
   getRoles: Array<Role>;
   getStatuss: Array<Status>;
   getSubcategories: Array<Subcategory>;
+  getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
 };
@@ -177,6 +175,10 @@ export type QueryGetInvoicesByCommissionIdArgs = {
   commissionId: Scalars["Float"]["input"];
   limit?: Scalars["Float"]["input"];
   offset?: Scalars["Float"]["input"];
+};
+
+export type QueryGetUserByIdArgs = {
+  userId: Scalars["Float"]["input"];
 };
 
 export type QueryGetUsersArgs = {
@@ -223,6 +225,15 @@ export type User = {
   roles: Array<Role>;
 };
 
+export type UserInput = {
+  commissions: Array<CommissionsInput>;
+  email: Scalars["String"]["input"];
+  firstname: Scalars["String"]["input"];
+  lastname: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
+  roles: Array<RolesInput>;
+};
+
 export type Vat = {
   __typename?: "Vat";
   id: Scalars["Float"]["output"];
@@ -258,12 +269,31 @@ export type AddSubcategoryMutation = {
 };
 
 export type CreateNewUserMutationVariables = Exact<{
-  data: CreateUserInput;
+  data: UserInput;
 }>;
 
 export type CreateNewUserMutation = {
   __typename?: "Mutation";
   createNewUser: {
+    __typename?: "User";
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    roles: Array<{ __typename?: "Role"; id: number }>;
+    commissions?: Array<{ __typename?: "Commission"; id: number }> | null;
+  };
+};
+
+export type UpdateUserMutationVariables = Exact<{
+  data: UserInput;
+  userId: Scalars["Float"]["input"];
+}>;
+
+export type UpdateUserMutation = {
+  __typename?: "Mutation";
+  updateUser: {
     __typename?: "User";
     id: number;
     firstname: string;
@@ -413,6 +443,27 @@ export type GetInvoicesByCommissionIdQuery = {
   };
 };
 
+export type GetUserByIdQueryVariables = Exact<{
+  userId: Scalars["Float"]["input"];
+}>;
+
+export type GetUserByIdQuery = {
+  __typename?: "Query";
+  getUserById: {
+    __typename?: "User";
+    id: number;
+    email: string;
+    firstname: string;
+    lastname: string;
+    roles: Array<{ __typename?: "Role"; id: number; label: string }>;
+    commissions?: Array<{
+      __typename?: "Commission";
+      id: number;
+      name: string;
+    }> | null;
+  };
+};
+
 export const AddCategoryDocument = gql`
   mutation AddCategory($label: String!, $creditDebitId: Float!) {
     addCategory(label: $label, creditDebitId: $creditDebitId) {
@@ -524,7 +575,7 @@ export type AddSubcategoryMutationOptions = Apollo.BaseMutationOptions<
   AddSubcategoryMutationVariables
 >;
 export const CreateNewUserDocument = gql`
-  mutation CreateNewUser($data: CreateUserInput!) {
+  mutation CreateNewUser($data: UserInput!) {
     createNewUser(data: $data) {
       id
       firstname
@@ -582,6 +633,67 @@ export type CreateNewUserMutationResult =
 export type CreateNewUserMutationOptions = Apollo.BaseMutationOptions<
   CreateNewUserMutation,
   CreateNewUserMutationVariables
+>;
+export const UpdateUserDocument = gql`
+  mutation UpdateUser($data: UserInput!, $userId: Float!) {
+    updateUser(data: $data, userId: $userId) {
+      id
+      firstname
+      lastname
+      email
+      password
+      roles {
+        id
+      }
+      commissions {
+        id
+      }
+    }
+  }
+`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateUserMutation,
+    UpdateUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    UpdateUserDocument,
+    options,
+  );
+}
+export type UpdateUserMutationHookResult = ReturnType<
+  typeof useUpdateUserMutation
+>;
+export type UpdateUserMutationResult =
+  Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
@@ -1201,6 +1313,97 @@ export type GetInvoicesByCommissionIdQueryResult = Apollo.QueryResult<
   GetInvoicesByCommissionIdQuery,
   GetInvoicesByCommissionIdQueryVariables
 >;
+export const GetUserByIdDocument = gql`
+  query GetUserById($userId: Float!) {
+    getUserById(userId: $userId) {
+      id
+      email
+      firstname
+      lastname
+      roles {
+        id
+        label
+      }
+      commissions {
+        id
+        name
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetUserByIdQuery__
+ *
+ * To run a query within a React component, call `useGetUserByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserByIdQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetUserByIdQuery,
+    GetUserByIdQueryVariables
+  > &
+    (
+      | { variables: GetUserByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options,
+  );
+}
+export function useGetUserByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUserByIdQuery,
+    GetUserByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options,
+  );
+}
+export function useGetUserByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetUserByIdQuery,
+        GetUserByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options,
+  );
+}
+export type GetUserByIdQueryHookResult = ReturnType<typeof useGetUserByIdQuery>;
+export type GetUserByIdLazyQueryHookResult = ReturnType<
+  typeof useGetUserByIdLazyQuery
+>;
+export type GetUserByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetUserByIdSuspenseQuery
+>;
+export type GetUserByIdQueryResult = Apollo.QueryResult<
+  GetUserByIdQuery,
+  GetUserByIdQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -1210,10 +1413,12 @@ export const namedOperations = {
     GetVats: "GetVats",
     GetCommissions: "GetCommissions",
     GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
+    GetUserById: "GetUserById",
   },
   Mutation: {
     AddCategory: "AddCategory",
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
+    UpdateUser: "UpdateUser",
   },
 };
