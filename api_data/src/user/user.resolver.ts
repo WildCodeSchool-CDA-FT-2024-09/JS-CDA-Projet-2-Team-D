@@ -14,7 +14,11 @@ import {
   Length,
   IsEmail,
 } from "class-validator";
-import { DeleteResponseStatus } from "../utilities/deleteResponseStatus";
+import { AppDataSource } from "../db/data-source";
+import {
+  DeleteResponseStatus,
+  RestoreResponseStatus,
+} from "../utilities/responseStatus";
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
@@ -215,6 +219,32 @@ export default class UserResolver {
     } catch (error) {
       console.error(error);
       return new DeleteResponseStatus("error", "server error");
+    }
+  }
+
+  @Mutation(() => RestoreResponseStatus)
+  async restoreUser(@Arg("data") data: userIdInput) {
+    try {
+      // Using getRepository because Active Record does not support restore
+      const userRepository = AppDataSource.getRepository(User);
+
+      const user = await userRepository.findOne({
+        where: { id: data.id },
+        withDeleted: true,
+      });
+
+      if (!user) {
+        return new RestoreResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await userRepository.restore(data.id);
+        return new RestoreResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
     }
   }
 }

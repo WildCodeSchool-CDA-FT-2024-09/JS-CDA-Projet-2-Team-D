@@ -18,3 +18,17 @@ export class DeleteResponseStatus {
   @Field({ nullable: true })
   message?: string;
 }
+
+@ObjectType()
+export class RestoreResponseStatus {
+  constructor(status: Status, message?: string) {
+    this.success = status === "success" ? true : false;
+    this.message = message;
+  }
+
+  @Field()
+  success: boolean;
+
+  @Field({ nullable: true })
+  message?: string;
+}
