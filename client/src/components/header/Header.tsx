@@ -7,7 +7,6 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
-import "./Header.css";
 
 interface HeaderProps {
   title: string;
@@ -35,7 +34,14 @@ const Header: React.FC<HeaderProps> = ({
   const avatarColor = roleColorMapping[userType || "default"];
 
   return (
-    <AppBar position="fixed" color="secondary">
+    <AppBar
+      position="fixed"
+      color="secondary"
+      sx={{
+        backgroundColor: "#D9D9D9",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -46,11 +52,27 @@ const Header: React.FC<HeaderProps> = ({
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <img
-              src={logoUrl}
-              alt="Logo Club Compta"
-              style={{ height: "40px" }}
-            />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "white",
+                borderRadius: "12px",
+                boxShadow: theme.shadows[3],
+                padding: 0.5,
+                height: "40px",
+                width: "40px",
+                marginRight: 2,
+              }}
+            >
+              <img
+                src={logoUrl}
+                alt="Logo Club Compta"
+                style={{ height: "34px", width: "auto" }}
+              />
+            </Box>
+
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography
                 variant="h1"
@@ -64,14 +86,20 @@ const Header: React.FC<HeaderProps> = ({
                   to="/"
                   style={{
                     textDecoration: "none",
-                    color: theme.palette.primary.main,
+                    color: "black",
                   }}
                 >
                   {title}
                 </Link>
               </Typography>
               {(subtitle || userType) && (
-                <Typography variant="h2" className="header-subtitle">
+                <Typography
+                  variant="h2"
+                  className="header-subtitle"
+                  sx={{
+                    color: "black",
+                  }}
+                >
                   {subtitle} {userType && `- ${userType}`}
                 </Typography>
               )}

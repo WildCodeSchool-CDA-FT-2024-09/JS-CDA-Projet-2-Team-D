@@ -20,7 +20,6 @@ export default class CategoryResolver {
   ): Promise<Category> {
     const creditDebit = await CreditDebit.findOneBy({ id: creditDebitId });
     if (!creditDebit) {
-      // console.log("error");
       throw new Error("Veuiller selectionner un type de crédit/débit valide");
     }
     if (label.trim() === "") {

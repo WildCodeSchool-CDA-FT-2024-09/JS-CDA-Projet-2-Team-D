@@ -1,16 +1,24 @@
 import { gql } from "@apollo/client";
 
 export const GET_USERS = gql`
-  query GetUsers {
-    getUsers {
-      id
-      firstname
-      lastname
-      email
-      roles {
+  query GetUsers($limit: Int!, $offset: Int!) {
+    getUsers(limit: $limit, offset: $offset) {
+      users {
         id
-        label
+        firstname
+        lastname
+        email
+        password
+        roles {
+          id
+          label
+        }
+        commissions {
+          id
+          name
+        }
       }
+      totalCount
     }
   }
 `;
@@ -76,6 +84,7 @@ export const GET_CATEGORIES = gql`
       subcategories {
         id
         label
+        code
       }
       creditDebit {
         id
@@ -109,29 +118,56 @@ export const GET_COMMISSIONS = gql`
 `;
 
 export const GET_INVOICE_BY_COMMISSION = gql`
-  query GetInvoicesByCommissionId($commissionId: Float!) {
-    getInvoicesByCommissionId(commissionId: $commissionId) {
-      commission {
-        name
+  query GetInvoicesByCommissionId(
+    $commissionId: Float!
+    $offset: Float!
+    $limit: Float!
+  ) {
+    getInvoicesByCommissionId(
+      commissionId: $commissionId
+      offset: $offset
+      limit: $limit
+    ) {
+      invoices {
+        date
         id
-      }
-      creditDebit {
+        invoiceNumber
         label
-        id
+        price_without_vat
+        status {
+          label
+          id
+        }
+        vat {
+          rate
+          label
+          id
+        }
+        creditDebit {
+          label
+          id
+        }
       }
-      date
+      totalCount
+    }
+  }
+`;
+
+export const GET_USER_BY_ID = gql`
+  query GetUserById($userId: Float!) {
+    getUserById(userId: $userId) {
       id
-      label
-      status {
+      email
+      firstname
+      lastname
+      roles {
         id
         label
       }
-      vat {
+      commissions {
         id
-        rate
-        label
+        name
       }
-      price_without_vat
     }
   }
 `;

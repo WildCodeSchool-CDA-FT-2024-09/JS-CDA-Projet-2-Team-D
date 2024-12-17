@@ -9,9 +9,9 @@ import {
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { IsNotEmpty, IsString, Length } from "class-validator";
-import { Budget } from "../budget/budget.entity";
 import { User } from "../user/user.entity";
-import { BudgetCommission } from "../budgetCommission/budgetCommission.entity";
+import { Budget } from "../budget/budget.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @ObjectType()
 @Entity()
@@ -27,14 +27,15 @@ export class Commission extends BaseEntity {
   @Column({ nullable: false, unique: true, type: "varchar", length: 30 })
   name: string;
 
-  // @Field(() => [Budget])
-  @OneToMany(
-    () => BudgetCommission,
-    (budgetCommission) => budgetCommission.commission
-  )
+  @Field(() => [Budget])
+  @OneToMany(() => Budget, (budget) => budget.commissions)
   budgets: Budget[];
 
-  @Field(() => [User])
+  @Field(() => [User], { nullable: true })
   @ManyToMany(() => User, (user) => user.commissions)
-  users: User[];
+  users?: User[];
+
+  @Field(() => [Invoice])
+  @OneToMany(() => Invoice, (invoice) => invoice.commission)
+  invoices?: Invoice[];
 }

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Arg, InputType, Field } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Arg,
+  InputType,
+  Field,
+  Int,
+} from "type-graphql";
 import {
   validate,
   IsString,
@@ -9,6 +17,8 @@ import {
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
+import { Commission } from "../commission/commission.entity";
+import { PaginatedUsers } from "./user.type";
 
 @InputType()
 class RolesInput {
@@ -17,7 +27,13 @@ class RolesInput {
 }
 
 @InputType()
-class CreateUserInput {
+class CommissionsInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class UserInput {
   @Field()
   @IsString()
   @IsNotEmpty()
@@ -47,19 +63,47 @@ class CreateUserInput {
 
   @Field(() => [RolesInput])
   roles: RolesInput[];
+
+  @Field(() => [CommissionsInput])
+  commissions: CommissionsInput[];
 }
 
 @Resolver(User)
 export default class UserResolver {
-  @Query(() => [User])
-  async getUsers() {
-    return await User.find({
-      relations: ["roles"],
+  @Query(() => PaginatedUsers)
+  async getUsers(
+    @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
+    @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
+  ): Promise<PaginatedUsers> {
+    const [users, totalCount] = await User.findAndCount({
+      relations: ["roles", "commissions"],
+      skip: offset,
+      take: limit,
+      order: {
+        id: "DESC",
+        lastname: "ASC",
+      },
     });
+
+    return { users, totalCount };
+  }
+
+  @Query(() => User)
+  async getUserById(@Arg("userId") userId: number) {
+    const user = await User.findOneOrFail({
+      where: { id: userId },
+      relations: ["roles", "commissions"],
+    });
+
+    if (!user) {
+      throw new Error("L'utilisateur n'existe pas");
+    }
+
+    return user;
   }
 
   @Mutation(() => User)
-  async createNewUser(@Arg("data") data: CreateUserInput) {
+  async createNewUser(@Arg("data") data: UserInput) {
     try {
       const user = new User();
       user.firstname = data.firstname;
@@ -68,29 +112,75 @@ export default class UserResolver {
       user.password = await argon2.hash(data.password);
 
       const error = await validate(user);
+
       if (error.length > 0)
         throw new Error(
           `Erreur dans la validation des données utilisateur : ${error}`
         );
 
-      await user.save();
+      // Attach roles
+      const roles = await Role.find();
+      user.roles = roles.filter((role) =>
+        data.roles.some((el) => el.id === role.id)
+      );
+
+      // Attach commissions
+      const commissions = await Commission.find();
+      user.commissions = commissions.filter((commission) =>
+        data.commissions.some((el) => el.id === commission.id)
+      );
+
+      const newUser = await user.save();
+
+      return newUser;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+    }
+  }
+
+  @Mutation(() => User)
+  async updateUser(
+    @Arg("userId") userId: number,
+    @Arg("data") data: UserInput
+  ) {
+    try {
+      const user = await User.findOneOrFail({
+        where: { id: userId },
+        relations: ["roles", "commissions"],
+      });
+
+      user.firstname = data.firstname;
+      user.lastname = data.lastname;
+      user.email = data.email;
+
+      // Update password only if it is not empty in the request
+      if (data.password) {
+        user.password = await argon2.hash(data.password);
+      }
+
+      const error = await validate(user);
+
+      if (error.length > 0)
+        throw new Error(
+          `Erreur dans la validation des données utilisateur : ${error}`
+        );
 
       // Attach roles
-      data.roles.map(async (roleInput) => {
-        const roleSelected = await Role.findOneOrFail({
-          where: { id: roleInput.id },
-        });
-        if (roleSelected) {
-          user.roles = [...(user.roles || []), roleSelected];
-          await user.save();
-        }
-      });
+      const roles = await Role.find();
+      user.roles = roles.filter((role) =>
+        data.roles.some((el) => el.id === role.id)
+      );
 
-      // Return user with associated roles
-      return User.findOneOrFail({
-        where: { id: user.id },
-        relations: ["roles"],
-      });
+      // Attach commissions
+      const commissions = await Commission.find();
+      user.commissions = commissions.filter((commission) =>
+        data.commissions.some((el) => el.id === commission.id)
+      );
+
+      const newUser = await user.save();
+
+      return newUser;
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
