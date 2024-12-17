@@ -182,6 +182,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
               <Box
                 component="input"
                 type="text"
+                placeholder={`${row.categoryLabel}`}
                 value={newCategoryLabel}
                 onChange={(e) => setNewCategoryLabel(e.target.value)}
                 onBlur={handleUpdateCategory}
@@ -193,29 +194,76 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                     setEditCategory(false);
                   }
                 }}
+                sx={{
+                  fontSize: "2rem",
+                  width: "100%",
+                  padding: "0.5rem",
+                  boxSizing: "border-box",
+                }}
               />
               <Box
                 component="select"
                 value={creditDebitId}
                 onChange={(e) => setCreditDebitId(Number(e.target.value))}
-                sx={{ display: "block", width: "100%", padding: "0.5rem" }}
+                sx={{
+                  fontSize: "1.2rem",
+                  color: theme.palette.primary.main,
+                  width: "100%",
+                  padding: "0.5rem",
+                  boxSizing: "border-box",
+                }}
               >
                 <option value="0">Crédit ou Débit</option>
                 <option value="1">Débit</option>
                 <option value="2">Crédit</option>
               </Box>
-              <div>
-                <Button onClick={() => handleUpdateCategory()}>Valider</Button>
-                <Button onClick={() => setEditCategory(false)}>Annuler</Button>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  marginTop: "1rem",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Button
+                  onClick={() => handleUpdateCategory()}
+                  sx={{
+                    backgroundColor: theme.palette.success.main,
+                    color: "white",
+                    fontWeight: "bold",
+                    border: "none",
+                    width: "100%",
+                    maxWidth: "120px",
+                    height: "4vh",
+                    fontSize: "1.1rem",
+                    marginRight: "20rem",
+                  }}
+                >
+                  Valider
+                </Button>
+                <Button
+                  sx={{
+                    backgroundColor: theme.palette.error.main,
+                    color: "white",
+                    fontWeight: "bold",
+                    border: "none",
+                    width: "100%",
+                    maxWidth: "120px",
+                    height: "4vh",
+                    fontSize: "1.1rem",
+                  }}
+                  onClick={() => setEditCategory(false)}
+                >
+                  Annuler
+                </Button>
               </div>
             </>
           ) : (
             <>
               <TableCell sx={{ border: "none" }}>
                 <div>
-                  {/* Catégorie principale */}
                   <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
-                  {/* Crédit/Débit en plus petit */}
                   <div
                     style={{
                       fontSize: "1.2rem",
