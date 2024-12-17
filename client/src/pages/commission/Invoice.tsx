@@ -20,15 +20,22 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
+import { useUser } from "../../hooks/useUser";
 
 const InvoiceForm: React.FC = () => {
+  const { user } = useUser();
+  const userId = user?.id;
+
   const {
     data: vatRatesData,
     loading: loadingVatRates,
     error: vatRatesError,
   } = useGetVatsQuery();
 
-  const [invoice, setInvoice] = useState<InvoiceState>(initialValues);
+  const [invoice, setInvoice] = useState<InvoiceState>({
+    ...initialValues,
+    user_id: userId ?? null,
+  });
 
   const handleFileUpload = (file: File | null) => {
     setInvoice((prevState) => ({
@@ -80,7 +87,10 @@ const InvoiceForm: React.FC = () => {
 
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.info("Validation réussie :", invoice);
+    if (userId) {
+      setInvoice((prevState) => ({ ...prevState, user_id: userId }));
+    }
+    console.info("Données de la facture :", invoice);
   };
 
   const loading = loadingVatRates;
