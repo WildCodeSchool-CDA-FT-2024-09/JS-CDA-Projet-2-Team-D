@@ -14,6 +14,7 @@ import {
   Length,
   IsEmail,
 } from "class-validator";
+import { DeleteResponseStatus } from "../utilities/deleteResponseStatus";
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
@@ -28,6 +29,12 @@ class RolesInput {
 
 @InputType()
 class CommissionsInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class userIdInput {
   @Field()
   id: number;
 }
@@ -184,6 +191,26 @@ export default class UserResolver {
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
+    }
+  }
+
+  @Mutation(() => DeleteResponseStatus)
+  async softDeleteUser(@Arg("data") data: userIdInput) {
+    try {
+      const user = await User.findOneBy({ id: data.id });
+
+      if (!user) {
+        return new DeleteResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await user.softRemove();
+        return new DeleteResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new DeleteResponseStatus("error", "server error");
     }
   }
 }
