@@ -73,6 +73,9 @@ class UserInput {
 
   @Field(() => [CommissionsInput])
   commissions: CommissionsInput[];
+
+  @Field({ nullable: true })
+  deletedAt?: string;
 }
 
 @Resolver(User)
@@ -83,6 +86,7 @@ export default class UserResolver {
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
     const [users, totalCount] = await User.findAndCount({
+      withDeleted: true, // By default TypeORM excludes soft deleted records
       relations: ["roles", "commissions"],
       skip: offset,
       take: limit,

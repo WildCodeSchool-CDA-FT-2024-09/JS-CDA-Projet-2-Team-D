@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetUsersQuery } from "../../../types/graphql-types";
+import {
+  useGetUsersQuery,
+  useSoftDeleteUserMutation,
+  GetUsersDocument,
+} from "../../../types/graphql-types";
+import useNotification from "../../../hooks/useNotification";
 import BtnCrud from "../../../components/BtnCrud";
 import BtnLink from "../../../components/BtnLink";
 import Table from "@mui/material/Table";
@@ -21,6 +26,9 @@ export default function ManageUser() {
 
   const navigate = useNavigate();
 
+  // User feedback
+  const { notifySuccess, notifyError } = useNotification();
+
   const { loading, error, data } = useGetUsersQuery({
     variables: {
       limit: limit,
@@ -28,12 +36,30 @@ export default function ManageUser() {
     },
   });
 
+  const [softDeleteUserMutation] = useSoftDeleteUserMutation();
+
   // the event parameter is prefixed with _ to avoid the linter flag as event is not used here but is mandatory in the MUI Pagination component
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     value: number,
   ) => {
     setPage(value);
+  };
+
+  const handleSoftDeleteUser = async (userId: number) => {
+    try {
+      await softDeleteUserMutation({
+        variables: {
+          data: { id: userId },
+        },
+        refetchQueries: [{ query: GetUsersDocument }],
+      });
+
+      notifySuccess("Utilisateur désactivé avec succès");
+    } catch (error) {
+      notifyError("Erreur lors de la désactivation de l'utilisateur");
+      console.error("Erreur lors de la désactivation de l'utilisateur", error);
+    }
   };
 
   const handleEditUser = (userId: number) => {
@@ -106,11 +132,19 @@ export default function ManageUser() {
                         handleClick={() => handleEditUser(user.id)}
                         type={"edit"}
                       />
-                      <BtnCrud
-                        disabled={false}
-                        handleClick={() => null}
-                        type={"delete"}
-                      />
+                      {user.deletedAt === null ? (
+                        <BtnCrud
+                          disabled={false}
+                          handleClick={() => handleSoftDeleteUser(user.id)}
+                          type={"disable"}
+                        />
+                      ) : (
+                        <BtnCrud
+                          disabled={false}
+                          handleClick={() => null}
+                          type={"enable"}
+                        />
+                      )}
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -119,7 +153,11 @@ export default function ManageUser() {
         </Table>
         <Stack
           spacing={2}
-          sx={{ marginBottom: "1em", display: "flex", alignItems: "flex-end" }}
+          sx={{
+            marginBottom: "1em",
+            display: "flex",
+            alignItems: "flex-end",
+          }}
         >
           <Pagination
             count={totalPages}

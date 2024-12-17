@@ -61,6 +61,7 @@ export class User extends BaseEntity {
   @OneToMany(() => Invoice, (invoice: Invoice) => invoice.id)
   invoices: Invoice[];
 
+  @Field(() => String, { nullable: true })
   @DeleteDateColumn()
   deletedAt: Date | null;
 }

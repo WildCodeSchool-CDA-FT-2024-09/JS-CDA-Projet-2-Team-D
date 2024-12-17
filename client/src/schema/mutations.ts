@@ -58,3 +58,12 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
+export const SOFTDELETE_USER = gql`
+  mutation SoftDeleteUser($data: userIdInput!) {
+    softDeleteUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
