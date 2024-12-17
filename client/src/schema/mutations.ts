@@ -58,3 +58,21 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
+export const SOFTDELETE_USER = gql`
+  mutation SoftDeleteUser($data: userIdInput!) {
+    softDeleteUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
+
+export const RESTORE_USER = gql`
+  mutation RestoreUser($data: userIdInput!) {
+    restoreUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
