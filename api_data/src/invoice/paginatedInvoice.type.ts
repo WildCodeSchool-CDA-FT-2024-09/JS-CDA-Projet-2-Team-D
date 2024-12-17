@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from "type-graphql";
+import { ObjectType, Field, Int, Float } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 
 @ObjectType()
@@ -8,4 +8,7 @@ export class PaginatedInvoices {
 
   @Field(() => Int)
   totalCount: number;
+
+  @Field(() => Float)
+  totalAmount: number;
 }

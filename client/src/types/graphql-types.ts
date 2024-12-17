@@ -145,6 +145,7 @@ export type MutationUpdateUserArgs = {
 export type PaginatedInvoices = {
   __typename?: "PaginatedInvoices";
   invoices: Array<Invoice>;
+  totalAmount: Scalars["Float"]["output"];
   totalCount: Scalars["Int"]["output"];
 };
 
@@ -161,14 +162,19 @@ export type Query = {
   getCategories: Array<Category>;
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
+  getCurrentBudgetByCommissionID?: Maybe<Budget>;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
   getRoles: Array<Role>;
-  getStatuss: Array<Status>;
+  getStatus: Array<Status>;
   getSubcategories: Array<Subcategory>;
   getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
+};
+
+export type QueryGetCurrentBudgetByCommissionIdArgs = {
+  commissionId: Scalars["Int"]["input"];
 };
 
 export type QueryGetInvoicesByCommissionIdArgs = {
@@ -429,6 +435,7 @@ export type GetInvoicesByCommissionIdQuery = {
   getInvoicesByCommissionId: {
     __typename?: "PaginatedInvoices";
     totalCount: number;
+    totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
       date: string;
@@ -462,6 +469,18 @@ export type GetUserByIdQuery = {
       name: string;
     }> | null;
   };
+};
+
+export type GetCurrentBudgetByCommissionIdQueryVariables = Exact<{
+  commissionId: Scalars["Int"]["input"];
+}>;
+
+export type GetCurrentBudgetByCommissionIdQuery = {
+  __typename?: "Query";
+  getCurrentBudgetByCommissionID?: {
+    __typename?: "Budget";
+    amount: number;
+  } | null;
 };
 
 export const AddCategoryDocument = gql`
@@ -1233,6 +1252,7 @@ export const GetInvoicesByCommissionIdDocument = gql`
         }
       }
       totalCount
+      totalAmount
     }
   }
 `;
@@ -1404,6 +1424,91 @@ export type GetUserByIdQueryResult = Apollo.QueryResult<
   GetUserByIdQuery,
   GetUserByIdQueryVariables
 >;
+export const GetCurrentBudgetByCommissionIdDocument = gql`
+  query GetCurrentBudgetByCommissionID($commissionId: Int!) {
+    getCurrentBudgetByCommissionID(commissionId: $commissionId) {
+      amount
+    }
+  }
+`;
+
+/**
+ * __useGetCurrentBudgetByCommissionIdQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentBudgetByCommissionIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentBudgetByCommissionIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentBudgetByCommissionIdQuery({
+ *   variables: {
+ *      commissionId: // value for 'commissionId'
+ *   },
+ * });
+ */
+export function useGetCurrentBudgetByCommissionIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetCurrentBudgetByCommissionIdQuery,
+    GetCurrentBudgetByCommissionIdQueryVariables
+  > &
+    (
+      | {
+          variables: GetCurrentBudgetByCommissionIdQueryVariables;
+          skip?: boolean;
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetCurrentBudgetByCommissionIdQuery,
+    GetCurrentBudgetByCommissionIdQueryVariables
+  >(GetCurrentBudgetByCommissionIdDocument, options);
+}
+export function useGetCurrentBudgetByCommissionIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCurrentBudgetByCommissionIdQuery,
+    GetCurrentBudgetByCommissionIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCurrentBudgetByCommissionIdQuery,
+    GetCurrentBudgetByCommissionIdQueryVariables
+  >(GetCurrentBudgetByCommissionIdDocument, options);
+}
+export function useGetCurrentBudgetByCommissionIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCurrentBudgetByCommissionIdQuery,
+        GetCurrentBudgetByCommissionIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCurrentBudgetByCommissionIdQuery,
+    GetCurrentBudgetByCommissionIdQueryVariables
+  >(GetCurrentBudgetByCommissionIdDocument, options);
+}
+export type GetCurrentBudgetByCommissionIdQueryHookResult = ReturnType<
+  typeof useGetCurrentBudgetByCommissionIdQuery
+>;
+export type GetCurrentBudgetByCommissionIdLazyQueryHookResult = ReturnType<
+  typeof useGetCurrentBudgetByCommissionIdLazyQuery
+>;
+export type GetCurrentBudgetByCommissionIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetCurrentBudgetByCommissionIdSuspenseQuery
+>;
+export type GetCurrentBudgetByCommissionIdQueryResult = Apollo.QueryResult<
+  GetCurrentBudgetByCommissionIdQuery,
+  GetCurrentBudgetByCommissionIdQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -1414,6 +1519,7 @@ export const namedOperations = {
     GetCommissions: "GetCommissions",
     GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
     GetUserById: "GetUserById",
+    GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
   },
   Mutation: {
     AddCategory: "AddCategory",

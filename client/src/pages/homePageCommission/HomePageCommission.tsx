@@ -14,7 +14,10 @@ import {
 } from "@mui/material";
 import { useMediaQuery, useTheme } from "@mui/material";
 import BudgetGauge from "../../components/budgetGaugeChart/BudgetGaugeChart";
-import { useGetInvoicesByCommissionIdQuery } from "../../types/graphql-types";
+import {
+  useGetInvoicesByCommissionIdQuery,
+  useGetCurrentBudgetByCommissionIdQuery,
+} from "../../types/graphql-types";
 import { formatDate } from "../../utils/dateUtils";
 import { useState } from "react";
 
@@ -22,12 +25,10 @@ const HomePageCommission = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // État pour gérer la pagination
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(5); // Nombre d'éléments par page
+  const [limit] = useState<number>(5);
   const offset = (page - 1) * limit;
 
-  // Gestion du changement de page
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     value: number,
@@ -35,8 +36,19 @@ const HomePageCommission = () => {
     setPage(value);
   };
 
-  // Appel de la requête GraphQL avec les paramètres donnés
-  const { data, loading, error } = useGetInvoicesByCommissionIdQuery({
+  const {
+    data: budgetData,
+    loading: budgetLoading,
+    error: budgetError,
+  } = useGetCurrentBudgetByCommissionIdQuery({
+    variables: { commissionId: 4 },
+  });
+
+  const {
+    data: invoiceData,
+    loading: invoiceLoading,
+    error: invoiceError,
+  } = useGetInvoicesByCommissionIdQuery({
     variables: {
       commissionId: 4,
       limit: limit,
@@ -44,25 +56,21 @@ const HomePageCommission = () => {
     },
   });
 
-  // Gestion des états de chargement et d'erreur
-  if (loading) return <Typography>Chargement des factures...</Typography>;
-  if (error)
+  if (budgetLoading || invoiceLoading)
+    return <Typography>Chargement des données...</Typography>;
+
+  if (budgetError || invoiceError)
     return (
       <Typography>
-        Erreur lors de la récupération des factures : {error.message}
+        Erreur : {budgetError?.message || invoiceError?.message}
       </Typography>
     );
 
-  // Extraction des données depuis la réponse GraphQL
-  const invoices = data?.getInvoicesByCommissionId.invoices || [];
-  const totalCount = data?.getInvoicesByCommissionId?.totalCount || 0;
+  const budgetGlobal = budgetData?.getCurrentBudgetByCommissionID?.amount || 0;
+  const budgetActuel = invoiceData?.getInvoicesByCommissionId?.totalAmount || 0;
+  const invoices = invoiceData?.getInvoicesByCommissionId.invoices || [];
+  const totalCount = invoiceData?.getInvoicesByCommissionId?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / limit);
-
-  const budgetActuel = invoices.reduce(
-    (sum, row) => sum + (row.price_without_vat || 0),
-    0,
-  );
-  const budgetGlobal = 4000;
 
   const getChipStyles = (status: string) => {
     let backgroundColor;
