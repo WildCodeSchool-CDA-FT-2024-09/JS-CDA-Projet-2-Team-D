@@ -4,6 +4,7 @@ import {
   useGetUsersQuery,
   useSoftDeleteUserMutation,
   GetUsersDocument,
+  useRestoreUserMutation,
 } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
 import BtnCrud from "../../../components/BtnCrud";
@@ -37,6 +38,7 @@ export default function ManageUser() {
   });
 
   const [softDeleteUserMutation] = useSoftDeleteUserMutation();
+  const [restoreUserMutation] = useRestoreUserMutation();
 
   // the event parameter is prefixed with _ to avoid the linter flag as event is not used here but is mandatory in the MUI Pagination component
   const handlePageChange = (
@@ -59,6 +61,22 @@ export default function ManageUser() {
     } catch (error) {
       notifyError("Erreur lors de la désactivation de l'utilisateur");
       console.error("Erreur lors de la désactivation de l'utilisateur", error);
+    }
+  };
+
+  const handleRestoreUser = async (userId: number) => {
+    try {
+      await restoreUserMutation({
+        variables: {
+          data: { id: userId },
+        },
+        refetchQueries: [{ query: GetUsersDocument }],
+      });
+
+      notifySuccess("Utilisateur réactivé avec succès");
+    } catch (error) {
+      notifyError("Erreur lors de la réactivé de l'utilisateur");
+      console.error("Erreur lors de la réactivé de l'utilisateur", error);
     }
   };
 
@@ -141,7 +159,7 @@ export default function ManageUser() {
                       ) : (
                         <BtnCrud
                           disabled={false}
-                          handleClick={() => null}
+                          handleClick={() => handleRestoreUser(user.id)}
                           type={"enable"}
                         />
                       )}

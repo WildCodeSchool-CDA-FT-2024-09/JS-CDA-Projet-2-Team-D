@@ -67,3 +67,12 @@ export const SOFTDELETE_USER = gql`
     }
   }
 `;
+
+export const RESTORE_USER = gql`
+  mutation RestoreUser($data: userIdInput!) {
+    restoreUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
