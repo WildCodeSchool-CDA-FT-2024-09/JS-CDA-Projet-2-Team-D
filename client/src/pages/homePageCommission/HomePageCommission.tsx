@@ -66,8 +66,9 @@ const HomePageCommission = () => {
       </Typography>
     );
 
-  const budgetGlobal = budgetData?.getCurrentBudgetByCommissionID?.amount || 0;
-  const budgetActuel = invoiceData?.getInvoicesByCommissionId?.totalAmount || 0;
+  const globalBudget = budgetData?.getCurrentBudgetByCommissionID?.amount || 0;
+  const currentBudget =
+    invoiceData?.getInvoicesByCommissionId?.totalAmount || 0;
   const invoices = invoiceData?.getInvoicesByCommissionId.invoices || [];
   const totalCount = invoiceData?.getInvoicesByCommissionId?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / limit);
@@ -104,7 +105,7 @@ const HomePageCommission = () => {
       >
         Récapitulatif des Factures de Commission
       </Typography>
-      <BudgetGauge budgetGlobal={budgetGlobal} budgetActuel={budgetActuel} />
+      <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
       <TableContainer component={Paper}>
         <Table sx={{ tableLayout: "auto" }}>
           <TableHead>
@@ -114,39 +115,54 @@ const HomePageCommission = () => {
               </TableCell>{" "}
               <TableCell>Date</TableCell>
               <TableCell>Libellé</TableCell>
-              {!isMobile && <TableCell>Prix HT</TableCell>}
+              {!isMobile && <TableCell>Montant HT</TableCell>}
               {!isMobile && <TableCell>Taux TVA</TableCell>}
-              <TableCell>Prix TTC</TableCell>
+              <TableCell>Montant TTC</TableCell>
               <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.invoiceNumber}</TableCell>
-                <TableCell>{formatDate(row.date)}</TableCell>
-                <TableCell>{row.label}</TableCell>
-                {!isMobile && (
+            {invoices.map((row) => {
+              // Ajustement des montants HT et TTC en fonction du type (Débit ou Crédit)
+              const montantHT =
+                row.creditDebit?.label?.toLowerCase() === "débit"
+                  ? -row.price_without_vat
+                  : row.price_without_vat;
+
+              const montantTTC =
+                row.creditDebit?.label?.toLowerCase() === "débit"
+                  ? -row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)
+                  : row.price_without_vat * (1 + (row.vat?.rate || 0) / 100);
+
+              return (
+                <TableRow key={row.id}>
+                  <TableCell>{row.invoiceNumber}</TableCell>
+                  <TableCell>{formatDate(row.date)}</TableCell>
+                  <TableCell>{row.label}</TableCell>
+                  {!isMobile && (
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {montantHT.toFixed(2)} €
+                    </TableCell>
+                  )}
+                  {!isMobile && (
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {row.vat?.rate || 0}%
+                    </TableCell>
+                  )}
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {row.price_without_vat} €
+                    {montantTTC.toFixed(2)} €
                   </TableCell>
-                )}
-                {!isMobile && (
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {row.vat?.rate}%
+                  <TableCell>
+                    <Chip
+                      label={
+                        isMobile ? row.status?.label[0] : row.status?.label
+                      }
+                      sx={getChipStyles(row.status?.label)}
+                    />
                   </TableCell>
-                )}
-                <TableCell sx={{ whiteSpace: "nowrap" }}>
-                  {row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)} €
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={isMobile ? row.status?.label[0] : row.status?.label}
-                    sx={getChipStyles(row.status?.label)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
         <Stack
