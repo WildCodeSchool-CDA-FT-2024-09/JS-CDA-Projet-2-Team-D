@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import {
   TextField,
   Button,
@@ -23,6 +24,8 @@ import { fr } from "date-fns/locale";
 import { useUser } from "../../hooks/useUser";
 
 const InvoiceForm: React.FC = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { user } = useUser();
   const userId = user?.id;
 
@@ -52,12 +55,18 @@ const InvoiceForm: React.FC = () => {
         >,
     options?: number,
   ) => {
-    const { name, value } = event.target;
+    const { name, value, files } = event.target as HTMLInputElement;
 
-    if (name === "price_without_vat" || name === "vat_id") {
+    // Gestion des fichiers
+    if (files && files.length > 0) {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: value,
+        [name]: files[0], // Ajoute le fichier uploadé
+      }));
+    } else if (name === "price_without_vat" || name === "vat_id") {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: +value,
       }));
     } else if (name === "category_id" && options) {
       setInvoice((prevState) => ({
@@ -87,11 +96,42 @@ const InvoiceForm: React.FC = () => {
 
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
+
     if (userId) {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
-
     console.info("Données de la facture :", invoice);
+    try {
+      const formData = new FormData();
+
+      // Ajouter les données de la facture à FormData
+      Object.entries(invoice).forEach(([key, value]) => {
+        if (value instanceof File || typeof value === "string") {
+          formData.append(key, value);
+        } else {
+          formData.append(key, JSON.stringify(value));
+        }
+      });
+
+      const response = await axios.post("/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.info("Réponse du serveur :", response.data);
+      alert("Facture envoyée avec succès !");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Erreur lors de l'envoi :", error.message);
+      } else {
+        console.error("Erreur inconnue :", error);
+        alert("Échec de l'envoi de la facture.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const loading = loadingVatRates;
@@ -269,9 +309,14 @@ const InvoiceForm: React.FC = () => {
               required={false}
             />
           </Grid>
-          <Grid size={12} container justifyContent="center">
-            <Button type="submit" variant="contained" color="primary">
-              Enregistrer la facture
+          <Grid size={12} container alignItems="center" justifyContent="center">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Envoi en cours..." : "Enregistrer la facture"}
             </Button>
           </Grid>
         </Grid>
