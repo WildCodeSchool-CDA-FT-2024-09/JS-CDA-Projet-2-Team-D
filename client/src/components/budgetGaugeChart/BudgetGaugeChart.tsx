@@ -23,7 +23,7 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
   return (
     <article style={{ textAlign: "center" }}>
       <h2>Budget global : {globalBudget.toLocaleString()} €</h2>
-      <h3>Total dépenses : {currentBudget.toLocaleString()} €</h3>
+      <h3>Total des dépenses : {currentBudget.toLocaleString()} €</h3>
       <Gauge
         startAngle={-120}
         endAngle={120}
