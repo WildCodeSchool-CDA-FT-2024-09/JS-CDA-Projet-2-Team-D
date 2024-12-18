@@ -113,9 +113,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
 
   const handleValidationCategory = (): boolean => {
     if (!newCategoryLabel) {
-      notifyError(
-        "Veuillez mettre mettre à jour le champ 'Nom de la catégorie'",
-      );
+      notifyError("Veuillez mettre à jour le champ 'Nom de la catégorie'");
       return false;
     }
 
@@ -156,7 +154,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   };
 
   return (
-    <React.Fragment>
+    <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
@@ -179,7 +177,6 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 flexDirection: "column",
                 border: "1px solid rgba(0, 0, 0, 0.1)",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-
                 padding: "1rem",
                 borderRadius: "8px",
                 width: "100%",
@@ -473,7 +470,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
 }
 
