@@ -31,6 +31,6 @@ export class Category extends BaseEntity {
   subcategories: Subcategory[];
 
   @Field(() => CreditDebit)
-  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
+  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.categories)
   creditDebit: CreditDebit;
 }

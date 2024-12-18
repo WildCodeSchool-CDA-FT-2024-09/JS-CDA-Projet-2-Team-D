@@ -90,6 +90,7 @@ const InvoiceForm: React.FC = () => {
     if (userId) {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
+
     console.info("Données de la facture :", invoice);
   };
 
@@ -121,6 +122,7 @@ const InvoiceForm: React.FC = () => {
               label="Commissions"
               value={invoice.commission_id}
               handleSelect={handleInvoiceChange}
+              required
             />
           </Grid>
 
@@ -148,6 +150,7 @@ const InvoiceForm: React.FC = () => {
               property="label"
               value={invoice.category_id.toString()}
               handleSelect={handleInvoiceChange}
+              required
             />
           </Grid>
           <Grid size={6}>
@@ -158,6 +161,7 @@ const InvoiceForm: React.FC = () => {
               value={invoice.subcategory_id?.toString()}
               subValue={invoice.category_id}
               handleSelect={handleInvoiceChange}
+              required
             />
           </Grid>
           <FormTextField
@@ -165,6 +169,7 @@ const InvoiceForm: React.FC = () => {
             label="Libellé"
             value={invoice.label}
             onChange={handleInvoiceChange}
+            required
           />
           <Grid size={6}>
             <FormTextField
@@ -175,7 +180,7 @@ const InvoiceForm: React.FC = () => {
                 invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
               }
               onChange={handleInvoiceChange}
-              inputProps={{ min: 0 }}
+              required
             />
           </Grid>
           <Grid size={6}>
