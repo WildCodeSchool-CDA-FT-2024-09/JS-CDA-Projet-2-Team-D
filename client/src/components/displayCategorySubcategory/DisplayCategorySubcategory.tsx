@@ -31,13 +31,15 @@ import { Button } from "@mui/material";
 function createData(
   label: string,
   id: number,
-  creditDebit: { label: string },
+  creditDebit: { label: string; id: number },
+
   subcategories: { id: number; label: string; code: string }[],
 ) {
   return {
     categoryId: id,
     categoryLabel: label,
     creditDebitLabel: creditDebit.label,
+    creditDebitId: creditDebit.id,
     subcategory: subcategories.map((subcategory) => ({
       id: subcategory.id,
       label: subcategory.label,
@@ -110,13 +112,11 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   };
 
   const handleValidationCategory = (): boolean => {
-    if (!newCategoryLabel) {
-      notifyError("Veuillez mettre à jour le champ 'Nom de la catégorie'");
-      return false;
-    }
+    const isCreditDebitIdChanged =
+      newCreditDebitId && newCreditDebitId !== row.creditDebitId;
 
-    if (row.categoryLabel === newCategoryLabel) {
-      notifyError("Le nom de la catégorie n'a pas changé");
+    if (!isCreditDebitIdChanged && !newCategoryLabel) {
+      notifyError("Aucune modification effectuée");
       return false;
     }
 
@@ -130,13 +130,20 @@ function Row(props: { row: ReturnType<typeof createData> }) {
 
   const handleUpdateCategory = async () => {
     if (!handleValidationCategory()) return;
+
+    const variables: {
+      id: number;
+      label: string;
+      creditDebitId: number;
+    } = {
+      id: row.categoryId,
+      label: newCategoryLabel || row.categoryLabel,
+      creditDebitId: newCreditDebitId || row.creditDebitId,
+    };
+
     try {
       await updateCategory({
-        variables: {
-          id: row.categoryId,
-          label: newCategoryLabel,
-          creditDebitId: newCreditDebitId,
-        },
+        variables,
         refetchQueries: ["GetCategories"],
       });
       setEditCategory(false);
@@ -148,6 +155,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   };
 
   const handleClickCategory = () => {
+    setNewCreditDebitId(row.creditDebitId);
     setEditCategory(true);
   };
 
@@ -187,7 +195,6 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 placeholder={`${row.categoryLabel}`}
                 value={newCategoryLabel}
                 onChange={(e) => setNewCategoryLabel(e.target.value)}
-                onBlur={handleUpdateCategory}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
                     handleUpdateCategory();
@@ -218,9 +225,10 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 }}
               >
                 <option value="0">Crédit ou Débit ?</option>
-                <option value="1">Débit</option>
-                <option value="2">Crédit</option>
+                <option value="1">Crédit</option>
+                <option value="2">Débit</option>
               </Box>
+
               <div
                 style={{
                   display: "flex",
@@ -485,7 +493,7 @@ function DisplayCategorySubcategory() {
       return createData(
         category.label,
         category.id,
-        { label: category.creditDebit.label },
+        { id: category.creditDebit.id, label: category.creditDebit.label },
         category.subcategories || [],
       );
     }) || [];
