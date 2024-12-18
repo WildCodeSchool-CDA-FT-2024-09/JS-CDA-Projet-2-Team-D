@@ -14,8 +14,9 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
+import { Link } from "react-router-dom";
 
-const drawerWidth = 300;
+const drawerWidth = 280;
 
 function CustomDrawer() {
   const { user } = useUser();
@@ -64,20 +65,24 @@ function CustomDrawer() {
             <Divider />
             <List>
               <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <GroupIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Gestion des utilisateurs" />
-                </ListItemButton>
+                <Link to={`/administrator/user`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <GroupIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Gestion des utilisateurs" />
+                  </ListItemButton>
+                </Link>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <InboxIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Gestion du budget" />
-                </ListItemButton>
+                <Link to={`/administrator/budget`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Gestion du budget" />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             </List>
           </>
