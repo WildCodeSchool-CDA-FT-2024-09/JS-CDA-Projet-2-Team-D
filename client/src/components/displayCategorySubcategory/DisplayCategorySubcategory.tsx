@@ -4,7 +4,7 @@ import {
 } from "../../types/graphql-types";
 import { useAddSubcategoryMutation } from "../../types/graphql-types";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 import useNotification from "../../hooks/useNotification";
 
@@ -129,13 +129,13 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       return false;
     }
 
-    // if (
-    //   row.categoryLabel === newCategoryLabel &&
-    //   data.creditDebitId === creditDebitId
-    // ) {
-    //   notifyError("Aucune modification n'a été apportée");
-    //   return false;
-    // }
+    if (
+      row.categoryLabel === newCategoryLabel &&
+      row.creditDebitLabel === String(creditDebitId)
+    ) {
+      notifyError("Aucune modification n'a été apportée");
+      return false;
+    }
     return true;
   };
 
@@ -148,7 +148,9 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           label: newCategoryLabel,
           creditDebitId: 1,
         },
+        refetchQueries: ["GetCategories"],
       });
+      setEditCategory(false);
       notifySuccess("Catégorie modifiée avec succès");
     } catch (err) {
       console.info(err);
@@ -161,7 +163,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   };
 
   return (
-    <>
+    <React.Fragment>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
@@ -178,7 +180,19 @@ function Row(props: { row: ReturnType<typeof createData> }) {
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
           {editCategory ? (
-            <>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                border: "1px solid rgba(0, 0, 0, 0.1)",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+
+                padding: "1rem",
+                borderRadius: "8px",
+                width: "100%",
+                backgroundColor: "white",
+              }}
+            >
               <Box
                 component="input"
                 type="text"
@@ -199,6 +213,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                   width: "100%",
                   padding: "0.5rem",
                   boxSizing: "border-box",
+                  border: "none",
                 }}
               />
               <Box
@@ -208,24 +223,40 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 sx={{
                   fontSize: "1.2rem",
                   color: theme.palette.primary.main,
-                  width: "100%",
+                  width: "50%",
                   padding: "0.5rem",
                   boxSizing: "border-box",
+                  marginBottom: "1.5rem",
                 }}
               >
-                <option value="0">Crédit ou Débit</option>
+                <option value="0">Crédit ou Débit ?</option>
                 <option value="1">Débit</option>
                 <option value="2">Crédit</option>
               </Box>
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
                   gap: "1rem",
                   marginTop: "1rem",
                   alignItems: "flex-start",
                 }}
               >
+                <Button
+                  sx={{
+                    backgroundColor: theme.palette.error.main,
+                    color: "white",
+                    fontWeight: "bold",
+                    border: "none",
+                    width: "90%",
+                    maxWidth: "120px",
+                    height: "4vh",
+                    fontSize: "1.1rem",
+                    marginRight: "8rem",
+                  }}
+                  onClick={() => setEditCategory(false)}
+                >
+                  Annuler
+                </Button>
                 <Button
                   onClick={() => handleUpdateCategory()}
                   sx={{
@@ -233,7 +264,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                     color: "white",
                     fontWeight: "bold",
                     border: "none",
-                    width: "100%",
+                    width: "90%",
                     maxWidth: "120px",
                     height: "4vh",
                     fontSize: "1.1rem",
@@ -242,39 +273,20 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 >
                   Valider
                 </Button>
-                <Button
-                  sx={{
-                    backgroundColor: theme.palette.error.main,
-                    color: "white",
-                    fontWeight: "bold",
-                    border: "none",
-                    width: "100%",
-                    maxWidth: "120px",
-                    height: "4vh",
-                    fontSize: "1.1rem",
-                  }}
-                  onClick={() => setEditCategory(false)}
-                >
-                  Annuler
-                </Button>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <TableCell sx={{ border: "none" }}>
-                <div>
-                  <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
-                  <div
-                    style={{
-                      fontSize: "1.2rem",
-                      color: theme.palette.primary.main,
-                    }}
-                  >
-                    {row.creditDebitLabel}
-                  </div>
-                </div>
-              </TableCell>
-            </>
+            <div>
+              <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
+              <div
+                style={{
+                  fontSize: "1.2rem",
+                  color: theme.palette.primary.main,
+                }}
+              >
+                {row.creditDebitLabel}
+              </div>
+            </div>
           )}
         </TableCell>
 
@@ -468,7 +480,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           </Collapse>
         </TableCell>
       </TableRow>
-    </>
+    </React.Fragment>
   );
 }
 
