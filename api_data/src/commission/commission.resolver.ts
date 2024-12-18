@@ -56,7 +56,7 @@ export default class CommissionResolver {
 
       return { invoices, totalCount, totalAmount };
     } catch (error) {
-      console.error("Error fetching invoices by co mmission ID:", error);
+      console.error("Error fetching invoices by commission ID:", error);
       throw new Error("Unable to fetch invoices for the given commission ID.");
     }
   }
