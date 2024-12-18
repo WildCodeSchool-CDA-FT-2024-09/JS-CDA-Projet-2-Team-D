@@ -156,6 +156,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
 
   const handleClickCategory = () => {
     setNewCreditDebitId(row.creditDebitId);
+    setNewCategoryLabel(row.categoryLabel);
     setEditCategory(true);
   };
 
@@ -501,7 +502,13 @@ function DisplayCategorySubcategory() {
   return (
     <TableContainer
       component={Paper}
-      sx={{ border: 1, marginTop: 10, marginLeft: 3, width: "100%" }}
+      sx={{
+        border: 1,
+        marginTop: 10,
+        marginLeft: 3,
+        marginRight: 3,
+        width: "90%",
+      }}
     >
       <Table aria-label="collapsible table">
         <TableHead>
