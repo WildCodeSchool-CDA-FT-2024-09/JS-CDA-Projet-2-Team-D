@@ -86,6 +86,12 @@ export type CreditDebit = {
   label: Scalars["String"]["output"];
 };
 
+export type DeleteResponseStatus = {
+  __typename?: "DeleteResponseStatus";
+  message?: Maybe<Scalars["String"]["output"]>;
+  success: Scalars["Boolean"]["output"];
+};
+
 export type Exercise = {
   __typename?: "Exercise";
   budgets: Array<Budget>;
@@ -119,6 +125,8 @@ export type Mutation = {
   addCategory: Category;
   addSubcategory: Subcategory;
   createNewUser: User;
+  restoreUser: RestoreResponseStatus;
+  softDeleteUser: DeleteResponseStatus;
   updateUser: User;
 };
 
@@ -135,6 +143,14 @@ export type MutationAddSubcategoryArgs = {
 
 export type MutationCreateNewUserArgs = {
   data: UserInput;
+};
+
+export type MutationRestoreUserArgs = {
+  data: UserIdInput;
+};
+
+export type MutationSoftDeleteUserArgs = {
+  data: UserIdInput;
 };
 
 export type MutationUpdateUserArgs = {
@@ -192,6 +208,12 @@ export type QueryGetUsersArgs = {
   offset?: Scalars["Int"]["input"];
 };
 
+export type RestoreResponseStatus = {
+  __typename?: "RestoreResponseStatus";
+  message?: Maybe<Scalars["String"]["output"]>;
+  success: Scalars["Boolean"]["output"];
+};
+
 export type Role = {
   __typename?: "Role";
   id: Scalars["Int"]["output"];
@@ -222,6 +244,7 @@ export type Subcategory = {
 export type User = {
   __typename?: "User";
   commissions?: Maybe<Array<Commission>>;
+  deletedAt?: Maybe<Scalars["String"]["output"]>;
   email: Scalars["String"]["output"];
   firstname: Scalars["String"]["output"];
   id: Scalars["Int"]["output"];
@@ -233,6 +256,7 @@ export type User = {
 
 export type UserInput = {
   commissions: Array<CommissionsInput>;
+  deletedAt?: InputMaybe<Scalars["String"]["input"]>;
   email: Scalars["String"]["input"];
   firstname: Scalars["String"]["input"];
   lastname: Scalars["String"]["input"];
@@ -246,6 +270,10 @@ export type Vat = {
   invoices: Array<Invoice>;
   label: Scalars["String"]["output"];
   rate: Scalars["Float"]["output"];
+};
+
+export type UserIdInput = {
+  id: Scalars["Float"]["input"];
 };
 
 export type AddCategoryMutationVariables = Exact<{
@@ -311,6 +339,32 @@ export type UpdateUserMutation = {
   };
 };
 
+export type SoftDeleteUserMutationVariables = Exact<{
+  data: UserIdInput;
+}>;
+
+export type SoftDeleteUserMutation = {
+  __typename?: "Mutation";
+  softDeleteUser: {
+    __typename?: "DeleteResponseStatus";
+    message?: string | null;
+    success: boolean;
+  };
+};
+
+export type RestoreUserMutationVariables = Exact<{
+  data: UserIdInput;
+}>;
+
+export type RestoreUserMutation = {
+  __typename?: "Mutation";
+  restoreUser: {
+    __typename?: "RestoreResponseStatus";
+    message?: string | null;
+    success: boolean;
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{
   limit: Scalars["Int"]["input"];
   offset: Scalars["Int"]["input"];
@@ -328,6 +382,7 @@ export type GetUsersQuery = {
       lastname: string;
       email: string;
       password: string;
+      deletedAt?: string | null;
       roles: Array<{ __typename?: "Role"; id: number; label: string }>;
       commissions?: Array<{
         __typename?: "Commission";
@@ -714,6 +769,108 @@ export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
   UpdateUserMutation,
   UpdateUserMutationVariables
 >;
+export const SoftDeleteUserDocument = gql`
+  mutation SoftDeleteUser($data: userIdInput!) {
+    softDeleteUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
+export type SoftDeleteUserMutationFn = Apollo.MutationFunction<
+  SoftDeleteUserMutation,
+  SoftDeleteUserMutationVariables
+>;
+
+/**
+ * __useSoftDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useSoftDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSoftDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [softDeleteUserMutation, { data, loading, error }] = useSoftDeleteUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useSoftDeleteUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SoftDeleteUserMutation,
+    SoftDeleteUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    SoftDeleteUserMutation,
+    SoftDeleteUserMutationVariables
+  >(SoftDeleteUserDocument, options);
+}
+export type SoftDeleteUserMutationHookResult = ReturnType<
+  typeof useSoftDeleteUserMutation
+>;
+export type SoftDeleteUserMutationResult =
+  Apollo.MutationResult<SoftDeleteUserMutation>;
+export type SoftDeleteUserMutationOptions = Apollo.BaseMutationOptions<
+  SoftDeleteUserMutation,
+  SoftDeleteUserMutationVariables
+>;
+export const RestoreUserDocument = gql`
+  mutation RestoreUser($data: userIdInput!) {
+    restoreUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
+export type RestoreUserMutationFn = Apollo.MutationFunction<
+  RestoreUserMutation,
+  RestoreUserMutationVariables
+>;
+
+/**
+ * __useRestoreUserMutation__
+ *
+ * To run a mutation, you first call `useRestoreUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRestoreUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [restoreUserMutation, { data, loading, error }] = useRestoreUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useRestoreUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RestoreUserMutation,
+    RestoreUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<RestoreUserMutation, RestoreUserMutationVariables>(
+    RestoreUserDocument,
+    options,
+  );
+}
+export type RestoreUserMutationHookResult = ReturnType<
+  typeof useRestoreUserMutation
+>;
+export type RestoreUserMutationResult =
+  Apollo.MutationResult<RestoreUserMutation>;
+export type RestoreUserMutationOptions = Apollo.BaseMutationOptions<
+  RestoreUserMutation,
+  RestoreUserMutationVariables
+>;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
     getUsers(limit: $limit, offset: $offset) {
@@ -723,6 +880,7 @@ export const GetUsersDocument = gql`
         lastname
         email
         password
+        deletedAt
         roles {
           id
           label
@@ -1526,5 +1684,7 @@ export const namedOperations = {
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
     UpdateUser: "UpdateUser",
+    SoftDeleteUser: "SoftDeleteUser",
+    RestoreUser: "RestoreUser",
   },
 };

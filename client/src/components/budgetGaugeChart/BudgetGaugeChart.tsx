@@ -12,7 +12,7 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
 }) => {
   const theme = useTheme();
 
-  const pourcentage = Math.floor((currentBudget / globalBudget) * 100);
+  const pourcentage = Math.floor((-currentBudget / globalBudget) * 100);
 
   const getColor = (value: number) => {
     if (value <= 50) return theme.palette.success.main;
@@ -22,8 +22,8 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
 
   return (
     <article style={{ textAlign: "center" }}>
-      <h2>{currentBudget.toLocaleString()} €</h2>
-      <h3>Total : {globalBudget.toLocaleString()} €</h3>
+      <h2>Budget global : {globalBudget.toLocaleString()} €</h2>
+      <h3>Total dépenses : {currentBudget.toLocaleString()} €</h3>
       <Gauge
         startAngle={-120}
         endAngle={120}
