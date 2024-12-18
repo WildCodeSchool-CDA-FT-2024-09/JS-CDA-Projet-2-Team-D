@@ -14,6 +14,11 @@ import {
   Length,
   IsEmail,
 } from "class-validator";
+import { AppDataSource } from "../db/data-source";
+import {
+  DeleteResponseStatus,
+  RestoreResponseStatus,
+} from "../utilities/responseStatus";
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
@@ -28,6 +33,12 @@ class RolesInput {
 
 @InputType()
 class CommissionsInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class userIdInput {
   @Field()
   id: number;
 }
@@ -66,6 +77,9 @@ class UserInput {
 
   @Field(() => [CommissionsInput])
   commissions: CommissionsInput[];
+
+  @Field({ nullable: true })
+  deletedAt?: string;
 }
 
 @Resolver(User)
@@ -76,6 +90,7 @@ export default class UserResolver {
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
     const [users, totalCount] = await User.findAndCount({
+      withDeleted: true, // By default TypeORM excludes soft deleted records
       relations: ["roles", "commissions"],
       skip: offset,
       take: limit,
@@ -184,6 +199,52 @@ export default class UserResolver {
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
+    }
+  }
+
+  @Mutation(() => DeleteResponseStatus)
+  async softDeleteUser(@Arg("data") data: userIdInput) {
+    try {
+      const user = await User.findOneBy({ id: data.id });
+
+      if (!user) {
+        return new DeleteResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await user.softRemove();
+        return new DeleteResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new DeleteResponseStatus("error", "server error");
+    }
+  }
+
+  @Mutation(() => RestoreResponseStatus)
+  async restoreUser(@Arg("data") data: userIdInput) {
+    try {
+      // Using getRepository because Active Record does not support restore
+      const userRepository = AppDataSource.getRepository(User);
+
+      const user = await userRepository.findOne({
+        where: { id: data.id },
+        withDeleted: true,
+      });
+
+      if (!user) {
+        return new RestoreResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await userRepository.restore(data.id);
+        return new RestoreResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
     }
   }
 }
