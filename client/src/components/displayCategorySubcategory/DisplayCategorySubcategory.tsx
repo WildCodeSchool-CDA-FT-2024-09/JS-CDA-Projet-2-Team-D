@@ -3,9 +3,7 @@ import {
   useUpdateCategoryMutation,
 } from "../../types/graphql-types";
 import { useAddSubcategoryMutation } from "../../types/graphql-types";
-
-import React, { useState } from "react";
-
+import { useState } from "react";
 import useNotification from "../../hooks/useNotification";
 
 import {
@@ -55,7 +53,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   const [editCategory, setEditCategory] = useState(false);
 
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
-  const [creditDebitId, setCreditDebitId] = useState<number>(0);
+  const [newCreditDebitId, setNewCreditDebitId] = useState<number>(0);
 
   const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
@@ -122,7 +120,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       return false;
     }
 
-    if (creditDebitId === 0) {
+    if (newCreditDebitId === 0) {
       notifyError("Veuillez sélectionner un type de crédit/débit valide !");
       return false;
     }
@@ -137,7 +135,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
         variables: {
           id: row.categoryId,
           label: newCategoryLabel,
-          creditDebitId: 1,
+          creditDebitId: newCreditDebitId,
         },
         refetchQueries: ["GetCategories"],
       });
@@ -208,8 +206,8 @@ function Row(props: { row: ReturnType<typeof createData> }) {
               />
               <Box
                 component="select"
-                value={creditDebitId}
-                onChange={(e) => setCreditDebitId(Number(e.target.value))}
+                value={newCreditDebitId}
+                onChange={(e) => setNewCreditDebitId(Number(e.target.value))}
                 sx={{
                   fontSize: "1.2rem",
                   color: theme.palette.primary.main,
