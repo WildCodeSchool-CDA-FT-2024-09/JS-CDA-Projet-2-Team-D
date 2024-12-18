@@ -129,13 +129,6 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       return false;
     }
 
-    if (
-      row.categoryLabel === newCategoryLabel &&
-      row.creditDebitLabel === String(creditDebitId)
-    ) {
-      notifyError("Aucune modification n'a été apportée");
-      return false;
-    }
     return true;
   };
 
