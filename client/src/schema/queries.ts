@@ -150,6 +150,7 @@ export const GET_INVOICE_BY_COMMISSION = gql`
         }
       }
       totalCount
+      totalAmount
     }
   }
 `;
@@ -169,6 +170,14 @@ export const GET_USER_BY_ID = gql`
         id
         name
       }
+    }
+  }
+`;
+
+export const GET_CURRENT_BUDGET_BY_COMMISSION_ID = gql`
+  query GetCurrentBudgetByCommissionID($commissionId: Int!) {
+    getCurrentBudgetByCommissionID(commissionId: $commissionId) {
+      amount
     }
   }
 `;
