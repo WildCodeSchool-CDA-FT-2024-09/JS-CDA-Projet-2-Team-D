@@ -96,6 +96,10 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: ":commissionId",
+            element: <HomePageCommission />,
+          },
+          {
             index: true,
             element: <HomePageCommission />,
           },
