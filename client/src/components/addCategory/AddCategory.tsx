@@ -71,6 +71,7 @@ function AddCategory() {
             label: category,
             creditDebitId,
           },
+          refetchQueries: ["GetCategories"],
         });
         console.info("Nouvelle catégorie ajoutée :", result.data);
         notifySuccess("Catégorie ajoutée avec succès !");

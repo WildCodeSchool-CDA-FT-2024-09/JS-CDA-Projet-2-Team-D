@@ -48,8 +48,11 @@ function createData(
   };
 }
 
-function Row(props: { row: ReturnType<typeof createData> }) {
-  const { row } = props;
+function Row(props: {
+  row: ReturnType<typeof createData>;
+  rows: ReturnType<typeof createData>[];
+}) {
+  const { row, rows } = props;
   const [open, setOpen] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [editCategory, setEditCategory] = useState(false);
@@ -114,8 +117,10 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   const handleValidationCategory = (): boolean => {
     const isCreditDebitIdChanged =
       newCreditDebitId && newCreditDebitId !== row.creditDebitId;
+    const isCategoryLabelChanged =
+      newCategoryLabel && newCategoryLabel !== row.categoryLabel;
 
-    if (!isCreditDebitIdChanged && !newCategoryLabel) {
+    if (!isCreditDebitIdChanged && !isCategoryLabelChanged) {
       notifyError("Aucune modification effectuée");
       return false;
     }
@@ -125,6 +130,16 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       return false;
     }
 
+    if (
+      rows.some(
+        (existingRow) =>
+          existingRow.categoryLabel === newCategoryLabel &&
+          existingRow.categoryId !== row.categoryId,
+      )
+    ) {
+      notifyError("Cette catégorie existe déjà");
+      return false;
+    }
     return true;
   };
 
@@ -530,7 +545,7 @@ function DisplayCategorySubcategory() {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.categoryId} row={row} />
+            <Row key={row.categoryId} row={row} rows={rows} />
           ))}
         </TableBody>
       </Table>
