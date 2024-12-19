@@ -67,25 +67,21 @@ function App() {
         <ThemeProvider theme={theme}>
           <NotificationProvider>
             {currentPage !== "/" ? (
-              <>
-                <Box sx={{ display: "flex" }}>
-                  <CssBaseline />
-                  <Header
-                    title="ClubCompta"
-                    subtitle="Budget 2024/2025"
-                    userType="Responsable"
-                    logoUrl="/Logo.svg"
-                    avatarColor="#6EBF8B"
-                  />
-                  <Drawer />
-                  <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
-                    {/* <MenuSideBar /> */}
-                    <UserBar />
-                    <Outlet />
-                    <Footer />
-                  </Box>
+              <Box sx={{ display: "flex" }}>
+                <CssBaseline />
+                <Header
+                  title="ClubCompta"
+                  subtitle="Budget 2024/2025"
+                  logoUrl="/Logo.svg"
+                />
+                <Drawer />
+                <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
+                  {/* <MenuSideBar /> */}
+                  <UserBar />
+                  <Outlet />
+                  <Footer />
                 </Box>
-              </>
+              </Box>
             ) : (
               <Home />
             )}

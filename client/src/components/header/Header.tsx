@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -7,31 +7,39 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
+import { UserContext } from "../../context/UserContext";
 
+const roleMapping: { [key: string]: string } = {
+  1: "Administrateur",
+  2: "Comptable",
+  3: "Responsable",
+};
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  userType?: string;
   logoUrl: string;
-  avatarColor: string;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
-  userType,
-  logoUrl,
-}) => {
+const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
   const theme = useTheme();
+  const userContext = useContext(UserContext);
 
-  // Color mapping depending on user role
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+
+  const { user } = userContext;
+
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main, // Red
-    Comptable: theme.palette.secondary.main, // Yellow
+    Comptable: theme.palette.warning.main, // Yellow
     Responsable: theme.palette.success.main, // Green
   };
 
-  const avatarColor = roleColorMapping[userType || "default"];
+  const userRole = user?.roles[0];
+  const userType =
+    userRole && roleMapping[userRole] ? roleMapping[userRole] : "Visiteur";
+  const avatarColor = roleColorMapping[userType] || "#D9D9D9";
 
   return (
     <AppBar
@@ -52,7 +60,16 @@ const Header: React.FC<HeaderProps> = ({
             alignItems: "center",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              color: "black",
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -73,25 +90,16 @@ const Header: React.FC<HeaderProps> = ({
                 style={{ height: "34px", width: "auto" }}
               />
             </Box>
-
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography
                 variant="h1"
                 component="div"
                 className="header-title"
                 sx={{
-                  display: { xs: "none", sm: "block" }, // Masked on mobile (xs) and displayed for sm +
+                  display: { xs: "none", sm: "block" },
                 }}
               >
-                <Link
-                  to="/"
-                  style={{
-                    textDecoration: "none",
-                    color: "black",
-                  }}
-                >
-                  {title}
-                </Link>
+                {title}
               </Typography>
               {(subtitle || userType) && (
                 <Typography
@@ -105,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({
                 </Typography>
               )}
             </Box>
-          </Box>
+          </Link>
 
           <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
             <Avatar color={avatarColor} />
