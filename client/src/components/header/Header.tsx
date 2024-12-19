@@ -1,4 +1,3 @@
-import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -7,7 +6,7 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
-import { UserContext } from "../../context/UserContext";
+import { useUser } from "../../hooks/useUser";
 
 const roleMapping: { [key: string]: string } = {
   1: "Administrateur",
@@ -22,13 +21,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
   const theme = useTheme();
-  const userContext = useContext(UserContext);
-
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserProvider");
-  }
-
-  const { user } = userContext;
+  const { user } = useUser();
 
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main, // Red
@@ -78,16 +71,16 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
                 backgroundColor: "white",
                 borderRadius: "12px",
                 boxShadow: theme.shadows[3],
-                padding: 0.5,
-                height: "40px",
-                width: "40px",
+                padding: 1,
+                height: "3.5rem",
+                width: "4rem",
                 marginRight: 2,
               }}
             >
               <img
                 src={logoUrl}
                 alt="Logo Club Compta"
-                style={{ height: "34px", width: "auto" }}
+                style={{ height: "3rem", width: "auto" }}
               />
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column" }}>

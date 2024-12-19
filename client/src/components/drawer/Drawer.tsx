@@ -20,8 +20,9 @@ const drawerWidth = 280;
 
 function CustomDrawer() {
   const { user } = useUser();
+
   const { data, loading, error } = useGetUserByIdQuery({
-    variables: { userId: 2 },
+    variables: { userId: user?.id ?? 0 },
   });
 
   if (loading) return <p>Chargement...</p>;
