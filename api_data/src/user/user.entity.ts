@@ -7,6 +7,7 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  DeleteDateColumn,
 } from "typeorm";
 import { Field, ObjectType, Int } from "type-graphql";
 import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
@@ -59,4 +60,8 @@ export class User extends BaseEntity {
   @Field(() => [Invoice])
   @OneToMany(() => Invoice, (invoice: Invoice) => invoice.id)
   invoices: Invoice[];
+
+  @Field(() => String, { nullable: true })
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

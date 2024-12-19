@@ -1,0 +1,20 @@
+meta {
+  name: /upload
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:7100/upload
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Content-Type: multipart/form-data
+}
+
+body:multipart-form {
+  file: @file(/home/fabien/Downloads/ScreenShot4760.jpg)
+  description: husky
+}

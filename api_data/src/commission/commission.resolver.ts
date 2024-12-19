@@ -39,7 +39,22 @@ export default class CommissionResolver {
       if (!invoices.length) {
         throw new Error("No invoices found for the given commission.");
       }
-      return { invoices, totalCount };
+
+      const allInvoices = await Invoice.find({
+        where: {
+          commission: { id: commissionId },
+          date: Between(lastExercise.start_date, lastExercise.end_date),
+        },
+        relations: ["vat", "creditDebit"],
+      });
+
+      const totalAmount = allInvoices.reduce((sum, invoice) => {
+        const vatRate = invoice.vat?.rate || 0;
+        const ttc = invoice.price_without_vat * (1 + vatRate / 100);
+        return sum + (invoice.creditDebit.id === 2 ? -ttc : ttc);
+      }, 0);
+
+      return { invoices, totalCount, totalAmount };
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
       throw new Error("Unable to fetch invoices for the given commission ID.");

@@ -3,8 +3,26 @@ import { gql } from "@apollo/client";
 export const ADD_CATEGORY = gql`
   mutation AddCategory($label: String!, $creditDebitId: Float!) {
     addCategory(label: $label, creditDebitId: $creditDebitId) {
+      creditDebit {
+        id
+      }
+      label
+    }
+  }
+`;
+
+export const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory(
+    $id: Float!
+    $label: String!
+    $creditDebitId: Float!
+  ) {
+    updateCategory(id: $id, label: $label, creditDebitId: $creditDebitId) {
       id
       label
+      creditDebit {
+        id
+      }
     }
   }
 `;
@@ -55,6 +73,24 @@ export const UPDATE_USER = gql`
       commissions {
         id
       }
+    }
+  }
+`;
+
+export const SOFTDELETE_USER = gql`
+  mutation SoftDeleteUser($data: userIdInput!) {
+    softDeleteUser(data: $data) {
+      message
+      success
+    }
+  }
+`;
+
+export const RESTORE_USER = gql`
+  mutation RestoreUser($data: userIdInput!) {
+    restoreUser(data: $data) {
+      message
+      success
     }
   }
 `;

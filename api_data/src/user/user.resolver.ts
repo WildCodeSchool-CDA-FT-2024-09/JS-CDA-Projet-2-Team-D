@@ -6,6 +6,7 @@ import {
   InputType,
   Field,
   Int,
+  Ctx,
 } from "type-graphql";
 import {
   validate,
@@ -14,11 +15,21 @@ import {
   Length,
   IsEmail,
 } from "class-validator";
+import { AppDataSource } from "../db/data-source";
+import {
+  DeleteResponseStatus,
+  RestoreResponseStatus,
+} from "../utilities/responseStatus";
+import * as jwt from "jsonwebtoken";
+import * as dotenv from "dotenv";
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
 import { PaginatedUsers } from "./user.type";
+
+dotenv.config();
+const { AUTH_SECRET_KEY } = process.env;
 
 @InputType()
 class RolesInput {
@@ -28,6 +39,12 @@ class RolesInput {
 
 @InputType()
 class CommissionsInput {
+  @Field()
+  id: number;
+}
+
+@InputType()
+class userIdInput {
   @Field()
   id: number;
 }
@@ -66,6 +83,9 @@ class UserInput {
 
   @Field(() => [CommissionsInput])
   commissions: CommissionsInput[];
+
+  @Field({ nullable: true })
+  deletedAt?: string;
 }
 
 @Resolver(User)
@@ -76,6 +96,7 @@ export default class UserResolver {
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
     const [users, totalCount] = await User.findAndCount({
+      withDeleted: true, // By default TypeORM excludes soft deleted records
       relations: ["roles", "commissions"],
       skip: offset,
       take: limit,
@@ -185,5 +206,104 @@ export default class UserResolver {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
     }
+  }
+
+  @Mutation(() => DeleteResponseStatus)
+  async softDeleteUser(@Arg("data") data: userIdInput) {
+    try {
+      const user = await User.findOneBy({ id: data.id });
+
+      if (!user) {
+        return new DeleteResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await user.softRemove();
+        return new DeleteResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new DeleteResponseStatus("error", "server error");
+    }
+  }
+
+  @Mutation(() => RestoreResponseStatus)
+  async restoreUser(@Arg("data") data: userIdInput) {
+    try {
+      // Using getRepository because Active Record does not support restore
+      const userRepository = AppDataSource.getRepository(User);
+
+      const user = await userRepository.findOne({
+        where: { id: data.id },
+        withDeleted: true,
+      });
+
+      if (!user) {
+        return new RestoreResponseStatus(
+          "error",
+          `L'utilisateur n°${data.id} n'existe pas`
+        );
+      } else {
+        await userRepository.restore(data.id);
+        return new RestoreResponseStatus("success");
+      }
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
+    }
+  }
+
+  @Query(() => Boolean)
+  async login(
+    @Arg("email") email: string,
+    @Arg("password") password: string,
+    @Ctx()
+    context: { res: { setHeader: (name: string, value: string) => void } }
+  ) {
+    try {
+      const user = await User.findOneOrFail({
+        where: { email: email },
+      });
+
+      if (!user) {
+        return new DeleteResponseStatus(
+          "error",
+          `Problème avec l'utilisateur. Veuillez réessayer.`
+        );
+      } else {
+        if (user.email === email) {
+          try {
+            if (await argon2.verify(user.password, password)) {
+              const token = jwt.sign(
+                {
+                  id: user.id,
+                  email: user.email,
+                  firstname: user.firstname,
+                  lastname: user.lastname,
+                },
+                AUTH_SECRET_KEY as string
+              );
+              context.res.setHeader(
+                "Set-Cookie",
+                `clubcompta_token=${token};httpOnly;secure;SameSite=Strict;expires=${new Date(
+                  new Date().getTime() + 1000 * 60 * 60 * 48 // 2 days
+                ).toUTCString()}`
+              );
+
+              return true;
+            }
+          } catch (error) {
+            console.error(error);
+            return new RestoreResponseStatus("error", "server error");
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
+    }
+
+    return false;
   }
 }

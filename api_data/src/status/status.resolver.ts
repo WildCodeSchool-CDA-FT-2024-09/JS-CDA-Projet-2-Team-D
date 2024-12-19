@@ -4,7 +4,7 @@ import { Status } from "./status.entity";
 @Resolver(Status)
 export default class StatusResolver {
   @Query(() => [Status])
-  async getStatuss() {
+  async getStatus() {
     return await Status.find();
   }
 }
