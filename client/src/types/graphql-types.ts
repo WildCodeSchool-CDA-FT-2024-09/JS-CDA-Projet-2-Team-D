@@ -28,7 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: string; output: string };
+  DateTimeISO: { input: unknown; output: unknown };
 };
 
 export type Bank = {
@@ -283,7 +283,27 @@ export type AddCategoryMutationVariables = Exact<{
 
 export type AddCategoryMutation = {
   __typename?: "Mutation";
-  addCategory: { __typename?: "Category"; id: number; label: string };
+  addCategory: {
+    __typename?: "Category";
+    label: string;
+    creditDebit: { __typename?: "CreditDebit"; id: number };
+  };
+};
+
+export type UpdateCategoryMutationVariables = Exact<{
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
+  creditDebitId: Scalars["Float"]["input"];
+}>;
+
+export type UpdateCategoryMutation = {
+  __typename?: "Mutation";
+  updateCategory: {
+    __typename?: "Category";
+    id: number;
+    label: string;
+    creditDebit: { __typename?: "CreditDebit"; id: number };
+  };
 };
 
 export type AddSubcategoryMutationVariables = Exact<{
@@ -412,7 +432,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: string;
+    date: unknown;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -493,7 +513,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: string;
+      date: unknown;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -541,7 +561,9 @@ export type GetCurrentBudgetByCommissionIdQuery = {
 export const AddCategoryDocument = gql`
   mutation AddCategory($label: String!, $creditDebitId: Float!) {
     addCategory(label: $label, creditDebitId: $creditDebitId) {
-      id
+      creditDebit {
+        id
+      }
       label
     }
   }
@@ -589,6 +611,66 @@ export type AddCategoryMutationResult =
 export type AddCategoryMutationOptions = Apollo.BaseMutationOptions<
   AddCategoryMutation,
   AddCategoryMutationVariables
+>;
+export const UpdateCategoryDocument = gql`
+  mutation UpdateCategory(
+    $id: Float!
+    $label: String!
+    $creditDebitId: Float!
+  ) {
+    updateCategory(id: $id, label: $label, creditDebitId: $creditDebitId) {
+      id
+      label
+      creditDebit {
+        id
+      }
+    }
+  }
+`;
+export type UpdateCategoryMutationFn = Apollo.MutationFunction<
+  UpdateCategoryMutation,
+  UpdateCategoryMutationVariables
+>;
+
+/**
+ * __useUpdateCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryMutation, { data, loading, error }] = useUpdateCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      label: // value for 'label'
+ *      creditDebitId: // value for 'creditDebitId'
+ *   },
+ * });
+ */
+export function useUpdateCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateCategoryMutation,
+    UpdateCategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateCategoryMutation,
+    UpdateCategoryMutationVariables
+  >(UpdateCategoryDocument, options);
+}
+export type UpdateCategoryMutationHookResult = ReturnType<
+  typeof useUpdateCategoryMutation
+>;
+export type UpdateCategoryMutationResult =
+  Apollo.MutationResult<UpdateCategoryMutation>;
+export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<
+  UpdateCategoryMutation,
+  UpdateCategoryMutationVariables
 >;
 export const AddSubcategoryDocument = gql`
   mutation AddSubcategory(
@@ -1681,6 +1763,7 @@ export const namedOperations = {
   },
   Mutation: {
     AddCategory: "AddCategory",
+    UpdateCategory: "UpdateCategory",
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
     UpdateUser: "UpdateUser",

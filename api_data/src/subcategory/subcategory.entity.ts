@@ -22,7 +22,15 @@ export class Subcategory extends BaseEntity {
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
-  @Column({ nullable: false, type: "varchar", length: 30 })
+  @Column({
+    nullable: false,
+    type: "varchar",
+    length: 30,
+    transformer: {
+      to: (value: string) => value.toUpperCase(),
+      from: (value: string) => value,
+    },
+  })
   code: string;
 
   @Field(() => String)

@@ -1,8 +1,9 @@
-import { useGetCategoriesQuery } from "../../types/graphql-types";
+import {
+  useGetCategoriesQuery,
+  useUpdateCategoryMutation,
+} from "../../types/graphql-types";
 import { useAddSubcategoryMutation } from "../../types/graphql-types";
-
 import { useState } from "react";
-
 import useNotification from "../../hooks/useNotification";
 
 import {
@@ -30,11 +31,15 @@ import { Button } from "@mui/material";
 function createData(
   label: string,
   id: number,
+  creditDebit: { label: string; id: number },
+
   subcategories: { id: number; label: string; code: string }[],
 ) {
   return {
     categoryId: id,
     categoryLabel: label,
+    creditDebitLabel: creditDebit.label,
+    creditDebitId: creditDebit.id,
     subcategory: subcategories.map((subcategory) => ({
       id: subcategory.id,
       label: subcategory.label,
@@ -43,21 +48,31 @@ function createData(
   };
 }
 
-function Row(props: { row: ReturnType<typeof createData> }) {
-  const { row } = props;
+function Row(props: {
+  row: ReturnType<typeof createData>;
+  rows: ReturnType<typeof createData>[];
+  creditDebitOptions: { id: number; label: string }[];
+}) {
+  const { row, rows, creditDebitOptions } = props;
   const [open, setOpen] = useState(false);
   const [showInput, setShowInput] = useState(false);
+  const [editCategory, setEditCategory] = useState(false);
+
+  const [newCategoryLabel, setNewCategoryLabel] = useState("");
+  const [newCreditDebitId, setNewCreditDebitId] = useState<number>(0);
 
   const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
 
   const [addASubcategory] = useAddSubcategoryMutation();
 
+  const [updateCategory] = useUpdateCategoryMutation();
+
   const { notifySuccess, notifyError } = useNotification();
 
   const theme = useTheme();
 
-  const handleValidation = () => {
+  const handleValidation = (): boolean => {
     if (!newSubcategoryLabel && !newSubcategoryCode) {
       notifyError("Veuillez remplir les champs");
       return false;
@@ -99,6 +114,68 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       notifyError("Erreur lors de l'ajout de la sous-catégorie");
     }
   };
+
+  const handleValidationCategory = (): boolean => {
+    const isCreditDebitIdChanged =
+      newCreditDebitId && newCreditDebitId !== row.creditDebitId;
+    const isCategoryLabelChanged =
+      newCategoryLabel && newCategoryLabel !== row.categoryLabel;
+
+    if (!isCreditDebitIdChanged && !isCategoryLabelChanged) {
+      notifyError("Aucune modification effectuée");
+      return false;
+    }
+
+    if (newCreditDebitId === 0) {
+      notifyError("Veuillez sélectionner un type de crédit/débit valide !");
+      return false;
+    }
+
+    if (
+      rows.some(
+        (existingRow) =>
+          existingRow.categoryLabel === newCategoryLabel &&
+          existingRow.categoryId !== row.categoryId,
+      )
+    ) {
+      notifyError("Cette catégorie existe déjà");
+      return false;
+    }
+    return true;
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!handleValidationCategory()) return;
+
+    const variables: {
+      id: number;
+      label: string;
+      creditDebitId: number;
+    } = {
+      id: row.categoryId,
+      label: newCategoryLabel || row.categoryLabel,
+      creditDebitId: newCreditDebitId || row.creditDebitId,
+    };
+
+    try {
+      await updateCategory({
+        variables,
+        refetchQueries: ["GetCategories"],
+      });
+      setEditCategory(false);
+      notifySuccess("Catégorie modifiée avec succès");
+    } catch (err) {
+      console.info(err);
+      notifyError("Erreur lors de la modification de la catégorie");
+    }
+  };
+
+  const handleClickCategory = () => {
+    setNewCreditDebitId(row.creditDebitId);
+    setNewCategoryLabel(row.categoryLabel);
+    setEditCategory(true);
+  };
+
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -116,10 +193,123 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
-          {row.categoryLabel}
+          {editCategory ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                border: "1px solid rgba(0, 0, 0, 0.1)",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                padding: "1rem",
+                borderRadius: "8px",
+                width: "100%",
+                backgroundColor: "white",
+              }}
+            >
+              <Box
+                component="input"
+                type="text"
+                placeholder={`${row.categoryLabel}`}
+                value={newCategoryLabel}
+                onChange={(e) => setNewCategoryLabel(e.target.value)}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    handleUpdateCategory();
+                  }
+                  if (e.key === "Escape") {
+                    setEditCategory(false);
+                  }
+                }}
+                sx={{
+                  fontSize: "2rem",
+                  width: "100%",
+                  padding: "0.5rem",
+                  boxSizing: "border-box",
+                  border: "none",
+                }}
+              />
+              <Box
+                component="select"
+                value={newCreditDebitId}
+                onChange={(e) => setNewCreditDebitId(Number(e.target.value))}
+                sx={{
+                  fontSize: "1.2rem",
+                  color: theme.palette.primary.main,
+                  width: "50%",
+                  padding: "0.5rem",
+                  boxSizing: "border-box",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <option value={0}>Crédit ou Débit</option>
+                {creditDebitOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </Box>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  marginTop: "1rem",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Button
+                  sx={{
+                    backgroundColor: theme.palette.error.main,
+                    color: "white",
+                    fontWeight: "bold",
+                    border: "none",
+                    width: "90%",
+                    maxWidth: "120px",
+                    height: "4vh",
+                    fontSize: "1.1rem",
+                    marginRight: "8rem",
+                  }}
+                  onClick={() => setEditCategory(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={() => handleUpdateCategory()}
+                  sx={{
+                    backgroundColor: theme.palette.success.main,
+                    color: "white",
+                    fontWeight: "bold",
+                    border: "none",
+                    width: "90%",
+                    maxWidth: "120px",
+                    height: "4vh",
+                    fontSize: "1.1rem",
+                    marginRight: "20rem",
+                  }}
+                >
+                  Valider
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
+              <div
+                style={{
+                  fontSize: "1.2rem",
+                  color: theme.palette.primary.main,
+                }}
+              >
+                {row.creditDebitLabel}
+              </div>
+            </div>
+          )}
         </TableCell>
+
         <TableCell align="center">
-          <IconButton>{<CreateIcon />}</IconButton>
+          <IconButton onClick={handleClickCategory}>
+            {<CreateIcon />}
+          </IconButton>
         </TableCell>
       </TableRow>
       <TableRow>
@@ -172,20 +362,23 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                         component="th"
                         scope="row"
                         sx={{
-                          verticalAlign: "middle", // Assure l'alignement vertical au centre
-                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          verticalAlign: "middle",
+                          textAlign: "left",
                           width: "50%",
                         }}
                       >
+                        <IconButton>
+                          <CreateIcon />
+                        </IconButton>
                         {sub.label}
-                        <IconButton>{<CreateIcon />}</IconButton>
                       </TableCell>
 
                       <TableCell
                         sx={{
-                          verticalAlign: "middle", // Assure l'alignement vertical au centre
-                          textAlign: "left", // Aligne le texte à gauche pour le "Label"
+                          verticalAlign: "middle",
+                          textAlign: "left",
                           width: "50%",
+                          textTransform: "uppercase",
                         }}
                       >
                         {sub.code}
@@ -312,6 +505,17 @@ function DisplayCategorySubcategory() {
 
   const { data, loading, error } = useGetCategoriesQuery();
 
+  const creditDebitOptions = [
+    ...new Map(
+      data?.getCategories
+        ?.filter((category) => category.creditDebit)
+        .map((category) => [
+          category.creditDebit.id,
+          { id: category.creditDebit.id, label: category.creditDebit.label },
+        ]),
+    ).values(),
+  ];
+
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
@@ -320,6 +524,7 @@ function DisplayCategorySubcategory() {
       return createData(
         category.label,
         category.id,
+        { id: category.creditDebit.id, label: category.creditDebit.label },
         category.subcategories || [],
       );
     }) || [];
@@ -327,7 +532,13 @@ function DisplayCategorySubcategory() {
   return (
     <TableContainer
       component={Paper}
-      sx={{ border: 1, marginTop: 10, marginLeft: 3, width: "100%" }}
+      sx={{
+        border: 1,
+        marginTop: 10,
+        marginLeft: 3,
+        marginRight: 3,
+        width: "90%",
+      }}
     >
       <Table aria-label="collapsible table">
         <TableHead>
@@ -349,7 +560,12 @@ function DisplayCategorySubcategory() {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.categoryId} row={row} />
+            <Row
+              key={row.categoryId}
+              row={row}
+              rows={rows}
+              creditDebitOptions={creditDebitOptions}
+            />
           ))}
         </TableBody>
       </Table>
