@@ -78,7 +78,7 @@ function App() {
                     avatarColor="#6EBF8B"
                   />
                   <Drawer />
-                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                  <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
                     {/* <MenuSideBar /> */}
                     <UserBar />
                     <Outlet />

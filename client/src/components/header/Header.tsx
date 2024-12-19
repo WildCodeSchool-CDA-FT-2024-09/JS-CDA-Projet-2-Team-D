@@ -38,6 +38,7 @@ const Header: React.FC<HeaderProps> = ({
       position="fixed"
       color="secondary"
       sx={{
+        height: "4rem",
         backgroundColor: "#D9D9D9",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
