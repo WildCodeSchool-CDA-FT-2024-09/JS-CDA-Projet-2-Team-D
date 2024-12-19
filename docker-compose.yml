@@ -30,13 +30,23 @@ services:
       db:
         condition: service_healthy
 
-  api_email:
-    build: ./api_email
-    command: npm run dev
-    restart: always
-    env_file: .env
+  # api_email:
+  #   build: ./api_email
+  #   command: npm run dev
+  #   restart: always
+  #   env_file: .env
+  #   volumes:
+  #     - ./api_email:/app/
+
+  api_upload:
+    build: ./api_upload
     volumes:
-      - ./api_email:/app/
+      - ./api_upload:/var/www/html
+    ports:
+      - 8081:8100 # to be removed when going in prod
+    depends_on:
+      db:
+        condition: service_healthy
 
   client:
     build: ./client
@@ -57,4 +67,5 @@ services:
     depends_on:
       - client
       - api_data
-      - api_email
+      # - api_email
+      - api_upload
