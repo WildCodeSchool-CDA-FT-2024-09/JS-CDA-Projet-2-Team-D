@@ -77,6 +77,14 @@ export default class SubcategoryResolver {
       subcategory.code = code.trim();
     }
 
+    // Vérifier si la sous-catégorie existe déjà
+    const existingSubcategory = await Subcategory.findOneBy({
+      label: subcategory.label,
+    });
+    if (existingSubcategory && existingSubcategory.id !== subcategory.id) {
+      throw new Error(`Subcategory with label ${label} already exists`);
+    }
+
     // Validation des données
     const errors = await validate(subcategory);
     if (errors.length > 0) {
