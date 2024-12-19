@@ -17,11 +17,15 @@ require_once __DIR__ . '/../config/database.php';
 return function (App $app) {
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
         // CORS Pre-Flight OPTIONS Request Handler
-        return $response;
+        return $response
+            ->withHeader('Access-Control-Allow-Origin', '*') // http://client:5173
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            ->withHeader('Access-Control-Allow-Credentials', 'true');;
     });
 
     /**
-     * Root endpoint
+     * GET Root endpoint
      */
     $app->get('/upload', function (Request $request, Response $response) {
         $response->getBody()->write('Hello upload.');
@@ -29,12 +33,43 @@ return function (App $app) {
     });
 
     /**
-     * Upload endpoint
+     * GET Invoice endpoint
+     */
+    // $app->get('/upload/invoice/{invoiceId}', function (Request $request, Response $response, array $args) {
+    //     $invoiceId = $args['invoiceId'];
+
+    //     // Get database connection
+    //     $db = getDbConnection();
+
+    //     // Prepare the SQL statement
+    //     $stmt = $db->prepare("SELECT * FROM invoice WHERE id = :invoiceId");
+
+    //     // // Execute the query
+    //     $stmt->execute([':invoiceId' => $invoiceId]);
+
+    //     // Fetch the invoice
+    //     $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //     if ($invoice === false) {
+    //         // If no invoice found, return a 404 error
+    //         $response->getBody()->write(json_encode(['success' => false, 'error' => 'Invoice not found']));
+    //         return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+    //     }
+
+    //     $response->getBody()->write('Invoice: '.$invoice['receipt']);
+
+    //     return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+    //     return $response;
+    // });
+
+    /**
+     * POST Upload endpoint
      *
      * By default, the uploaded file will be named that way: Facture-<random-hash>.<extension>
      * Along with the file, you may pass a "description" parameter that will replace the string "Facture".
      */
-    $app->post('/upload', function (Request $request, Response $response) {
+    $app->post('/upload', function (Request $request, Response $response, array $args) {
         // Some parameters
         $uploadDir = __DIR__ . '/../upload';
         $allowedFileTypes = explode(',', $_ENV['ALLOWED_FILE_TYPES']);
@@ -82,24 +117,73 @@ return function (App $app) {
             }
 
             $filename = moveUploadedFile($uploadDir, $file, $description);
-            $response->getBody()->write(json_encode(['success' => true, 'filename' => $filename]));
+            // $response->getBody()->write(json_encode(['success' => true, 'filename' => $filename]));
 
             // Get database connection
             $db = getDbConnection();
 
-            // Prepare the SQL statement
-            // $stmt = $db->prepare("INSERT INTO invoice (receipt) VALUES (:receipt)");
+            try {
+                // Prepare the SQL statement
+                $stmt = $db->prepare('
+                    INSERT INTO invoice (
+                        "price_without_vat",
+                        "label",
+                        "receipt",
+                        "info",
+                        "paid",
+                        "date",
+                        "invoiceNumber",
+                        "statusId",
+                        "vatId",
+                        "creditDebitId",
+                        "subcategoryId",
+                        "commissionId",
+                        "bankAccountId",
+                        "userId"
+                    ) VALUES (
+                        :price_without_vat,
+                        :label,
+                        :receipt,
+                        :info,
+                        :paid,
+                        :date,
+                        :invoiceNumber,
+                        :statusId,
+                        :vatId,
+                        :creditDebitId,
+                        :subcategoryId,
+                        :commissionId,
+                        :bankAccountId,
+                        :userId
+                    )
+                ');
 
-            // Execute the insert
-            // $stmt->execute([
-            //     ':receipt' => $filename,
-            // ]);
+                // Execute the insert
+                $stmt->execute([
+                    ':price_without_vat' => 200.99,
+                    ':label' => "test",
+                    ':receipt' => $filename,
+                    ':info' => "test",
+                    ':paid' => true,
+                    ':date' => "2024-11-11 00:00:00",
+                    ':invoiceNumber' => "facture_2024_100",
+                    ':statusId' => 2,
+                    ':vatId' => 1,
+                    ':creditDebitId' => 1,
+                    ':subcategoryId' => 1,
+                    ':commissionId' => 1,
+                    ':bankAccountId' => 1,
+                    ':userId' => 1
+                ]);
 
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+                // return $response->getBody()->write(json_encode(['success' => true, 'filename' => $filename]));
+                // $response->getBody()->write(json_encode(['success' => true, 'error' => 'Failed to add the invoice or to upload the file']));
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+            }
         }
-
-        $response->getBody()->write(json_encode(['success' => false, 'error' => 'Failed to upload file']));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     });
 };
 
