@@ -42,7 +42,11 @@ services:
     build: ./api_upload
     restart: always
     volumes:
-      - ./api_upload:/var/www/html
+      - ./api_upload/src:/var/www/html/src
+      - ./api_upload/public:/var/www/html/public
+      - ./api_upload/config:/var/www/html/config
+      - ./api_upload/templates:/var/www/html/templates
+      - ./api_upload/upload:/var/www/html/upload
     ports:
       - 8081:8100 # to be removed when going in prod
     depends_on:
