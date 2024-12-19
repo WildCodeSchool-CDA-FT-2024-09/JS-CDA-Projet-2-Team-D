@@ -51,8 +51,9 @@ function createData(
 function Row(props: {
   row: ReturnType<typeof createData>;
   rows: ReturnType<typeof createData>[];
+  creditDebitOptions: { id: number; label: string }[];
 }) {
-  const { row, rows } = props;
+  const { row, rows, creditDebitOptions } = props;
   const [open, setOpen] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [editCategory, setEditCategory] = useState(false);
@@ -240,9 +241,12 @@ function Row(props: {
                   marginBottom: "1.5rem",
                 }}
               >
-                <option value="0">Crédit ou Débit ?</option>
-                <option value="1">Crédit</option>
-                <option value="2">Débit</option>
+                <option value={0}>Crédit ou Débit</option>
+                {creditDebitOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
               </Box>
 
               <div
@@ -501,6 +505,17 @@ function DisplayCategorySubcategory() {
 
   const { data, loading, error } = useGetCategoriesQuery();
 
+  const creditDebitOptions = [
+    ...new Map(
+      data?.getCategories
+        ?.filter((category) => category.creditDebit)
+        .map((category) => [
+          category.creditDebit.id,
+          { id: category.creditDebit.id, label: category.creditDebit.label },
+        ]),
+    ).values(),
+  ];
+
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
@@ -545,7 +560,12 @@ function DisplayCategorySubcategory() {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.categoryId} row={row} rows={rows} />
+            <Row
+              key={row.categoryId}
+              row={row}
+              rows={rows}
+              creditDebitOptions={creditDebitOptions}
+            />
           ))}
         </TableBody>
       </Table>
