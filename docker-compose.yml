@@ -38,6 +38,17 @@ services:
   #   volumes:
   #     - ./api_email:/app/
 
+  api_upload:
+    build: ./api_upload
+    restart: always
+    volumes:
+      - ./api_upload:/var/www/html
+    ports:
+      - 8081:8100 # to be removed when going in prod
+    depends_on:
+      db:
+        condition: service_healthy
+
   client:
     build: ./client
     command: npm run dev
@@ -58,3 +69,4 @@ services:
       - client
       - api_data
       # - api_email
+      - api_upload
