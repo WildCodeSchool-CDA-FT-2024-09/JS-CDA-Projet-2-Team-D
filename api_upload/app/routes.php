@@ -5,6 +5,11 @@ declare(strict_types=1);
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
+use Dotenv\Dotenv;
+
+// Enable reading of .env file
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
 
 // Include the database connection file
 require_once __DIR__ . '/../config/database.php';
@@ -32,8 +37,8 @@ return function (App $app) {
     $app->post('/upload', function (Request $request, Response $response) {
         // Some parameters
         $uploadDir = __DIR__ . '/../upload';
-        $authorizedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
-        $maxFileSize = 10 * 1024 * 1024 ;  // Maximum file size (10 MB)
+        $allowedFileTypes = explode(',', $_ENV['ALLOWED_FILE_TYPES']);
+        $maxFileSize = $_ENV['MAX_FILE_SIZE'];
 
         // Get all parsed body parameters as array
         $params = $request->getParsedBody();
@@ -41,6 +46,7 @@ return function (App $app) {
         // Get the string value
         $description = $params['description'] ?? "Facture";
 
+        // Create the upload directory if it doesn't exist
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -61,8 +67,8 @@ return function (App $app) {
             $fileExtension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
 
             // Check extension
-            if (!in_array($fileExtension, $authorizedExtensions)) {
-                $response->getBody()->write(json_encode(['success' => false, 'error' => 'File extension not permitted. Allowed extensions: '.implode(', ',$authorizedExtensions)]));
+            if (!in_array($fileExtension, $allowedFileTypes)) {
+                $response->getBody()->write(json_encode(['success' => false, 'error' => 'File extension not permitted. Allowed extensions: '.implode(', ',$allowedFileTypes)]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(415); // Unsupported Media Type
             }
 

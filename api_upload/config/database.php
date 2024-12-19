@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Dotenv\Dotenv;
 
-// Ensure the path is correct to the directory containing the .env file
+// Enable reading of .env file
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
