@@ -89,12 +89,12 @@ return function (App $app) {
         // Handle uploaded files
         $uploadedFiles = $request->getUploadedFiles();
 
-        if (empty($uploadedFiles['file'])) {
+        if (empty($uploadedFiles['receipt'])) {
             $response->getBody()->write(json_encode(['success' => false, 'error' => 'No file uploaded']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
-        $file = $uploadedFiles['file'];
+        $file = $uploadedFiles['receipt'];
 
         // Validate and move file
         if ($file->getError() === UPLOAD_ERR_OK) {
