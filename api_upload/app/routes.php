@@ -69,7 +69,7 @@ return function (App $app) {
      * By default, the uploaded file will be named that way: Facture-<random-hash>.<extension>
      * Along with the file, you may pass a "description" parameter that will replace the string "Facture".
      */
-    $app->post('/upload', function (Request $request, Response $response, array $args) {
+    $app->post('/upload', function (Request $request, Response $response) {
         // Some parameters
         $uploadDir = __DIR__ . '/../upload';
         $allowedFileTypes = explode(',', $_ENV['ALLOWED_FILE_TYPES']);
@@ -117,10 +117,25 @@ return function (App $app) {
             }
 
             $filename = moveUploadedFile($uploadDir, $file, $description);
-            // $response->getBody()->write(json_encode(['success' => true, 'filename' => $filename]));
 
             // Get database connection
             $db = getDbConnection();
+
+            // Retrieve POST parameters from the form body
+            $postData = $request->getParsedBody();
+            $price_without_vat = $postData['price_without_vat'];
+            $label = $postData['label'];
+            $info = $postData['info'] ?? "";
+            $paid = $postData['paid'];
+            $date = $postData['date'];
+            $invoiceNumber = $postData['invoiceNumber'];
+            $statusId = $postData['statusId'];
+            $vatId = $postData['vatId'];
+            $creditDebitId = $postData['creditDebitId'];
+            $subcategoryId = $postData['subcategoryId'];
+            $commissionId = $postData['commissionId'];
+            $bankAccountId = $postData['bankAccountId'];
+            $userId = $postData['userId'];
 
             try {
                 // Prepare the SQL statement
@@ -160,25 +175,23 @@ return function (App $app) {
 
                 // Execute the insert
                 $stmt->execute([
-                    ':price_without_vat' => 200.99,
-                    ':label' => "test",
+                    ':price_without_vat' => $price_without_vat,
+                    ':label' => $label,
                     ':receipt' => $filename,
-                    ':info' => "test",
-                    ':paid' => true,
-                    ':date' => "2024-11-11 00:00:00",
-                    ':invoiceNumber' => "facture_2024_100",
-                    ':statusId' => 2,
-                    ':vatId' => 1,
-                    ':creditDebitId' => 1,
-                    ':subcategoryId' => 1,
-                    ':commissionId' => 1,
-                    ':bankAccountId' => 1,
-                    ':userId' => 1
+                    ':info' => $info,
+                    ':paid' => $paid,
+                    ':date' => $date,
+                    ':invoiceNumber' => $invoiceNumber,
+                    ':statusId' => $statusId,
+                    ':vatId' => $vatId,
+                    ':creditDebitId' => $creditDebitId,
+                    ':subcategoryId' => $subcategoryId,
+                    ':commissionId' => $commissionId,
+                    ':bankAccountId' => $bankAccountId,
+                    ':userId' => $userId
                 ]);
 
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-                // return $response->getBody()->write(json_encode(['success' => true, 'filename' => $filename]));
-                // $response->getBody()->write(json_encode(['success' => true, 'error' => 'Failed to add the invoice or to upload the file']));
             } catch (Exception $e) {
                 echo "Error: " . $e->getMessage();
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
