@@ -42,6 +42,7 @@ services:
     build: ./api_upload
     restart: always
     volumes:
+      - ./api_upload/app:/var/www/html/app
       - ./api_upload/src:/var/www/html/src
       - ./api_upload/public:/var/www/html/public
       - ./api_upload/config:/var/www/html/config
