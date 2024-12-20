@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
 import { useUser } from "../../hooks/useUser";
+import UserBar from "../UserBar";
 
 const roleMapping: { [key: string]: string } = {
   1: "Administrateur",
@@ -50,66 +51,70 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
           }}
         >
-          <Link
-            to="/"
-            style={{
-              textDecoration: "none",
-              color: "black",
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-            }}
-          >
-            <Box
-              sx={{
+          <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <Link
+              to="/"
+              style={{
+                textDecoration: "none",
+                color: "black",
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "white",
-                borderRadius: "12px",
-                boxShadow: theme.shadows[3],
-                padding: 1,
-                height: "3.5rem",
-                width: "4rem",
-                marginRight: 2,
+                gap: "16px",
               }}
             >
-              <img
-                src={logoUrl}
-                alt="Logo Club Compta"
-                style={{ height: "3rem", width: "auto" }}
-              />
-            </Box>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography
-                variant="h1"
-                component="div"
-                className="header-title"
+              <Box
                 sx={{
-                  display: { xs: "none", sm: "block" },
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  borderRadius: "12px",
+                  boxShadow: theme.shadows[3],
+                  padding: 1,
+                  height: "3.5rem",
+                  width: "4rem",
+                  marginRight: 2,
                 }}
               >
-                {title}
-              </Typography>
-              {(subtitle || userType) && (
+                <img
+                  src={logoUrl}
+                  alt="Logo Club Compta"
+                  style={{ height: "3rem", width: "auto" }}
+                />
+              </Box>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography
-                  variant="h2"
-                  className="header-subtitle"
+                  variant="h1"
+                  component="div"
+                  className="header-title"
                   sx={{
-                    color: "black",
+                    display: { xs: "none", sm: "block" },
                   }}
                 >
-                  {subtitle} {userType && `- ${userType}`}
+                  {title}
                 </Typography>
-              )}
-            </Box>
-          </Link>
+                {(subtitle || userType) && (
+                  <Typography
+                    variant="h2"
+                    className="header-subtitle"
+                    sx={{
+                      color: "black",
+                    }}
+                  >
+                    {subtitle} {userType && `- ${userType}`}
+                  </Typography>
+                )}
+              </Box>
+            </Link>
+          </Box>
 
-          <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
-            <Avatar color={avatarColor} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <UserBar />
+            <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
+              <Avatar color={avatarColor} />
+            </Box>
           </Box>
         </Toolbar>
       </Container>
