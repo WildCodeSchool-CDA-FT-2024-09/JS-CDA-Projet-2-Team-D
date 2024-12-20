@@ -5,7 +5,6 @@ import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Drawer from "./components/drawer/Drawer";
 import Home from "./pages/Home";
-import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
@@ -76,8 +75,6 @@ function App() {
                 />
                 <Drawer />
                 <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
-                  {/* <MenuSideBar /> */}
-                  <UserBar />
                   <Outlet />
                   <Footer />
                 </Box>

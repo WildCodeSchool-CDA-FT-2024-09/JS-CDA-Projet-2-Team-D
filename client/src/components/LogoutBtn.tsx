@@ -16,7 +16,7 @@ function LogoutBtn() {
           fontSize: ".8em",
         }}
       >
-        <div>{user?.email}</div>
+        <div>{user?.firstname}</div>
         <Button onClick={logout} sx={{ fontSize: ".8em" }}>
           Déconnexion
         </Button>
