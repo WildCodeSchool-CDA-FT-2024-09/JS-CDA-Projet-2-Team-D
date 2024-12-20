@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -7,37 +6,40 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme } from "@mui/material/styles";
+import { useUser } from "../../hooks/useUser";
 
+const roleMapping: { [key: string]: string } = {
+  1: "Administrateur",
+  2: "Comptable",
+  3: "Responsable",
+};
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  userType?: string;
   logoUrl: string;
-  avatarColor: string;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
-  userType,
-  logoUrl,
-}) => {
+const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
   const theme = useTheme();
+  const { user } = useUser();
 
-  // Color mapping depending on user role
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main, // Red
-    Comptable: theme.palette.secondary.main, // Yellow
+    Comptable: theme.palette.warning.main, // Yellow
     Responsable: theme.palette.success.main, // Green
   };
 
-  const avatarColor = roleColorMapping[userType || "default"];
+  const userRole = user?.roles[0];
+  const userType =
+    userRole && roleMapping[userRole] ? roleMapping[userRole] : "Visiteur";
+  const avatarColor = roleColorMapping[userType] || "#D9D9D9";
 
   return (
     <AppBar
       position="fixed"
       color="secondary"
       sx={{
+        height: "4rem",
         backgroundColor: "#D9D9D9",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
@@ -51,7 +53,16 @@ const Header: React.FC<HeaderProps> = ({
             alignItems: "center",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              color: "black",
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -60,37 +71,28 @@ const Header: React.FC<HeaderProps> = ({
                 backgroundColor: "white",
                 borderRadius: "12px",
                 boxShadow: theme.shadows[3],
-                padding: 0.5,
-                height: "40px",
-                width: "40px",
+                padding: 1,
+                height: "3.5rem",
+                width: "4rem",
                 marginRight: 2,
               }}
             >
               <img
                 src={logoUrl}
                 alt="Logo Club Compta"
-                style={{ height: "34px", width: "auto" }}
+                style={{ height: "3rem", width: "auto" }}
               />
             </Box>
-
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography
                 variant="h1"
                 component="div"
                 className="header-title"
                 sx={{
-                  display: { xs: "none", sm: "block" }, // Masked on mobile (xs) and displayed for sm +
+                  display: { xs: "none", sm: "block" },
                 }}
               >
-                <Link
-                  to="/"
-                  style={{
-                    textDecoration: "none",
-                    color: "black",
-                  }}
-                >
-                  {title}
-                </Link>
+                {title}
               </Typography>
               {(subtitle || userType) && (
                 <Typography
@@ -104,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({
                 </Typography>
               )}
             </Box>
-          </Box>
+          </Link>
 
           <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
             <Avatar color={avatarColor} />

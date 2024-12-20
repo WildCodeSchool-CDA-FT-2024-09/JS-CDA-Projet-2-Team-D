@@ -20,8 +20,12 @@ import {
 } from "../../types/graphql-types";
 import { formatDate } from "../../utils/dateUtils";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 const HomePageCommission = () => {
+  const { commissionId } = useParams<{ commissionId: string }>();
+  const commissionIdNumber = parseInt(commissionId || "0", 10);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -41,7 +45,8 @@ const HomePageCommission = () => {
     loading: budgetLoading,
     error: budgetError,
   } = useGetCurrentBudgetByCommissionIdQuery({
-    variables: { commissionId: 4 },
+    variables: { commissionId: commissionIdNumber },
+    skip: !commissionIdNumber,
   });
 
   const {
@@ -50,10 +55,11 @@ const HomePageCommission = () => {
     error: invoiceError,
   } = useGetInvoicesByCommissionIdQuery({
     variables: {
-      commissionId: 4,
+      commissionId: commissionIdNumber,
       limit: limit,
       offset: offset,
     },
+    skip: !commissionIdNumber,
   });
 
   if (budgetLoading || invoiceLoading)
@@ -122,66 +128,76 @@ const HomePageCommission = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.map((row) => {
-              // Ajustement des montants HT et TTC en fonction du type (Débit ou Crédit)
-              const montantHT =
-                row.creditDebit?.label?.toLowerCase() === "débit"
-                  ? -row.price_without_vat
-                  : row.price_without_vat;
+            {invoices.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={isMobile ? 5 : 7} align="center">
+                  Aucune facture disponible
+                </TableCell>
+              </TableRow>
+            ) : (
+              invoices.map((row) => {
+                // Ajustement des montants HT et TTC en fonction du type (Débit ou Crédit)
+                const montantHT =
+                  row.creditDebit?.label?.toLowerCase() === "débit"
+                    ? -row.price_without_vat
+                    : row.price_without_vat;
 
-              const montantTTC =
-                row.creditDebit?.label?.toLowerCase() === "débit"
-                  ? -row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)
-                  : row.price_without_vat * (1 + (row.vat?.rate || 0) / 100);
+                const montantTTC =
+                  row.creditDebit?.label?.toLowerCase() === "débit"
+                    ? -row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)
+                    : row.price_without_vat * (1 + (row.vat?.rate || 0) / 100);
 
-              return (
-                <TableRow key={row.id}>
-                  <TableCell>{row.invoiceNumber}</TableCell>
-                  <TableCell>{formatDate(row.date)}</TableCell>
-                  <TableCell>{row.label}</TableCell>
-                  {!isMobile && (
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell>{row.invoiceNumber}</TableCell>
+                    <TableCell>{formatDate(row.date)}</TableCell>
+                    <TableCell>{row.label}</TableCell>
+                    {!isMobile && (
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {montantHT.toFixed(2)} €
+                      </TableCell>
+                    )}
+                    {!isMobile && (
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {row.vat?.rate || 0}%
+                      </TableCell>
+                    )}
                     <TableCell sx={{ whiteSpace: "nowrap" }}>
-                      {montantHT.toFixed(2)} €
+                      {montantTTC.toFixed(2)} €
                     </TableCell>
-                  )}
-                  {!isMobile && (
-                    <TableCell sx={{ whiteSpace: "nowrap" }}>
-                      {row.vat?.rate || 0}%
+                    <TableCell>
+                      <Chip
+                        label={
+                          isMobile ? row.status?.label[0] : row.status?.label
+                        }
+                        sx={getChipStyles(row.status?.label)}
+                      />
                     </TableCell>
-                  )}
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {montantTTC.toFixed(2)} €
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={
-                        isMobile ? row.status?.label[0] : row.status?.label
-                      }
-                      sx={getChipStyles(row.status?.label)}
-                    />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
-        <Stack
-          spacing={2}
-          sx={{
-            marginBottom: "1em",
-            marginTop: "1em",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            showFirstButton
-            showLastButton
-          />
-        </Stack>
+        {invoices.length > 0 && (
+          <Stack
+            spacing={2}
+            sx={{
+              marginBottom: "1em",
+              marginTop: "1em",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              showFirstButton
+              showLastButton
+            />
+          </Stack>
+        )}
       </TableContainer>
     </Box>
   );
