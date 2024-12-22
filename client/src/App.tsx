@@ -5,7 +5,6 @@ import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Drawer from "./components/drawer/Drawer";
 import Home from "./pages/Home";
-import UserBar from "./components/UserBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
@@ -67,25 +66,19 @@ function App() {
         <ThemeProvider theme={theme}>
           <NotificationProvider>
             {currentPage !== "/" ? (
-              <>
-                <Box sx={{ display: "flex" }}>
-                  <CssBaseline />
-                  <Header
-                    title="ClubCompta"
-                    subtitle="Budget 2024/2025"
-                    userType="Responsable"
-                    logoUrl="/Logo.svg"
-                    avatarColor="#6EBF8B"
-                  />
-                  <Drawer />
-                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                    {/* <MenuSideBar /> */}
-                    <UserBar />
-                    <Outlet />
-                    <Footer />
-                  </Box>
+              <Box sx={{ display: "flex" }}>
+                <CssBaseline />
+                <Header
+                  title="ClubCompta"
+                  subtitle="Budget 2024/2025"
+                  logoUrl="/Logo.svg"
+                />
+                <Drawer />
+                <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
+                  <Outlet />
+                  <Footer />
                 </Box>
-              </>
+              </Box>
             ) : (
               <Home />
             )}

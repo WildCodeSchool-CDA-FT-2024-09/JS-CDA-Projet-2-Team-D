@@ -28,7 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: unknown; output: unknown };
+  DateTimeISO: { input: string; output: string };
 };
 
 export type Bank = {
@@ -127,6 +127,7 @@ export type Mutation = {
   createNewUser: User;
   restoreUser: RestoreResponseStatus;
   softDeleteUser: DeleteResponseStatus;
+  updateCategory: Category;
   updateUser: User;
 };
 
@@ -151,6 +152,12 @@ export type MutationRestoreUserArgs = {
 
 export type MutationSoftDeleteUserArgs = {
   data: UserIdInput;
+};
+
+export type MutationUpdateCategoryArgs = {
+  creditDebitId: Scalars["Float"]["input"];
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
 };
 
 export type MutationUpdateUserArgs = {
@@ -187,6 +194,7 @@ export type Query = {
   getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
+  login: Scalars["Boolean"]["output"];
 };
 
 export type QueryGetCurrentBudgetByCommissionIdArgs = {
@@ -206,6 +214,11 @@ export type QueryGetUserByIdArgs = {
 export type QueryGetUsersArgs = {
   limit?: Scalars["Int"]["input"];
   offset?: Scalars["Int"]["input"];
+};
+
+export type QueryLoginArgs = {
+  email: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
 };
 
 export type RestoreResponseStatus = {
@@ -432,7 +445,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: unknown;
+    date: string;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -509,7 +522,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: unknown;
+      date: string;
       id: number;
       invoiceNumber: string;
       label: string;

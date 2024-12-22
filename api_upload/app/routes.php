@@ -121,6 +121,12 @@ return function (App $app) {
             // Get database connection
             $db = getDbConnection();
 
+            // Get the next invoice number
+            $lastInvoiceNumber = $db->query('SELECT "invoiceNumber" FROM invoice ORDER BY id DESC LIMIT 1')
+                        ->fetch(PDO::FETCH_COLUMN);
+
+            $invoiceNumber = incrementInvoiceCode($lastInvoiceNumber);
+
             // Retrieve POST parameters from the form body
             $postData = $request->getParsedBody();
             $price_without_vat = $postData['price_without_vat'];
@@ -208,4 +214,30 @@ function moveUploadedFile($uploadDir, $uploadedFile, $desc)
     $uploadedFile->moveTo($uploadDir . DIRECTORY_SEPARATOR . $filename);
 
     return $filename;
+}
+
+// Generate new invoice number (format: YYYY-000001)
+function incrementInvoiceCode($invoiceNumber) {
+    // Split the invoice number
+    $parts = explode('-', $invoiceNumber);
+    $number = end($parts);
+
+    // Increment the numeric part and keep it zero-padded to 6 digits
+    $newNumber = str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
+
+    // Combine the current year and the new number
+    return date("Y") . '-' . $newNumber;
+}
+
+// Generate new invoice number (format: YYYY-000001)
+function incrementInvoiceCode($invoiceNumber) {
+    // Split the invoice number
+    $parts = explode('-', $invoiceNumber);
+    $number = end($parts);
+
+    // Increment the numeric part and keep it zero-padded to 6 digits
+    $newNumber = str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
+
+    // Combine the current year and the new number
+    return date("Y") . '-' . $newNumber;
 }
