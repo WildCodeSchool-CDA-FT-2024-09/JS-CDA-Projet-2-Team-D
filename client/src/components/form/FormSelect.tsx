@@ -17,7 +17,7 @@ interface FormSelectProps {
   name: string;
   label: string;
   value: string | number;
-  subValue?: number;
+  subValue?: number | null;
   property: string;
   handleSelect: (event: SelectChangeEvent<string | number>) => void;
   error?: string;
@@ -91,7 +91,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
         <Select
           name={name}
           label={label}
-          value={value.toString()}
+          value={value.toString() ?? ""}
           onChange={launchSelect}
           aria-label={`${label} sélectionné : $ ${value.toString() || "Non sélectionné"}`}
         >

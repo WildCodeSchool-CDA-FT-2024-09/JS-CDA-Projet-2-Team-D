@@ -11,17 +11,21 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
-
 import FormSelect from "../../components/FormSelect";
 import FormTextField from "../../components/FormTextField";
 import { FormSelectVat, Invoice } from "../../components/FormSelectVat";
-import { InvoiceState, initialValues } from "../../types/InvoiceInputType";
+import {
+  InvoiceState,
+  initialValues,
+  isValidInvoice,
+} from "../../types/InvoiceInputType";
 import { useGetVatsQuery } from "../../types/graphql-types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
 import { useUser } from "../../hooks/useUser";
+// import { number } from "zod";
 
 const InvoiceForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,23 +106,51 @@ const InvoiceForm: React.FC = () => {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
     console.info("Données de la facture :", invoice);
+
     try {
+      if (!userId) {
+        throw new Error("Utilisateur non connecté");
+      }
+
+      // Mettre à jour l'invoice avec l'userId
+      setInvoice((prevState) => ({ ...prevState, user_id: userId }));
+      // Validation complète avant de procéder
+
+      if (!isValidInvoice(invoice, userId)) {
+        throw new Error("Veuillez remplir tous les champs obligatoires");
+      }
       const formData = new FormData();
 
-      // Ajouter les données de la facture à FormData
-      Object.entries(invoice).forEach(([key, value]) => {
-        if (value instanceof File || typeof value === "string") {
-          formData.append(key, value);
-        } else {
-          formData.append(key, JSON.stringify(value));
-        }
-      });
+      // Maintenant on sait que tous les champs requis sont présents
+      formData.append("statusId", invoice.status_id.toString());
+      formData.append("vatId", invoice.vat_id.toString());
+      formData.append("creditDebitId", invoice.credit_debit_id.toString());
+      formData.append("subcategoryId", invoice.subcategory_id.toString());
+      formData.append("commissionId", invoice.commission_id.toString());
+      formData.append("userId", userId.toString());
+      formData.append(
+        "price_without_vat",
+        invoice.price_without_vat.toString(),
+      );
+      formData.append("receipt", invoice.receipt);
+      formData.append("label", invoice.label);
+      formData.append("info", invoice.info);
+      formData.append("paid", invoice.paid ? "1" : "0");
+      formData.append("date", invoice.date.toISOString());
+      formData.append("category_id", invoice.category_id.toString());
+      formData.append("invoice_id", invoice.invoice_id ?? ""); // Champ facultatif
+      formData.append("total", invoice.total.toString());
+      formData.append("bankAccountId", ""); // Champ facultatif
 
-      const response = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await axios.post(
+        "http://localhost:7100/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      });
+      );
 
       console.info("Réponse du serveur :", response.data);
       alert("Facture envoyée avec succès !");
@@ -160,7 +192,7 @@ const InvoiceForm: React.FC = () => {
               name="commission_id"
               property="name"
               label="Commissions"
-              value={invoice.commission_id}
+              value={invoice.commission_id ?? ""}
               handleSelect={handleInvoiceChange}
               required
             />
@@ -188,7 +220,7 @@ const InvoiceForm: React.FC = () => {
               name="category_id"
               label="Catégories"
               property="label"
-              value={invoice.category_id.toString()}
+              value={invoice.category_id ?? ""}
               handleSelect={handleInvoiceChange}
               required
             />
@@ -198,8 +230,8 @@ const InvoiceForm: React.FC = () => {
               name="subcategory_id"
               label="Sous-catégories"
               property="label"
-              value={invoice.subcategory_id?.toString()}
-              subValue={invoice.category_id}
+              value={invoice.subcategory_id?.toString() ?? ""}
+              subValue={invoice.category_id ?? undefined}
               handleSelect={handleInvoiceChange}
               required
             />

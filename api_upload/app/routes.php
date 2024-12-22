@@ -128,7 +128,8 @@ return function (App $app) {
             $info = $postData['info'] ?? "";
             $paid = $postData['paid'];
             $date = $postData['date'];
-            $invoiceNumber = $postData['invoiceNumber'];
+            // $invoiceNumber = $postData['invoiceNumber'];
+            $invoiceNumber = "FACTURE-12";
             $statusId = $postData['statusId'];
             $vatId = $postData['vatId'];
             $creditDebitId = $postData['creditDebitId'];

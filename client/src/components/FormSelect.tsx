@@ -37,6 +37,8 @@ const FormSelect: React.FC<FormSelectProps> = ({
     GetCommissionsQuery | GetCategoriesQuery
   >();
 
+  const [creditDebitId, _setCreditDebitId] = useState<number | null>(null);
+
   useEffect(() => {
     const getItems = async () => {
       let result: GetCommissionsQuery | GetCategoriesQuery | null = null;
@@ -51,9 +53,12 @@ const FormSelect: React.FC<FormSelectProps> = ({
       if (result) {
         setItems(result);
       }
+      if (creditDebitId !== null) {
+        console.info(`Le Credit/Debit ID est : ${creditDebitId}`);
+      }
     };
     getItems();
-  }, [name, getCategory, getCommissions]);
+  }, [name, getCategory, getCommissions, creditDebitId]);
 
   const getCreditDebitId = (categoryId: number): number => {
     if (items && "getCategories" in items) {
@@ -67,8 +72,10 @@ const FormSelect: React.FC<FormSelectProps> = ({
 
   const launchSelect = (event: SelectChangeEvent<string | number>) => {
     if (name === "category_id") {
-      const credit_debit_id = getCreditDebitId(+event.target.value);
-      handleSelect(event, credit_debit_id);
+      // const credit_debit_id = getCreditDebitId(+event.target.value);
+      // setCreditDebitId(credit_debit_id);
+      const creditDebitIdValue = getCreditDebitId(+event.target.value);
+      _setCreditDebitId(creditDebitIdValue);
     } else {
       handleSelect(event);
     }
@@ -91,7 +98,8 @@ const FormSelect: React.FC<FormSelectProps> = ({
         <Select
           name={name}
           label={label}
-          value={value.toString()}
+          // value={value.toString()}
+          value={value ?? ""}
           onChange={launchSelect}
           aria-label={`${label} sélectionné : $ ${value.toString() || "Non sélectionné"}`}
         >
