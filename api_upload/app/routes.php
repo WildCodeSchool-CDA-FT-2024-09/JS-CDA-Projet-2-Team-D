@@ -135,7 +135,7 @@ return function (App $app) {
             $creditDebitId = $postData['creditDebitId'];
             $subcategoryId = $postData['subcategoryId'];
             $commissionId = $postData['commissionId'];
-            $bankAccountId = $postData['bankAccountId'];
+            // $bankAccountId = $postData['bankAccountId'];
             $userId = $postData['userId'];
 
             try {
@@ -154,7 +154,6 @@ return function (App $app) {
                         "creditDebitId",
                         "subcategoryId",
                         "commissionId",
-                        "bankAccountId",
                         "userId"
                     ) VALUES (
                         :price_without_vat,
@@ -169,7 +168,6 @@ return function (App $app) {
                         :creditDebitId,
                         :subcategoryId,
                         :commissionId,
-                        :bankAccountId,
                         :userId
                     )
                 ');
@@ -188,7 +186,6 @@ return function (App $app) {
                     ':creditDebitId' => $creditDebitId,
                     ':subcategoryId' => $subcategoryId,
                     ':commissionId' => $commissionId,
-                    ':bankAccountId' => $bankAccountId,
                     ':userId' => $userId
                 ]);
 

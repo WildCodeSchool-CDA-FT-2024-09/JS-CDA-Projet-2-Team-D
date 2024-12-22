@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
-import FormSelect from "../../components/FormSelect";
-import FormTextField from "../../components/FormTextField";
-import { FormSelectVat, Invoice } from "../../components/FormSelectVat";
+import FormSelect from "../../components/form/FormSelect";
+import FormTextField from "../../components/form/FormTextField";
+import { FormSelectVat, Invoice } from "../../components/form/FormSelectVat";
 import {
   InvoiceState,
   initialValues,
@@ -25,7 +25,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
 import { useUser } from "../../hooks/useUser";
-// import { number } from "zod";
 
 const InvoiceForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,11 +60,10 @@ const InvoiceForm: React.FC = () => {
   ) => {
     const { name, value, files } = event.target as HTMLInputElement;
 
-    // Gestion des fichiers
     if (files && files.length > 0) {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: files[0], // Ajoute le fichier uploadé
+        [name]: files[0], // Adds the uploaded file
       }));
     } else if (name === "price_without_vat" || name === "vat_id") {
       setInvoice((prevState) => ({
@@ -112,16 +110,12 @@ const InvoiceForm: React.FC = () => {
         throw new Error("Utilisateur non connecté");
       }
 
-      // Mettre à jour l'invoice avec l'userId
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
-      // Validation complète avant de procéder
 
       if (!isValidInvoice(invoice, userId)) {
         throw new Error("Veuillez remplir tous les champs obligatoires");
       }
       const formData = new FormData();
-
-      // Maintenant on sait que tous les champs requis sont présents
       formData.append("statusId", invoice.status_id.toString());
       formData.append("vatId", invoice.vat_id.toString());
       formData.append("creditDebitId", invoice.credit_debit_id.toString());
@@ -138,9 +132,9 @@ const InvoiceForm: React.FC = () => {
       formData.append("paid", invoice.paid ? "1" : "0");
       formData.append("date", invoice.date.toISOString());
       formData.append("category_id", invoice.category_id.toString());
-      formData.append("invoice_id", invoice.invoice_id ?? ""); // Champ facultatif
+      formData.append("invoice_id", invoice.invoice_id ?? ""); // optional field
       formData.append("total", invoice.total.toString());
-      formData.append("bankAccountId", ""); // Champ facultatif
+      formData.append("bankAccountId", ""); // optional field
 
       const response = await axios.post(
         "http://localhost:7100/upload",
