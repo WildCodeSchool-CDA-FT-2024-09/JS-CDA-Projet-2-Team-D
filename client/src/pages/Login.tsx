@@ -4,7 +4,19 @@ import { useUser } from "../hooks/useUser";
 import useNotification from "../hooks/useNotification";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import { Button, Grid2, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  Grid2,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+  Typography,
+} from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "/Logo_seul.svg";
 
 export default function Login() {
@@ -13,6 +25,22 @@ export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [btnState, setBtnState] = useState<boolean>(false);
+
+  // Password texfield
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
 
   const { user, login } = useUser();
 
@@ -84,17 +112,36 @@ export default function Login() {
               autoComplete="email"
               autoFocus
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="password"
-              label="Mot de passe"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-            />
+            <FormControl fullWidth>
+              <InputLabel htmlFor="password">Mot de passe</InputLabel>
+              <OutlinedInput
+                required
+                fullWidth
+                id="password"
+                label="Mot de passe"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword
+                          ? "Cacher le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      onMouseUp={handleMouseUpPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              ></OutlinedInput>
+            </FormControl>
             <Button
               disabled={btnState}
               type="submit"
