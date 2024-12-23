@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router";
-import { UserProvider } from "./context/UserContext";
 import NotificationProvider from "./context/NotificationContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
@@ -62,29 +61,27 @@ function App() {
 
   return (
     <>
-      <UserProvider>
-        <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            {currentPage !== "/" ? (
-              <Box sx={{ display: "flex" }}>
-                <CssBaseline />
-                <Header
-                  title="ClubCompta"
-                  subtitle="Budget 2024/2025"
-                  logoUrl="/Logo.svg"
-                />
-                <Drawer />
-                <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
-                  <Outlet />
-                  <Footer />
-                </Box>
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          {currentPage !== "/" ? (
+            <Box sx={{ display: "flex" }}>
+              <CssBaseline />
+              <Header
+                title="ClubCompta"
+                subtitle="Budget 2024/2025"
+                logoUrl="/Logo.svg"
+              />
+              <Drawer />
+              <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
+                <Outlet />
+                <Footer />
               </Box>
-            ) : (
-              <Home />
-            )}
-          </NotificationProvider>
-        </ThemeProvider>
-      </UserProvider>
+            </Box>
+          ) : (
+            <Home />
+          )}
+        </NotificationProvider>
+      </ThemeProvider>
     </>
   );
 }

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
+import { UserProvider } from "./context/UserContext";
 import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
@@ -112,7 +113,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ApolloProvider client={connection}>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
     </ApolloProvider>
   </StrictMode>,
 );
