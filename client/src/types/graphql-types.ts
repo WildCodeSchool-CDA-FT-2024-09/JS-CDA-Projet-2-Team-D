@@ -28,7 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: unknown; output: unknown };
+  DateTimeISO: { input: string; output: string };
 };
 
 export type Bank = {
@@ -104,7 +104,7 @@ export type Exercise = {
 export type Invoice = {
   __typename?: "Invoice";
   bankAccount?: Maybe<BankAccount>;
-  commission?: Maybe<Commission>;
+  commission: Commission;
   creditDebit: CreditDebit;
   date: Scalars["DateTimeISO"]["output"];
   id: Scalars["Float"]["output"];
@@ -115,8 +115,8 @@ export type Invoice = {
   price_without_vat: Scalars["Float"]["output"];
   receipt: Scalars["String"]["output"];
   status: Status;
-  subcategory?: Maybe<Subcategory>;
-  user?: Maybe<User>;
+  subcategory: Subcategory;
+  user: User;
   vat: Vat;
 };
 
@@ -128,7 +128,6 @@ export type Mutation = {
   restoreUser: RestoreResponseStatus;
   softDeleteUser: DeleteResponseStatus;
   updateCategory: Category;
-  updateSubcategory: Subcategory;
   updateUser: User;
 };
 
@@ -157,13 +156,6 @@ export type MutationSoftDeleteUserArgs = {
 
 export type MutationUpdateCategoryArgs = {
   creditDebitId: Scalars["Float"]["input"];
-  id: Scalars["Float"]["input"];
-  label: Scalars["String"]["input"];
-};
-
-export type MutationUpdateSubcategoryArgs = {
-  categoryId: Scalars["Float"]["input"];
-  code: Scalars["String"]["input"];
   id: Scalars["Float"]["input"];
   label: Scalars["String"]["input"];
 };
@@ -327,23 +319,6 @@ export type UpdateCategoryMutation = {
   };
 };
 
-export type UpdateSubcategoryMutationVariables = Exact<{
-  id: Scalars["Float"]["input"];
-  label: Scalars["String"]["input"];
-  code: Scalars["String"]["input"];
-  categoryId: Scalars["Float"]["input"];
-}>;
-
-export type UpdateSubcategoryMutation = {
-  __typename?: "Mutation";
-  updateSubcategory: {
-    __typename?: "Subcategory";
-    id: number;
-    label: string;
-    code: string;
-  };
-};
-
 export type AddSubcategoryMutationVariables = Exact<{
   label: Scalars["String"]["input"];
   code: Scalars["String"]["input"];
@@ -470,28 +445,24 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: unknown;
+    date: string;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
     creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
-    subcategory?: {
-      __typename?: "Subcategory";
-      id: number;
-      label: string;
-    } | null;
-    commission?: { __typename?: "Commission"; id: number; name: string } | null;
+    subcategory: { __typename?: "Subcategory"; id: number; label: string };
+    commission: { __typename?: "Commission"; id: number; name: string };
     bankAccount?: {
       __typename?: "BankAccount";
       id: number;
       name: string;
     } | null;
-    user?: {
+    user: {
       __typename?: "User";
       id: number;
       firstname: string;
       lastname: string;
-    } | null;
+    };
   }>;
 };
 
@@ -551,7 +522,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: unknown;
+      date: string;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -709,71 +680,6 @@ export type UpdateCategoryMutationResult =
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<
   UpdateCategoryMutation,
   UpdateCategoryMutationVariables
->;
-export const UpdateSubcategoryDocument = gql`
-  mutation UpdateSubcategory(
-    $id: Float!
-    $label: String!
-    $code: String!
-    $categoryId: Float!
-  ) {
-    updateSubcategory(
-      id: $id
-      label: $label
-      code: $code
-      categoryId: $categoryId
-    ) {
-      id
-      label
-      code
-    }
-  }
-`;
-export type UpdateSubcategoryMutationFn = Apollo.MutationFunction<
-  UpdateSubcategoryMutation,
-  UpdateSubcategoryMutationVariables
->;
-
-/**
- * __useUpdateSubcategoryMutation__
- *
- * To run a mutation, you first call `useUpdateSubcategoryMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateSubcategoryMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateSubcategoryMutation, { data, loading, error }] = useUpdateSubcategoryMutation({
- *   variables: {
- *      id: // value for 'id'
- *      label: // value for 'label'
- *      code: // value for 'code'
- *      categoryId: // value for 'categoryId'
- *   },
- * });
- */
-export function useUpdateSubcategoryMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateSubcategoryMutation,
-    UpdateSubcategoryMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateSubcategoryMutation,
-    UpdateSubcategoryMutationVariables
-  >(UpdateSubcategoryDocument, options);
-}
-export type UpdateSubcategoryMutationHookResult = ReturnType<
-  typeof useUpdateSubcategoryMutation
->;
-export type UpdateSubcategoryMutationResult =
-  Apollo.MutationResult<UpdateSubcategoryMutation>;
-export type UpdateSubcategoryMutationOptions = Apollo.BaseMutationOptions<
-  UpdateSubcategoryMutation,
-  UpdateSubcategoryMutationVariables
 >;
 export const AddSubcategoryDocument = gql`
   mutation AddSubcategory(
@@ -1867,7 +1773,6 @@ export const namedOperations = {
   Mutation: {
     AddCategory: "AddCategory",
     UpdateCategory: "UpdateCategory",
-    UpdateSubcategory: "UpdateSubcategory",
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
     UpdateUser: "UpdateUser",
