@@ -181,3 +181,17 @@ export const GET_CURRENT_BUDGET_BY_COMMISSION_ID = gql`
     }
   }
 `;
+
+export const GET_AUTHENTICATED_USER = gql`
+  query GetAuthenticatedUser {
+    getAuthenticatedUser {
+      id
+      firstname
+      lastname
+      email
+      roles {
+        id
+      }
+    }
+  }
+`;
