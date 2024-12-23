@@ -1,91 +1,40 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Arg,
-  InputType,
-  Field,
-  Int,
-  Ctx,
-} from "type-graphql";
-import {
-  validate,
-  IsString,
-  IsNotEmpty,
-  Length,
-  IsEmail,
-} from "class-validator";
+import { Resolver, Query, Mutation, Arg, Int, Ctx } from "type-graphql";
+import { validate } from "class-validator";
 import { AppDataSource } from "../db/data-source";
 import {
   DeleteResponseStatus,
   RestoreResponseStatus,
 } from "../utilities/responseStatus";
+import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
-import { PaginatedUsers } from "./user.type";
+import {
+  PaginatedUsers,
+  UserInput,
+  UserIdInput,
+  LoginResponse,
+  AuthenticatedUserResponse,
+} from "./user.type";
 
 dotenv.config();
 const { AUTH_SECRET_KEY } = process.env;
 
-@InputType()
-class RolesInput {
-  @Field()
-  id: number;
-}
-
-@InputType()
-class CommissionsInput {
-  @Field()
-  id: number;
-}
-
-@InputType()
-class userIdInput {
-  @Field()
-  id: number;
-}
-
-@InputType()
-class UserInput {
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 50)
-  firstname: string;
-
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 50)
-  lastname: string;
-
-  @Field()
-  @IsEmail()
-  @IsNotEmpty()
-  @Length(5, 150)
-  email: string;
-
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  passwordConfirm: string;
-
-  @Field(() => [RolesInput])
-  roles: RolesInput[];
-
-  @Field(() => [CommissionsInput])
-  commissions: CommissionsInput[];
-
-  @Field({ nullable: true })
-  deletedAt?: string;
+interface UserContext {
+  req: IncomingMessage;
+  res: ServerResponse;
+  loggedInUser?: {
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    roles: number[];
+    iat: number;
+    exp: number;
+  };
 }
 
 @Resolver(User)
@@ -209,7 +158,7 @@ export default class UserResolver {
   }
 
   @Mutation(() => DeleteResponseStatus)
-  async softDeleteUser(@Arg("data") data: userIdInput) {
+  async softDeleteUser(@Arg("data") data: UserIdInput) {
     try {
       const user = await User.findOneBy({ id: data.id });
 
@@ -229,7 +178,7 @@ export default class UserResolver {
   }
 
   @Mutation(() => RestoreResponseStatus)
-  async restoreUser(@Arg("data") data: userIdInput) {
+  async restoreUser(@Arg("data") data: UserIdInput) {
     try {
       // Using getRepository because Active Record does not support restore
       const userRepository = AppDataSource.getRepository(User);
@@ -254,16 +203,16 @@ export default class UserResolver {
     }
   }
 
-  @Query(() => Boolean)
+  @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string,
-    @Ctx()
-    context: { res: { setHeader: (name: string, value: string) => void } }
+    @Ctx() context: UserContext
   ) {
     try {
       const user = await User.findOneOrFail({
         where: { email: email },
+        relations: ["roles"],
       });
 
       if (!user) {
@@ -272,31 +221,40 @@ export default class UserResolver {
           `Problème avec l'utilisateur. Veuillez réessayer.`
         );
       } else {
-        if (user.email === email) {
-          try {
-            if (await argon2.verify(user.password, password)) {
-              const token = jwt.sign(
-                {
-                  id: user.id,
-                  email: user.email,
-                  firstname: user.firstname,
-                  lastname: user.lastname,
-                },
-                AUTH_SECRET_KEY as string
-              );
-              context.res.setHeader(
-                "Set-Cookie",
-                `clubcompta_token=${token};httpOnly;secure;SameSite=Strict;expires=${new Date(
-                  new Date().getTime() + 1000 * 60 * 60 * 48 // 2 days
-                ).toUTCString()}`
-              );
+        try {
+          if (await argon2.verify(user.password, password)) {
+            const token = jwt.sign(
+              {
+                id: user.id,
+                email: user.email,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                roles: user.roles.map((role) => ({ id: role.id })),
+              },
+              AUTH_SECRET_KEY as string,
+              {
+                expiresIn: "48h",
+              }
+            );
+            context.res.setHeader(
+              "Set-Cookie",
+              `clubcompta_token=${token};httpOnly;secure;SameSite=Strict;expires=${new Date(
+                new Date().getTime() + 1000 * 60 * 60 * 48 // 2 days
+              ).toUTCString()}`
+            );
 
-              return true;
-            }
-          } catch (error) {
-            console.error(error);
-            return new RestoreResponseStatus("error", "server error");
+            return {
+              token: token,
+              id: user.id,
+              email: user.email,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              roles: user.roles.map((role) => ({ id: role.id })),
+            };
           }
+        } catch (error) {
+          console.error(error);
+          return new RestoreResponseStatus("error", "server error");
         }
       }
     } catch (error) {
@@ -304,6 +262,50 @@ export default class UserResolver {
       return new RestoreResponseStatus("error", "server error");
     }
 
-    return false;
+    throw new DeleteResponseStatus(
+      "error",
+      "Problème avec vos  identifiants. Veuillez réessayer."
+    );
+  }
+
+  @Query(() => AuthenticatedUserResponse)
+  async getAuthenticatedUser(
+    @Ctx()
+    context: UserContext
+  ) {
+    const user = context.loggedInUser;
+
+    if (user?.email && user?.roles) {
+      return {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        roles: user.roles,
+      };
+    } else {
+      throw new DeleteResponseStatus(
+        "error",
+        "Utilisateur non authentifié (token manquant ou non valide)"
+      );
+    }
+  }
+
+  @Mutation(() => String)
+  async logout(@Ctx() context: UserContext): Promise<string> {
+    const user = context.loggedInUser;
+    if (user?.email && user?.roles) {
+      const { res } = context;
+      res.setHeader(
+        "Set-Cookie",
+        `clubcompta_token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict`
+      );
+      return "Vous avez bien été déconnecté";
+    } else {
+      throw new DeleteResponseStatus(
+        "error",
+        "Utilisateur non authentifié (token manquant ou non valide)"
+      );
+    }
   }
 }
