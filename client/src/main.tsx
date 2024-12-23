@@ -13,7 +13,7 @@ import UpdateUser from "./pages/administrator/user/UpdateUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
-import Home from "./pages/Home.tsx";
+import Login from "./pages/Login.tsx";
 import Administrator from "./pages/administrator/Administrator.tsx";
 
 const router = createBrowserRouter([
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: <Login />,
       },
       {
         path: "administrator",

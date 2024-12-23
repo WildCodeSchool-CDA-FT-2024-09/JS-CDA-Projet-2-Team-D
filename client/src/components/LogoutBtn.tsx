@@ -1,9 +1,20 @@
+import { useNavigate } from "react-router-dom";
+import { useLogoutMutation } from "../types/graphql-types";
 import { Button } from "@mui/material";
 import { Stack } from "@mui/system";
 import { useUser } from "../hooks/useUser";
 
 function LogoutBtn() {
-  const { user, logout } = useUser();
+  const navigate = useNavigate();
+  const { user, setUser } = useUser();
+
+  const [logoutMutation] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    await logoutMutation();
+    setUser(null);
+    navigate("/");
+  };
 
   return (
     <>
@@ -16,8 +27,8 @@ function LogoutBtn() {
           fontSize: ".8em",
         }}
       >
-        <div>{user?.firstname}</div>
-        <Button onClick={logout} sx={{ fontSize: ".8em" }}>
+        <div>{`${user?.firstname} ${user?.lastname}`}</div>
+        <Button onClick={handleLogout} sx={{ fontSize: ".8em" }}>
           Déconnexion
         </Button>
       </Stack>

@@ -1,18 +1,16 @@
-import { createContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useState, ReactNode } from "react";
 
 type User = {
   id: number;
-  firstname: string;
   email: string;
+  firstname: string;
+  lastname: string;
   roles: string[];
 } | null;
 
 export type UserContextType = {
   user: User | null;
-  isAuthenticated: boolean;
-  hasRole: (role: string) => boolean;
-  login: (user: User | null) => void;
-  logout: () => void;
+  setUser: (user: User | null) => void;
 };
 
 // Create the context with default values
@@ -27,42 +25,10 @@ interface UserProviderProps {
 
 // Implement the provider
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
-  const login = (user: User) => {
-    setUser(user);
-    localStorage.setItem("user", JSON.stringify(user));
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
-
-  const isAuthenticated = Boolean(user);
-
-  const hasRole = (role: string): boolean => {
-    return user?.roles.includes(role) ?? false;
-  };
-
-  // Sync state with localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser: User = JSON.parse(storedUser);
-      if (JSON.stringify(parsedUser) !== JSON.stringify(user)) {
-        setUser(parsedUser);
-      }
-    }
-  }, [user]);
+  const [user, setUser] = useState<User | null>(null);
 
   return (
-    <UserContext.Provider
-      value={{ user, isAuthenticated, hasRole, login, logout }}
-    >
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );
