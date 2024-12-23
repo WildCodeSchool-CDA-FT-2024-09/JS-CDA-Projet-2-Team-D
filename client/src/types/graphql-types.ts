@@ -104,7 +104,7 @@ export type Exercise = {
 export type Invoice = {
   __typename?: "Invoice";
   bankAccount?: Maybe<BankAccount>;
-  commission?: Maybe<Commission>;
+  commission: Commission;
   creditDebit: CreditDebit;
   date: Scalars["DateTimeISO"]["output"];
   id: Scalars["Float"]["output"];
@@ -115,8 +115,8 @@ export type Invoice = {
   price_without_vat: Scalars["Float"]["output"];
   receipt: Scalars["String"]["output"];
   status: Status;
-  subcategory?: Maybe<Subcategory>;
-  user?: Maybe<User>;
+  subcategory: Subcategory;
+  user: User;
   vat: Vat;
 };
 
@@ -450,23 +450,19 @@ export type GetInvoicesQuery = {
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
     creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
-    subcategory?: {
-      __typename?: "Subcategory";
-      id: number;
-      label: string;
-    } | null;
-    commission?: { __typename?: "Commission"; id: number; name: string } | null;
+    subcategory: { __typename?: "Subcategory"; id: number; label: string };
+    commission: { __typename?: "Commission"; id: number; name: string };
     bankAccount?: {
       __typename?: "BankAccount";
       id: number;
       name: string;
     } | null;
-    user?: {
+    user: {
       __typename?: "User";
       id: number;
       firstname: string;
       lastname: string;
-    } | null;
+    };
   }>;
 };
 
