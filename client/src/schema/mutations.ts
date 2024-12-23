@@ -27,6 +27,26 @@ export const UPDATE_CATEGORY = gql`
   }
 `;
 
+export const UPDATE_SUBCATEGORY = gql`
+  mutation UpdateSubcategory(
+    $id: Float!
+    $label: String!
+    $code: String!
+    $categoryId: Float!
+  ) {
+    updateSubcategory(
+      id: $id
+      label: $label
+      code: $code
+      categoryId: $categoryId
+    ) {
+      id
+      label
+      code
+    }
+  }
+`;
+
 export const ADD_SUBCATEGORY = gql`
   mutation AddSubcategory(
     $label: String!
