@@ -1,11 +1,12 @@
+// import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
-import { UserProvider } from "./context/UserContext";
 import NotificationProvider from "./context/NotificationContext";
+// import { useUser } from "./hooks/useUser";
+// import { useGetAuthenticatedUserQuery } from "./types/graphql-types";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Drawer from "./components/drawer/Drawer";
-import Home from "./pages/Home";
-import UserBar from "./components/UserBar";
+import Home from "./pages/Login";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
@@ -61,37 +62,55 @@ function App() {
   const location = useLocation();
   const currentPage = location.pathname;
 
+  // const {
+  //   data: loggedInUser,
+  //   loading,
+  //   error: loggedInUserError,
+  // } = useGetAuthenticatedUserQuery();
+
+  // const { setUser } = useUser();
+
+  // useEffect(() => {
+  //   if (!loggedInUserError && loggedInUser) {
+  //     setUser({
+  //       id: loggedInUser!.getAuthenticatedUser.id,
+  //       firstname: loggedInUser!.getAuthenticatedUser.firstname,
+  //       lastname: loggedInUser!.getAuthenticatedUser.lastname,
+  //       email: loggedInUser!.getAuthenticatedUser.email,
+  //       roles: loggedInUser!.getAuthenticatedUser.roles.map((role) =>
+  //         role.id.toString(),
+  //       ),
+  //     });
+  //   }
+  // }, [loggedInUser, loggedInUserError, setUser]);
+
+  // if (loading) {
+  //   return <Box>🥁 Chargement...</Box>;
+  // }
+
   return (
     <>
-      <UserProvider>
-        <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            {currentPage !== "/" ? (
-              <>
-                <Box sx={{ display: "flex" }}>
-                  <CssBaseline />
-                  <Header
-                    title="ClubCompta"
-                    subtitle="Budget 2024/2025"
-                    userType="Responsable"
-                    logoUrl="/Logo.svg"
-                    avatarColor="#6EBF8B"
-                  />
-                  <Drawer />
-                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                    {/* <MenuSideBar /> */}
-                    <UserBar />
-                    <Outlet />
-                    <Footer />
-                  </Box>
-                </Box>
-              </>
-            ) : (
-              <Home />
-            )}
-          </NotificationProvider>
-        </ThemeProvider>
-      </UserProvider>
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          {currentPage !== "/" ? (
+            <Box sx={{ display: "flex" }}>
+              <CssBaseline />
+              <Header
+                title="ClubCompta"
+                subtitle="Budget 2024/2025"
+                logoUrl="/Logo.svg"
+              />
+              <Drawer />
+              <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
+                <Outlet />
+                <Footer />
+              </Box>
+            </Box>
+          ) : (
+            <Home />
+          )}
+        </NotificationProvider>
+      </ThemeProvider>
     </>
   );
 }

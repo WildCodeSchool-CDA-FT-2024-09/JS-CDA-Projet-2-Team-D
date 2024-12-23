@@ -4,6 +4,7 @@ import {
   IsString,
   Length,
   IsOptional,
+  IsPositive,
 } from "class-validator";
 import { Field, ObjectType } from "type-graphql";
 import {
@@ -32,12 +33,12 @@ export class Invoice extends BaseEntity {
   @Field(() => Number)
   @Column({ nullable: false, type: "float" })
   @IsNotEmpty()
+  @IsPositive()
   price_without_vat: number;
 
   @Field(() => String)
   @Column({ nullable: false, type: "varchar", length: 50 })
   @IsString()
-  @IsNotEmpty()
   @Length(1, 50)
   label: string;
 
@@ -46,14 +47,14 @@ export class Invoice extends BaseEntity {
   @IsString()
   @IsNotEmpty()
   @Length(1, 30)
-  receipt: string;
+  receipt?: string | null;
 
   @Field(() => String)
-  @Column({ nullable: false, type: "varchar", length: 250 })
+  @Column({ nullable: true, type: "varchar", length: 250 })
   @IsString()
-  @IsNotEmpty()
-  @Length(1, 250)
-  info: string;
+  @IsOptional()
+  @Length(0, 250)
+  info: string | null;
 
   @Field(() => Boolean)
   @Column({ nullable: false, type: "boolean" })
@@ -77,20 +78,22 @@ export class Invoice extends BaseEntity {
   date: Date;
 
   @Field(() => CreditDebit)
-  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.id)
+  @ManyToOne(() => CreditDebit, (creditDebit) => creditDebit.invoices, {
+    nullable: false,
+  })
   creditDebit: CreditDebit;
 
-  @Field(() => Subcategory, { nullable: true })
-  @ManyToOne(() => Subcategory, (subcategory) => subcategory.id, {
-    nullable: true,
+  @Field(() => Subcategory, { nullable: false })
+  @ManyToOne(() => Subcategory, (subcategory) => subcategory.invoices, {
+    nullable: false,
   })
-  subcategory?: Subcategory;
+  subcategory: Subcategory;
 
-  @Field(() => Commission, { nullable: true })
+  @Field(() => Commission, { nullable: false })
   @ManyToOne(() => Commission, (commission) => commission.id, {
-    nullable: true,
+    nullable: false,
   })
-  commission?: Commission;
+  commission: Commission;
 
   @Field(() => BankAccount, { nullable: true })
   @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.invoices, {
@@ -99,13 +102,14 @@ export class Invoice extends BaseEntity {
   })
   @IsOptional()
   @JoinColumn({ name: "bankAccountId" })
-  bankAccount?: BankAccount;
+  bankAccount?: BankAccount | null;
 
   @Field(() => String)
-  @Column({ nullable: false, type: "varchar" })
-  invoiceNumber: string;
+  @Column({ nullable: true, type: "varchar" })
+  @IsOptional()
+  invoiceNumber: string | null;
 
-  @Field(() => User, { nullable: true })
-  @ManyToOne(() => User, (user) => user.id, { nullable: true })
-  user?: User;
+  @Field(() => User, { nullable: false })
+  @ManyToOne(() => User, (user) => user.id, { nullable: false })
+  user: User;
 }
