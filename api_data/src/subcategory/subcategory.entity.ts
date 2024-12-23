@@ -41,7 +41,7 @@ export class Subcategory extends BaseEntity {
   label: string;
 
   @Field(() => Category)
-  @ManyToOne(() => Category, (category) => category.id)
+  @ManyToOne(() => Category, (category) => category.subcategories)
   category: Category;
 
   @Field(() => [Invoice])
