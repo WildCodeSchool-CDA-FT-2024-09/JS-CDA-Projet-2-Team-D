@@ -1,53 +1,36 @@
-import React, { useState, ChangeEvent } from "react";
+import { useState } from "react";
+import axios from "axios";
 import {
   TextField,
   Button,
   Paper,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  SelectChangeEvent,
   Checkbox,
   FormControlLabel,
-  SelectChangeEvent,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
+import FormSelect from "../../components/form/FormSelect";
+import FormTextField from "../../components/form/FormTextField";
+import { FormSelectVat, Invoice } from "../../components/form/FormSelectVat";
 import {
-  useGetVatsQuery,
-  useGetCategoriesQuery,
-  useGetCommissionsQuery,
-} from "../../types/graphql-types";
+  InvoiceState,
+  initialValues,
+  isValidInvoice,
+} from "../../types/InvoiceInputType";
+import { useGetVatsQuery } from "../../types/graphql-types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
-
-interface InvoiceState {
-  commission_id: number;
-  date: Date | null;
-  category_id: number;
-  invoice_id: string;
-  subcategory_id: number;
-  label: string;
-  credit_debit_id: number;
-  receipt: File | null;
-  info: string;
-  paid: boolean;
-  price_without_vat: number;
-  vat_id: number;
-  status_id: number;
-  user_id: number;
-  total: number; // Total amount (TTC)
-}
+import { useUser } from "../../hooks/useUser";
 
 const InvoiceForm: React.FC = () => {
-  const {
-    data: categoriesData,
-    loading: loadingCategories,
-    error: categoriesError,
-  } = useGetCategoriesQuery();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useUser();
+  const userId = user?.id;
 
   const {
     data: vatRatesData,
@@ -55,33 +38,10 @@ const InvoiceForm: React.FC = () => {
     error: vatRatesError,
   } = useGetVatsQuery();
 
-  const {
-    data: commissionsData,
-    loading: loadingCommissions,
-    error: commissionsError,
-  } = useGetCommissionsQuery();
-
-  // const currentYear = new Date().getFullYear();
-
   const [invoice, setInvoice] = useState<InvoiceState>({
-    commission_id: 0,
-    date: new Date(),
-    price_without_vat: 0,
-    category_id: 0,
-    invoice_id: "",
-    subcategory_id: 0,
-    label: "",
-    receipt: null,
-    credit_debit_id: 1,
-    info: "",
-    paid: false,
-    vat_id: 1,
-    status_id: 2,
-    user_id: 0,
-    total: 0,
+    ...initialValues,
+    user_id: userId ?? null,
   });
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleFileUpload = (file: File | null) => {
     setInvoice((prevState) => ({
@@ -90,58 +50,41 @@ const InvoiceForm: React.FC = () => {
     }));
   };
 
-  const handleChange = (
+  const handleInvoiceChange = (
     event:
-      | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | SelectChangeEvent<string>,
+      | SelectChangeEvent<string | number>
+      | React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >,
+    options?: number,
   ) => {
-    const { name, value } = event.target;
+    const { name, value, files } = event.target as HTMLInputElement;
 
-    const parsedValue = [
-      "price_without_vat",
-      "vat_id",
-      "commission_id",
-      "category_id",
-      "subcategory_id",
-      "credit_debit_id",
-    ].includes(name)
-      ? Number(value)
-      : value;
-
-    // Management of the specific logic for "price_without_vat" or "vat_id"
-    if (name === "price_without_vat" || name === "vat_id") {
-      const ht =
-        name === "price_without_vat"
-          ? typeof parsedValue === "number"
-            ? parsedValue
-            : 0
-          : invoice.price_without_vat;
-
-      if (!vatRatesData?.getVats) {
-        console.error("Les données de taux de TVA ne sont pas disponibles.");
-        return;
-      }
-
-      const selectedVAT = vatRatesData.getVats.find(
-        (vat) => vat.id === (name === "vat_id" ? parsedValue : invoice.vat_id),
-      );
-
-      if (!selectedVAT) {
-        console.error("Aucun taux de TVA trouvé pour cet ID");
-        return;
-      }
-
-      const vatRate = selectedVAT.rate || 0;
-      const totalTTC = ht + (ht * vatRate) / 100;
+    if (files && files.length > 0) {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: parsedValue,
-        total: totalTTC,
+        [name]: files[0], // Adds the uploaded file
+      }));
+    } else if (name === "price_without_vat" || name === "vat_id") {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: +value,
+      }));
+    } else if (name === "category_id" && options) {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: +value as number,
+        credit_debit_id: options, // Update credit/debit id
+      }));
+    } else if (name === "paid") {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: !prevState.paid,
       }));
     } else {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: parsedValue,
+        [name]: value,
       }));
     }
   };
@@ -153,92 +96,80 @@ const InvoiceForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Checking mandatory fields
-    const newErrors: { [key: string]: string } = {};
-    const requiredFields = [
-      "label",
-      "price_without_vat",
-      "category_id",
-      "subcategory_id",
-      "commission_id",
-      "date",
-      "receipt",
-    ];
+    setIsSubmitting(true);
 
-    requiredFields.forEach((field) => {
-      if (
-        !invoice[field as keyof InvoiceState] ||
-        invoice[field as keyof InvoiceState] === 0 ||
-        invoice[field as keyof InvoiceState] === null
-      ) {
-        newErrors[field] = "Ce champ est obligatoire.";
+    if (userId) {
+      setInvoice((prevState) => ({ ...prevState, user_id: userId }));
+    }
+    console.info("Données de la facture :", invoice);
+
+    try {
+      if (!userId) {
+        throw new Error("Utilisateur non connecté");
       }
-    });
 
-    if (!invoice.subcategory_id || invoice.subcategory_id === 0) {
-      newErrors["subcategory_id"] =
-        "Sélectionner une sous-catégorie est obligatoire.";
+      setInvoice((prevState) => ({ ...prevState, user_id: userId }));
+
+      if (!isValidInvoice(invoice, userId)) {
+        throw new Error("Veuillez remplir tous les champs obligatoires");
+      }
+      const formData = new FormData();
+      formData.append("statusId", invoice.status_id.toString());
+      formData.append("vatId", invoice.vat_id.toString());
+      formData.append("creditDebitId", invoice.credit_debit_id.toString());
+      formData.append("subcategoryId", invoice.subcategory_id.toString());
+      formData.append("commissionId", invoice.commission_id.toString());
+      formData.append("userId", userId.toString());
+      formData.append(
+        "price_without_vat",
+        invoice.price_without_vat.toString(),
+      );
+      formData.append("receipt", invoice.receipt);
+      formData.append("label", invoice.label);
+      formData.append("info", invoice.info);
+      formData.append("paid", invoice.paid ? "1" : "0");
+      formData.append("date", invoice.date.toISOString());
+      formData.append("category_id", invoice.category_id.toString());
+      formData.append("invoice_id", invoice.invoice_id ?? ""); // optional field
+      formData.append("total", invoice.total.toString());
+      formData.append("bankAccountId", ""); // optional field
+
+      const response = await axios.post(
+        "http://localhost:7100/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      console.info("Réponse du serveur :", response.data);
+      alert("Facture envoyée avec succès !");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Erreur lors de l'envoi :", error.message);
+      } else {
+        console.error("Erreur inconnue :", error);
+        alert("Échec de l'envoi de la facture.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (invoice.receipt) {
-      console.info("Uploaded file:", invoice.receipt);
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    console.info("Form data:", invoice);
-    //  Prepare the input object based on the current state
-    // const input = {
-    //   commission_id: invoice.commission_id,
-    //   date: invoice.date,
-    //   category_id: invoice.category_id,
-    //   subcategory_id: invoice.subcategory_id,
-    //   invoice_id: invoice.invoice_id,
-    //   label: invoice.label,
-    //   credit_debit_id: invoice.credit_debit_id,
-    //   price_without_vat: invoice.price_without_vat,
-    //   vat_id: invoice.vat_id,
-    //   receipt: invoice.receipt,
-    //   paid: invoice.paid,
-    //   info: invoice.info,
-    //   status_id: invoice.status_id,
-    //   user_id: invoice.user_id,
   };
 
-  // try {
-  //   const response = await createInvoice({ variables: { input } });
-  //   console.info("Invoice created:", response.data.setInvoice);
-  // } catch (error) {
-  //   console.error("Error creating invoice:", error);
-  // }
-
-  const loading = loadingCategories || loadingVatRates || loadingCommissions;
-  const error = categoriesError || vatRatesError || commissionsError;
+  const loading = loadingVatRates;
+  const error = vatRatesError;
 
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
 
   if (error) {
-    return (
-      <Typography>
-        Error:{" "}
-        {categoriesError?.message ||
-          vatRatesError?.message ||
-          commissionsError?.message}
-      </Typography>
-    );
+    return <Typography>Error: {vatRatesError?.message}</Typography>;
   }
-
-  const selectedCategory = categoriesData?.getCategories.find(
-    (category) => category.id === invoice.category_id,
-  );
-  const creditDebitLabel = selectedCategory?.creditDebit?.label || "";
 
   return (
     <Paper
@@ -250,38 +181,18 @@ const InvoiceForm: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            {" "}
-            <FormControl fullWidth>
-              <InputLabel>Commissions</InputLabel>
-              <Select
-                name="commission_id"
-                value={invoice.commission_id.toString()}
-                onChange={handleChange}
-                error={!!errors["commission_id"]}
-                aria-label={`Commission sélectionnée : ${
-                  commissionsData?.getCommissions.find(
-                    (commission) => commission.id === invoice.commission_id,
-                  )?.name || "Non sélectionnée"
-                }`}
-              >
-                {commissionsData?.getCommissions.map((commission) => (
-                  <MenuItem
-                    key={commission.id}
-                    value={commission.id.toString()}
-                  >
-                    {commission.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors["commission_id"] && (
-                <Typography color="error" variant="body2">
-                  {errors["commission_id"]}
-                </Typography>
-              )}
-            </FormControl>
+          <Grid size={6}>
+            <FormSelect
+              name="commission_id"
+              property="name"
+              label="Commissions"
+              value={invoice.commission_id ?? ""}
+              handleSelect={handleInvoiceChange}
+              required
+            />
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+
+          <Grid size={6}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
@@ -289,6 +200,7 @@ const InvoiceForm: React.FC = () => {
               <DatePicker
                 label="Date de la facture"
                 value={invoice.date}
+                name="date"
                 onChange={handleDateChange}
                 format="eee dd MMMM yyyy"
                 slots={{
@@ -297,142 +209,97 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth>
-              <InputLabel>Catégorie</InputLabel>
-              <Select
-                name="category_id"
-                value={invoice.category_id.toString()}
-                onChange={handleChange}
-                error={!!errors["category_id"]}
-                aria-label={`Catégorie sélectionnée : ${
-                  categoriesData?.getCategories.find(
-                    (category) => category.id === invoice.category_id,
-                  )?.label || "Non sélectionnée"
-                }`}
-              >
-                {categoriesData?.getCategories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors["category_id"] && (
-                <Typography color="error" variant="body2">
-                  {errors["category_id"]}
-                </Typography>
-              )}
-            </FormControl>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            {" "}
-            <FormControl fullWidth>
-              <InputLabel>Sous-catégorie</InputLabel>
-              <Select
-                name="subcategory_id"
-                value={invoice.subcategory_id.toString()}
-                onChange={handleChange}
-                error={!!errors["subcategory_id"]}
-                aria-label={`Sous-catégorie sélectionnée : ${
-                  selectedCategory?.subcategories?.find(
-                    (subcategory) => subcategory.id === invoice.subcategory_id,
-                  )?.label || "Non sélectionnée"
-                }`}
-              >
-                {selectedCategory?.subcategories?.map((subcategory) => (
-                  <MenuItem
-                    key={subcategory.id}
-                    value={subcategory.id.toString()}
-                  >
-                    {subcategory.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors["subcategory_id"] && (
-                <Typography color="error" variant="body2">
-                  {errors["subcategory_id"]}
-                </Typography>
-              )}
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              fullWidth
-              label="Libellé"
-              name="label"
-              value={invoice.label}
-              onChange={handleChange}
-              aria-live="polite"
-              aria-describedby="libelle-helper"
-              error={!!errors["label"]}
-              helperText={errors["label"]}
+          <Grid size={6}>
+            <FormSelect
+              name="category_id"
+              label="Catégories"
+              property="label"
+              value={invoice.category_id ?? ""}
+              handleSelect={handleInvoiceChange}
+              required
             />
-            <div
-              id="libelle-helper"
-              style={{
-                display: invoice.label.length === 0 ? "block" : "none",
-              }}
-            ></div>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              fullWidth
-              label="Prix HT"
+          <Grid size={6}>
+            <FormSelect
+              name="subcategory_id"
+              label="Sous-catégories"
+              property="label"
+              value={invoice.subcategory_id?.toString() ?? ""}
+              subValue={invoice.category_id ?? undefined}
+              handleSelect={handleInvoiceChange}
+              required
+            />
+          </Grid>
+          <FormTextField
+            name="label"
+            label="Libellé"
+            value={invoice.label}
+            onChange={handleInvoiceChange}
+            required
+          />
+          <Grid size={6}>
+            <FormTextField
               name="price_without_vat"
+              label="Prix HT"
+              type="number"
               value={
                 invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
               }
-              onChange={handleChange}
-              type="number"
-              inputProps={{ min: 0 }}
-              error={!!errors["price_without_vat"]}
-              helperText={errors["price_without_vat"]}
-              aria-label="Montant du prix hors taxe, à remplir sans la TVA"
+              onChange={handleInvoiceChange}
+              required
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth>
-              <Select
-                name="vat_id"
-                value={
-                  invoice.vat_id?.toString() ||
-                  vatRatesData?.getVats[0]?.id.toString() ||
-                  ""
-                }
-                onChange={(e) => handleChange(e as SelectChangeEvent)}
-                aria-label={`Taux TVA sélectionné : ${
-                  vatRatesData?.getVats.find((vat) => vat.id === invoice.vat_id)
-                    ?.label || "Non sélectionné"
-                }`}
-              >
-                {vatRatesData?.getVats.map((vat) => (
-                  <MenuItem key={vat.id} value={vat.id.toString()}>
-                    {vat.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          {/* Total - Displaying dynamic credit/debit label */}
           <Grid size={6}>
-            <Typography variant="h6" aria-live="polite">
-              Total TTC:{" "}
-              <span style={{ marginLeft: "10px" }}>
-                {invoice.total.toFixed(2)} €
-              </span>
-              {creditDebitLabel && (
-                <span style={{ marginLeft: "10px" }}>({creditDebitLabel})</span>
+            <FormSelectVat
+              name="vat_id"
+              label="Taux de TVA"
+              value={invoice.vat_id?.toString()}
+              onChange={handleInvoiceChange}
+              options={vatRatesData?.getVats || []}
+              priceWithoutVat={invoice.price_without_vat}
+              setInvoice={
+                setInvoice as React.Dispatch<React.SetStateAction<Invoice>>
+              }
+            />
+          </Grid>
+          <Grid size={6}>
+            <Typography variant="h6">
+              Total TTC :{" "}
+              {invoice.category_id !== 0 ? (
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    color:
+                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                  }}
+                >
+                  {invoice.credit_debit_id === 1 ? "+" : "-"}
+                </span>
+              ) : (
+                ""
+              )}
+              {(invoice.total || 0).toFixed(2)} €
+              {invoice.category_id !== 0 && (
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    color:
+                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                    marginLeft: "5px",
+                  }}
+                >
+                  ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
+                </span>
               )}
             </Typography>
           </Grid>
+
           <Grid size={6}>
             <FormControlLabel
               control={
                 <Checkbox
                   checked={invoice.paid}
-                  onChange={(e) =>
-                    setInvoice({ ...invoice, paid: e.target.checked })
-                  }
+                  onChange={(e) => handleInvoiceChange(e)}
                   name="paid"
                   aria-checked={invoice.paid ? "true" : "false"}
                 />
@@ -457,20 +324,25 @@ const InvoiceForm: React.FC = () => {
             )}
           </Grid>
           <Grid size={12}>
-            <TextField
-              fullWidth
-              label="Informations complémentaires"
+            <FormTextField
               name="info"
+              label="Informations complémentaires"
               value={invoice.info}
-              onChange={handleChange}
+              onChange={handleInvoiceChange}
               multiline
               rows={4}
               aria-live="polite"
+              required={false}
             />
           </Grid>
-          <Grid size={12}>
-            <Button type="submit" variant="contained" color="primary">
-              Enregistrer la facture
+          <Grid size={12} container alignItems="center" justifyContent="center">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Envoi en cours..." : "Enregistrer la facture"}
             </Button>
           </Grid>
         </Grid>

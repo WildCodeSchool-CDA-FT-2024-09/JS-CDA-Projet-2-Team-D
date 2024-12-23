@@ -56,12 +56,13 @@ services:
 
   client:
     build: ./client
-    command: npm run dev
+    command: npm run dev -- --host
     restart: always
     environment:
       - VITE_API_URL=http://localhost:7100/graph
     volumes:
       - ./client/src:/app/src
+      - /app/node_modules
 
   reverse_proxy:
     image: nginx
