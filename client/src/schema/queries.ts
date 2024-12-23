@@ -181,3 +181,17 @@ export const GET_CURRENT_BUDGET_BY_COMMISSION_ID = gql`
     }
   }
 `;
+
+export const GET_BUDGET_OVERVIEW = gql`
+  query GetBudgetOverview {
+    getBudgetOverview {
+      globalBudget
+      budgets {
+        amount
+        commissions {
+          name
+        }
+      }
+    }
+  }
+`;
