@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../types/graphql-types";
 import { useUser } from "../hooks/useUser";
 import useNotification from "../hooks/useNotification";
 import Box from "@mui/material/Box";
@@ -15,16 +14,9 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const [btnState, setBtnState] = useState<boolean>(false);
 
+  const { user, login } = useUser();
+
   const { notifyError, notifySuccess } = useNotification();
-
-  const [loginMutation] = useLoginMutation({
-    variables: {
-      email,
-      password,
-    },
-  });
-
-  const { user, setUser } = useUser();
 
   const redirectionByRoles = (roles: number[]) => {
     if (roles.includes(1)) {
@@ -53,34 +45,13 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await loginMutation({
-        variables: {
-          email,
-          password,
-        },
-      });
+      await login(email.trim(), password);
+      notifySuccess("Connexion réussie. Vous allez être redirigé.e");
 
-      if (response.data?.login) {
-        const user = response.data.login;
-
-        setUser({
-          id: user.id,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          email: user.email,
-          roles: user.roles.map((role) => role.id.toString()),
-        });
-
-        notifySuccess("Connexion réussie. Vous allez être redirigé.e");
-
-        // Redirect to the user highest role homepage
-        redirectionByRoles(user.roles.map(Number));
-      } else if (response.errors) {
-        notifyError("Problème avec vos identifiants. Veuillez réessayer.");
-      }
-    } catch (err) {
-      console.error("Login failed:", err);
-      notifyError("Erreur : connexion échouée");
+      // Redirect to the user highest role homepage
+      if (user) redirectionByRoles(user.roles.map(Number));
+    } catch {
+      notifyError("Problème avec vos identifiants. Veuillez réessayer.");
     }
   };
 

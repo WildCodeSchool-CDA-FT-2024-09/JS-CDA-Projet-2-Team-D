@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import NotificationProvider from "./context/NotificationContext";
-import { useUser } from "./hooks/useUser";
-import { useGetAuthenticatedUserQuery } from "./types/graphql-types";
+// import { useUser } from "./hooks/useUser";
+// import { useGetAuthenticatedUserQuery } from "./types/graphql-types";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Drawer from "./components/drawer/Drawer";
@@ -62,31 +62,31 @@ function App() {
   const location = useLocation();
   const currentPage = location.pathname;
 
-  const {
-    data: loggedInUser,
-    loading,
-    error: loggedInUserError,
-  } = useGetAuthenticatedUserQuery();
+  // const {
+  //   data: loggedInUser,
+  //   loading,
+  //   error: loggedInUserError,
+  // } = useGetAuthenticatedUserQuery();
 
-  const { setUser } = useUser();
+  // const { setUser } = useUser();
 
-  useEffect(() => {
-    if (!loggedInUserError && loggedInUser) {
-      setUser({
-        id: loggedInUser!.getAuthenticatedUser.id,
-        firstname: loggedInUser!.getAuthenticatedUser.firstname,
-        lastname: loggedInUser!.getAuthenticatedUser.lastname,
-        email: loggedInUser!.getAuthenticatedUser.email,
-        roles: loggedInUser!.getAuthenticatedUser.roles.map((role) =>
-          role.id.toString(),
-        ),
-      });
-    }
-  }, [loggedInUser, loggedInUserError, setUser]);
+  // useEffect(() => {
+  //   if (!loggedInUserError && loggedInUser) {
+  //     setUser({
+  //       id: loggedInUser!.getAuthenticatedUser.id,
+  //       firstname: loggedInUser!.getAuthenticatedUser.firstname,
+  //       lastname: loggedInUser!.getAuthenticatedUser.lastname,
+  //       email: loggedInUser!.getAuthenticatedUser.email,
+  //       roles: loggedInUser!.getAuthenticatedUser.roles.map((role) =>
+  //         role.id.toString(),
+  //       ),
+  //     });
+  //   }
+  // }, [loggedInUser, loggedInUserError, setUser]);
 
-  if (loading) {
-    return <Box>🥁 Chargement...</Box>;
-  }
+  // if (loading) {
+  //   return <Box>🥁 Chargement...</Box>;
+  // }
 
   return (
     <>

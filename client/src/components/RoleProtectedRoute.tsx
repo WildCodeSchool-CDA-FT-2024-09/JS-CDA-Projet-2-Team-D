@@ -10,8 +10,9 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
   children,
   requiredRole,
 }) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
 
+  if (loading) return <p>🥁 Chargement...</p>;
   if (!user?.email || !user.roles.some((role) => role === requiredRole)) {
     return <Navigate to="/" replace />;
   }

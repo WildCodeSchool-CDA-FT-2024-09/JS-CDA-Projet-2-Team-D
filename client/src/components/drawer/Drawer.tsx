@@ -12,7 +12,6 @@ import {
   Toolbar,
 } from "@mui/material";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -48,7 +47,6 @@ function CustomDrawer() {
       >
         <Toolbar />
         <Divider />
-        <Divider />
         <List>
           <ListItem disablePadding>
             <Link to={`/administrator`}>
@@ -81,28 +79,10 @@ function CustomDrawer() {
             </Link>
           </ListItem>
         </List>
+        <Divider />
         {/* Menu Administrateur */}
         {user?.roles.includes("1") && (
           <>
-            <List>
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <TableIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Opérations" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <AnalyticsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Statistiques" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-            <Divider />
             <List>
               <ListItem disablePadding>
                 <Link to={`/administrator/user`}>
