@@ -15,6 +15,7 @@ import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
 import Administrator from "./pages/administrator/Administrator.tsx";
+import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,16 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <Administrator />,
+          },
+          {
+            path: "overview",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <BudgetOverview />,
+              },
+            ],
           },
           {
             path: "user",

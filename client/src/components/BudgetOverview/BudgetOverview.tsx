@@ -12,25 +12,34 @@ const BudgetOverview: React.FC = () => {
   const globalBudget = data?.getBudgetOverview.globalBudget || 0;
 
   const pieChartData = budgetsData.map((budget) => ({
-    id: budget.commissions.name, // Nom de la commission
-    value: budget.amount, // Montant du budget
+    value: budget.amount,
+    label: budget.commissions.name,
   }));
+  console.info("pieChartData:", pieChartData);
 
   return (
-    <div>
+    <article style={{ textAlign: "center" }}>
       <h2>Vue d'ensemble des budgets</h2>
-      <p>Budget global : {globalBudget.toLocaleString()} €</p>
+      <h3>Budget global : {globalBudget.toLocaleString()} €</h3>
       <PieChart
         series={[
           {
+            arcLabel: (item) => `${item.value}€`,
+            arcLabelRadius: "70%",
             data: pieChartData,
+            innerRadius: 50,
+            outerRadius: 190,
+            startAngle: 0,
+            endAngle: 360,
+            cornerRadius: 0,
             highlightScope: { fade: "global", highlight: "item" },
-            valueFormatter: (value) => `${value.toLocaleString()} €`,
+            faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
+            valueFormatter: (value: { value: number }) => `${value.value} €`,
           },
         ]}
         height={400}
       />
-    </div>
+    </article>
   );
 };
 
