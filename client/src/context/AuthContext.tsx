@@ -42,10 +42,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const { data: loggedInUser, error: loggedInUserError } =
-    useGetAuthenticatedUserQuery();
+  const {
+    //data: loggedInUser,
+    error: loggedInUserError,
+    refetch,
+  } = useGetAuthenticatedUserQuery({
+    fetchPolicy: "network-only", // Don't use cache
+    errorPolicy: "all", // Handle errors without throwing
+  });
 
   const checkAuth = async () => {
+    // Manually refetch to ensure fresh data
+    const { data: loggedInUser } = await refetch();
+
     try {
       if (!loggedInUserError && loggedInUser) {
         setUser({
@@ -57,8 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             role.id.toString(),
           ),
         });
+      } else {
+        setUser(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("Auth check failed:", error);
       setUser(null);
     } finally {
       setLoading(false);
