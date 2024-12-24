@@ -1,7 +1,7 @@
 FROM node:lts-alpine AS dev
 
 WORKDIR /app
-COPY *.json ./
+COPY package*.json ./
 RUN npm ping
 RUN npm install
 COPY . .

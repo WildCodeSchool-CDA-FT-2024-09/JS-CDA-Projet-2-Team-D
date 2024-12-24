@@ -98,7 +98,7 @@ export const UPDATE_USER = gql`
 `;
 
 export const SOFTDELETE_USER = gql`
-  mutation SoftDeleteUser($data: userIdInput!) {
+  mutation SoftDeleteUser($data: UserIdInput!) {
     softDeleteUser(data: $data) {
       message
       success
@@ -107,10 +107,31 @@ export const SOFTDELETE_USER = gql`
 `;
 
 export const RESTORE_USER = gql`
-  mutation RestoreUser($data: userIdInput!) {
+  mutation RestoreUser($data: UserIdInput!) {
     restoreUser(data: $data) {
       message
       success
     }
+  }
+`;
+
+export const LOGIN = gql`
+  mutation Login($password: String!, $email: String!) {
+    login(password: $password, email: $email) {
+      id
+      firstname
+      lastname
+      email
+      roles {
+        id
+      }
+      token
+    }
+  }
+`;
+
+export const LOGOUT = gql`
+  mutation Logout {
+    logout
   }
 `;

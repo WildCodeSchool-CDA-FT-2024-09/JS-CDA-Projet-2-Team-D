@@ -12,8 +12,8 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
 }) => {
   const theme = useTheme();
 
-  const pourcentage = Math.floor((-currentBudget / globalBudget) * 100);
-
+  const pourcentage =
+    globalBudget > 0 ? Math.floor((-currentBudget / globalBudget) * 100) : 0;
   const getColor = (value: number) => {
     if (value <= 50) return theme.palette.success.main;
     if (value <= 75) return theme.palette.secondary.main;

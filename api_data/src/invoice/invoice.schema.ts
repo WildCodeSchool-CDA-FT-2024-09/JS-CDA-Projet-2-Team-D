@@ -1,24 +1,9 @@
-import { Field, InputType, ObjectType } from "type-graphql";
+import { Field, InputType, ObjectType, Float, Int, ID } from "type-graphql";
 
 @InputType()
 export class InvoiceInput {
   @Field()
-  commissions: string;
-
-  @Field()
-  date: Date;
-
-  @Field()
-  subcategory_id: number;
-
-  @Field()
-  clientId: number;
-
-  @Field()
   label: string;
-
-  @Field()
-  type: string;
 
   @Field()
   price_without_vat: number;
@@ -27,29 +12,86 @@ export class InvoiceInput {
   vat_id: number;
 
   @Field()
-  receipt: string;
+  total: number;
 
   @Field()
   paid: boolean;
 
   @Field()
-  info: string;
+  date: Date;
+
+  // @Field({ nullable: true })
+  // receipt?: string | null;
+
+  @Field({ nullable: true })
+  info?: string | null;
+
+  @Field(() => Int)
+  category_id: number;
+
+  @Field(() => Int)
+  subcategory_id: number;
+
+  @Field(() => Int, { nullable: true })
+  commission_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  credit_debit_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  status_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  bank_act_id?: number | null;
 }
 
 @ObjectType()
 export class Invoice {
-  @Field(() => String)
+  @Field(() => ID)
   id: string;
-  commissions!: string;
-  date!: Date;
-  subcategory_id!: number;
-  clientId!: number;
-  label!: string;
-  type!: string;
-  price_without_vat!: number;
-  vat_id!: number;
-  total!: number;
-  receipt!: string;
-  paid!: boolean;
-  info!: string;
+
+  @Field(() => Date)
+  date: Date;
+
+  @Field(() => String)
+  label: string;
+
+  @Field(() => Float)
+  price_without_vat: number;
+
+  @Field(() => Float)
+  total: number;
+
+  @Field(() => Boolean)
+  paid: boolean;
+
+  // @Field(() => String, { nullable: true })
+  // receipt?: string | null;
+
+  @Field(() => String, { nullable: true })
+  info?: string | null;
+
+  @Field(() => Int)
+  category_id: number;
+
+  @Field(() => Int)
+  subcategory_id: number;
+
+  @Field(() => Int)
+  vat_id: number;
+
+  @Field(() => Int, { nullable: true })
+  commission_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  credit_debit_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  status_id?: number;
+
+  @Field(() => Int, { nullable: true })
+  bank_act_id?: number | null;
+
+  @Field(() => Int)
+  user_id: number;
 }

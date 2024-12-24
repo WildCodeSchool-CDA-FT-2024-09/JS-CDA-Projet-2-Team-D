@@ -1,5 +1,6 @@
 import { useUser } from "../../hooks/useUser";
-import MenuSideBar from "../menuSideBar/MenuSideBar";
+import { Link } from "react-router-dom";
+import { useGetUserByIdQuery } from "../../types/graphql-types";
 import {
   Divider,
   Drawer,
@@ -11,15 +12,23 @@ import {
   Toolbar,
 } from "@mui/material";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
-import { Link } from "react-router-dom";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const drawerWidth = 280;
 
 function CustomDrawer() {
   const { user } = useUser();
+
+  const { data, loading, error } = useGetUserByIdQuery({
+    variables: { userId: user?.id ?? 0 },
+  });
+
+  if (loading) return <p>Chargement...</p>;
+  if (error) return <p>Erreur : {error.message}</p>;
+
+  const commissions = data?.getUserById.commissions || [];
 
   return (
     <>
@@ -39,30 +48,41 @@ function CustomDrawer() {
         <Toolbar />
         <Divider />
         <List>
-          <MenuSideBar />
+          <ListItem disablePadding>
+            <Link to={`/administrator`}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ChevronRightIcon />
+                </ListItemIcon>
+                <ListItemText primary="Administrateur" />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+          <ListItem disablePadding>
+            <Link to={`/accountant`}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ChevronRightIcon />
+                </ListItemIcon>
+                <ListItemText primary="Comptable" />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+          <ListItem disablePadding>
+            <Link to={`/commission`}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ChevronRightIcon />
+                </ListItemIcon>
+                <ListItemText primary="Commission" />
+              </ListItemButton>
+            </Link>
+          </ListItem>
         </List>
+        <Divider />
         {/* Menu Administrateur */}
         {user?.roles.includes("1") && (
           <>
-            <List>
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <TableIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Opérations" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <AnalyticsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Statistiques" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-            <Divider />
             <List>
               <ListItem disablePadding>
                 <Link to={`/administrator/user`}>
@@ -108,14 +128,24 @@ function CustomDrawer() {
           <>
             <Divider />
             <List>
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <TableIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Partie Commission" />
-                </ListItemButton>
-              </ListItem>
+              {commissions.length > 0 ? (
+                commissions.map((commission: { id: number; name: string }) => (
+                  <ListItem key={commission.id} disablePadding>
+                    <Link to={`/commission/${commission.id}`}>
+                      <ListItemButton>
+                        <ListItemIcon>
+                          <TableIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={commission.name} />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem disablePadding>
+                  <ListItemText primary="Aucune commission assignée" />
+                </ListItem>
+              )}
             </List>
           </>
         )}

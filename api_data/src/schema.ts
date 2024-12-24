@@ -29,6 +29,10 @@ const getSchema = async () => {
       BudgetResolver,
     ],
     validate: true,
+    authChecker: ({ context }): boolean => {
+      if (context.loggedInUser) return true;
+      return false;
+    },
   });
 };
 export default getSchema;

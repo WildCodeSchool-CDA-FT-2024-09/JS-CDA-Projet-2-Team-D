@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import connection from "./services/connection";
+import { AuthProvider } from "./context/AuthContext";
 import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
@@ -12,7 +13,7 @@ import UpdateUser from "./pages/administrator/user/UpdateUser.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
-import Home from "./pages/Home.tsx";
+import Login from "./pages/Login.tsx";
 import Administrator from "./pages/administrator/Administrator.tsx";
 
 const router = createBrowserRouter([
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: <Login />,
       },
       {
         path: "administrator",
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: ":commissionId",
+            element: <HomePageCommission />,
+          },
+          {
             index: true,
             element: <HomePageCommission />,
           },
@@ -108,7 +113,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ApolloProvider client={connection}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </ApolloProvider>
   </StrictMode>,
 );
