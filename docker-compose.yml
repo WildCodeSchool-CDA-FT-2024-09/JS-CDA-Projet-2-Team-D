@@ -44,7 +44,7 @@ services:
     volumes:
       - ./api_upload:/var/www/html
     ports:
-      - 8081:8100 # to be removed when going in prod
+      - 8082:8100 # to be removed when going in prod
     depends_on:
       db:
         condition: service_healthy
