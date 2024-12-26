@@ -49,7 +49,7 @@ services:
       - ./api_upload/templates:/var/www/html/templates
       - ./api_upload/upload:/var/www/html/upload
     ports:
-      - 8082:8100 # to be removed when going in prod
+      - 8081:8100 # to be removed when going in prod
     depends_on:
       db:
         condition: service_healthy
