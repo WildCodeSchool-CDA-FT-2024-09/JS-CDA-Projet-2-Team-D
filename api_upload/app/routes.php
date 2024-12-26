@@ -186,6 +186,9 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             } catch (Exception $e) {
                 echo "Error: " . $e->getMessage();
+
+                // Delete the uploaded file
+                unlink($uploadDir . DIRECTORY_SEPARATOR . $filename);
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
             }
         }
