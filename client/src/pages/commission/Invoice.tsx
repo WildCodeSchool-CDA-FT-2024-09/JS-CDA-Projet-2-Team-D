@@ -253,10 +253,6 @@ const InvoiceForm: React.FC = () => {
               label="Prix HT"
               type="number"
               value={invoice.price_without_vat.toString()}
-              // value={
-              //   invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
-              // }
-              // value={invoice.price_without_vat || ""}
               onChange={handleInvoiceChange}
               required
             />
@@ -277,7 +273,7 @@ const InvoiceForm: React.FC = () => {
           <Grid size={6}>
             <Typography variant="h6">
               Total TTC :{" "}
-              {invoice.category_id !== 0 ? (
+              {invoice.category_id && invoice.category_id !== 0 ? (
                 <>
                   <span
                     style={{
@@ -301,7 +297,7 @@ const InvoiceForm: React.FC = () => {
                   </span>
                 </>
               ) : (
-                "" // Si aucune catégorie n'est sélectionnée, rien n'est affiché
+                ""
               )}
             </Typography>
           </Grid>
