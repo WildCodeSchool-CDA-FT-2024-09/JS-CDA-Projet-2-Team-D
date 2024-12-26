@@ -266,34 +266,33 @@ const InvoiceForm: React.FC = () => {
             <Typography variant="h6">
               Total TTC :{" "}
               {invoice.category_id !== 0 ? (
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color:
-                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
-                  }}
-                >
-                  {invoice.credit_debit_id === 1 ? "+" : "-"}
-                </span>
+                <>
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color:
+                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                    }}
+                  >
+                    {invoice.credit_debit_id === 1 ? "+" : "-"}
+                  </span>
+                  {(invoice.total || 0).toFixed(2)} €
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color:
+                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
+                  </span>
+                </>
               ) : (
-                ""
-              )}
-              {(invoice.total || 0).toFixed(2)} €
-              {invoice.category_id !== 0 && (
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color:
-                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
-                    marginLeft: "5px",
-                  }}
-                >
-                  ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
-                </span>
+                "" // Si aucune catégorie n'est sélectionnée, rien n'est affiché
               )}
             </Typography>
           </Grid>
-
           <Grid size={6}>
             <FormControlLabel
               control={

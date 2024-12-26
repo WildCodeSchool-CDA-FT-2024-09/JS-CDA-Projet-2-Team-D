@@ -146,6 +146,17 @@ function CustomDrawer() {
                   <ListItemText primary="Aucune commission assignée" />
                 </ListItem>
               )}
+              {/* Bouton Facture pour les membres des commissions */}
+              <ListItem disablePadding>
+                <Link to={`/commission/invoice`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Factures" />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
             </List>
           </>
         )}
