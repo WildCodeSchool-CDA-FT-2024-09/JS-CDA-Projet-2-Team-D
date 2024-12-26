@@ -195,3 +195,22 @@ export const GET_AUTHENTICATED_USER = gql`
     }
   }
 `;
+
+export const GET_EXERCISES = gql`
+  query GetExercises {
+    getExercises {
+      id
+      label
+      start_date
+      end_date
+      budgets {
+        commissionId
+        amount
+        commissions {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
