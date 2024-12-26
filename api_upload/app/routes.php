@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\App;
 use Dotenv\Dotenv;
 
@@ -15,13 +16,12 @@ $dotenv->load();
 require_once __DIR__ . '/../config/database.php';
 
 return function (App $app) {
+    // CORS Pre-Flight OPTIONS Request Handler
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
-        // CORS Pre-Flight OPTIONS Request Handler
         return $response
-            ->withHeader('Access-Control-Allow-Origin', '*') // http://client:5173
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-            ->withHeader('Access-Control-Allow-Credentials', 'true');;
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization');
     });
 
     /**
@@ -199,6 +199,13 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
             }
         }
+    });
+
+    // Catch-all route to serve a 404 Not Found page if none of the routes match
+    // NOTE: make sure this route is defined last
+    $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+        $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+        return $handler($req, $res);
     });
 };
 
