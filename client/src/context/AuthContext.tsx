@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check authentication status on mount
     checkAuth();
-  }, []);
+  }, [window.location.pathname]);
 
   const {
     //data: loggedInUser,
@@ -49,6 +49,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useGetAuthenticatedUserQuery({
     fetchPolicy: "network-only", // Don't use cache
     errorPolicy: "all", // Handle errors without throwing
+    // This ensures the query runs on component mount
+    skip: false,
+    // Add credentials to all requests
+    context: {
+      credentials: "include",
+    },
   });
 
   const checkAuth = async () => {

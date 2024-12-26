@@ -11,10 +11,10 @@ import {
   ListItemText,
   Toolbar,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CardTravelIcon from "@mui/icons-material/CardTravel";
 
 const drawerWidth = 280;
 
@@ -95,12 +95,12 @@ function CustomDrawer() {
                 </Link>
               </ListItem>
               <ListItem disablePadding>
-                <Link to={`/administrator/budget`}>
+                <Link to={`/administrator/exercise`}>
                   <ListItemButton>
                     <ListItemIcon>
-                      <InboxIcon />
+                      <CardTravelIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Gestion du budget" />
+                    <ListItemText primary="Gestion des exercises" />
                   </ListItemButton>
                 </Link>
               </ListItem>
