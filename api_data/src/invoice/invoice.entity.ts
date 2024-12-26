@@ -43,10 +43,10 @@ export class Invoice extends BaseEntity {
   label: string;
 
   @Field(() => String)
-  @Column({ nullable: false, type: "varchar", length: 30 })
+  @Column({ nullable: false, type: "varchar", length: 50 })
   @IsString()
   @IsNotEmpty()
-  @Length(1, 30)
+  @Length(1, 50)
   receipt?: string | null;
 
   @Field(() => String)
