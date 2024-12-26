@@ -68,7 +68,7 @@ const InvoiceForm: React.FC = () => {
     } else if (name === "price_without_vat" || name === "vat_id") {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: +value,
+        [name]: value ? +value : 0,
       }));
     } else if (name === "category_id" && options) {
       setInvoice((prevState) => ({
@@ -80,6 +80,11 @@ const InvoiceForm: React.FC = () => {
       setInvoice((prevState) => ({
         ...prevState,
         [name]: !prevState.paid,
+      }));
+    } else if (name === "label" || name === "info") {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: value || "",
       }));
     } else {
       setInvoice((prevState) => ({
@@ -148,6 +153,8 @@ const InvoiceForm: React.FC = () => {
 
       console.info("Réponse du serveur :", response.data);
       alert("Facture envoyée avec succès !");
+
+      resetForm();
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Erreur lors de l'envoi :", error.message);
@@ -158,6 +165,9 @@ const InvoiceForm: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+  const resetForm = () => {
+    setInvoice({ ...initialValues });
   };
 
   const loading = loadingVatRates;
@@ -233,7 +243,7 @@ const InvoiceForm: React.FC = () => {
           <FormTextField
             name="label"
             label="Libellé"
-            value={invoice.label}
+            value={invoice.label || ""}
             onChange={handleInvoiceChange}
             required
           />
@@ -242,9 +252,11 @@ const InvoiceForm: React.FC = () => {
               name="price_without_vat"
               label="Prix HT"
               type="number"
-              value={
-                invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
-              }
+              value={invoice.price_without_vat.toString()}
+              // value={
+              //   invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
+              // }
+              // value={invoice.price_without_vat || ""}
               onChange={handleInvoiceChange}
               required
             />
