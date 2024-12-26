@@ -1,6 +1,5 @@
 import {
   useGetCategoriesQuery,
-  useUpdateCategoryMutation,
   useUpdateSubcategoryMutation,
   useAddSubcategoryMutation,
 } from "../../types/graphql-types";
@@ -50,6 +49,8 @@ function createData(
   };
 }
 
+import UpdateCategory from "../updateCategory/UpdateCategory";
+
 function Row(props: {
   row: ReturnType<typeof createData>;
   rows: ReturnType<typeof createData>[];
@@ -62,9 +63,6 @@ function Row(props: {
 
   const [editSubcategoryId, setEditSubcategoryId] = useState<number>(0);
 
-  const [newCategoryLabel, setNewCategoryLabel] = useState("");
-  const [newCreditDebitId, setNewCreditDebitId] = useState<number>(0);
-
   const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
   const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
 
@@ -73,7 +71,6 @@ function Row(props: {
 
   const [addASubcategory] = useAddSubcategoryMutation();
 
-  const [updateCategory] = useUpdateCategoryMutation();
   const [updateSubcategory] = useUpdateSubcategoryMutation();
 
   const { notifySuccess, notifyError } = useNotification();
@@ -124,61 +121,6 @@ function Row(props: {
     }
   };
 
-  const handleValidationCategory = (): boolean => {
-    const isCreditDebitIdChanged =
-      newCreditDebitId && newCreditDebitId !== row.creditDebitId;
-    const isCategoryLabelChanged =
-      newCategoryLabel && newCategoryLabel !== row.categoryLabel;
-
-    if (!isCreditDebitIdChanged && !isCategoryLabelChanged) {
-      notifyError("Aucune modification effectuée");
-      return false;
-    }
-
-    if (newCreditDebitId === 0) {
-      notifyError("Veuillez sélectionner un type de crédit/débit valide !");
-      return false;
-    }
-
-    if (
-      rows.some(
-        (existingRow) =>
-          existingRow.categoryLabel === newCategoryLabel &&
-          existingRow.categoryId !== row.categoryId,
-      )
-    ) {
-      notifyError("Cette catégorie existe déjà");
-      return false;
-    }
-    return true;
-  };
-
-  const handleUpdateCategory = async () => {
-    if (!handleValidationCategory()) return;
-
-    const variables: {
-      id: number;
-      label: string;
-      creditDebitId: number;
-    } = {
-      id: row.categoryId,
-      label: newCategoryLabel || row.categoryLabel,
-      creditDebitId: newCreditDebitId || row.creditDebitId,
-    };
-
-    try {
-      await updateCategory({
-        variables,
-        refetchQueries: ["GetCategories"],
-      });
-      setEditCategory(false);
-      notifySuccess("Catégorie modifiée avec succès");
-    } catch (err) {
-      console.info(err);
-      notifyError("Erreur lors de la modification de la catégorie");
-    }
-  };
-
   interface Subcategory {
     id: number;
     label: string;
@@ -198,8 +140,6 @@ function Row(props: {
   };
 
   const handleClickCategory = () => {
-    setNewCreditDebitId(row.creditDebitId);
-    setNewCategoryLabel(row.categoryLabel);
     setEditCategory(true);
   };
 
@@ -291,102 +231,18 @@ function Row(props: {
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
           {editCategory ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                border: "1px solid rgba(0, 0, 0, 0.1)",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                padding: "1rem",
-                borderRadius: "8px",
-                width: "100%",
-                backgroundColor: "white",
-              }}
-            >
-              <Box
-                component="input"
-                type="text"
-                placeholder={`${row.categoryLabel}`}
-                value={newCategoryLabel}
-                onChange={(e) => setNewCategoryLabel(e.target.value)}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
-                    handleUpdateCategory();
-                  }
-                  if (e.key === "Escape") {
-                    setEditCategory(false);
-                  }
-                }}
-                sx={{
-                  fontSize: "2rem",
-                  width: "100%",
-                  padding: "0.5rem",
-                  boxSizing: "border-box",
-                  border: "none",
-                }}
-              />
-              <Box
-                component="select"
-                value={newCreditDebitId}
-                onChange={(e) => setNewCreditDebitId(Number(e.target.value))}
-                sx={{
-                  fontSize: "1.2rem",
-                  color: theme.palette.primary.main,
-                  width: "50%",
-                  padding: "0.5rem",
-                  boxSizing: "border-box",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                {creditDebitOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </Box>
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: "1rem",
-                  marginTop: "1rem",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Button
-                  sx={{
-                    backgroundColor: theme.palette.error.main,
-                    color: "white",
-                    fontWeight: "bold",
-                    border: "none",
-                    width: "90%",
-                    maxWidth: "120px",
-                    height: "4vh",
-                    fontSize: "1.1rem",
-                    marginRight: "8rem",
-                  }}
-                  onClick={() => setEditCategory(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={() => handleUpdateCategory()}
-                  sx={{
-                    backgroundColor: theme.palette.success.main,
-                    color: "white",
-                    fontWeight: "bold",
-                    border: "none",
-                    width: "90%",
-                    maxWidth: "120px",
-                    height: "4vh",
-                    fontSize: "1.1rem",
-                    marginRight: "20rem",
-                  }}
-                >
-                  Valider
-                </Button>
-              </div>
-            </div>
+            <UpdateCategory
+              categoryId={row.categoryId}
+              categoryLabel={row.categoryLabel}
+              creditDebitId={row.creditDebitId}
+              creditDebitOptions={creditDebitOptions}
+              categories={rows.map((row) => ({
+                id: row.categoryId,
+                label: row.categoryLabel,
+                creditDebitId: row.creditDebitId,
+              }))}
+              onClose={() => setEditCategory(false)}
+            />
           ) : (
             <div>
               <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>

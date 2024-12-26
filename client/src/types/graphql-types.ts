@@ -28,7 +28,16 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: string; output: string };
+  DateTimeISO: { input: unknown; output: unknown };
+};
+
+export type AuthenticatedUserResponse = {
+  __typename?: "AuthenticatedUserResponse";
+  email: Scalars["String"]["output"];
+  firstname: Scalars["String"]["output"];
+  id: Scalars["Float"]["output"];
+  lastname: Scalars["String"]["output"];
+  roles: Array<UserRoleInput>;
 };
 
 export type Bank = {
@@ -120,14 +129,27 @@ export type Invoice = {
   vat: Vat;
 };
 
+export type LoginResponse = {
+  __typename?: "LoginResponse";
+  email: Scalars["String"]["output"];
+  firstname: Scalars["String"]["output"];
+  id: Scalars["Float"]["output"];
+  lastname: Scalars["String"]["output"];
+  roles: Array<UserRoleInput>;
+  token: Scalars["String"]["output"];
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   addCategory: Category;
   addSubcategory: Subcategory;
   createNewUser: User;
+  login: LoginResponse;
+  logout: Scalars["String"]["output"];
   restoreUser: RestoreResponseStatus;
   softDeleteUser: DeleteResponseStatus;
   updateCategory: Category;
+  updateSubcategory: Subcategory;
   updateUser: User;
 };
 
@@ -146,6 +168,11 @@ export type MutationCreateNewUserArgs = {
   data: UserInput;
 };
 
+export type MutationLoginArgs = {
+  email: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
+};
+
 export type MutationRestoreUserArgs = {
   data: UserIdInput;
 };
@@ -156,6 +183,13 @@ export type MutationSoftDeleteUserArgs = {
 
 export type MutationUpdateCategoryArgs = {
   creditDebitId: Scalars["Float"]["input"];
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
+};
+
+export type MutationUpdateSubcategoryArgs = {
+  categoryId: Scalars["Float"]["input"];
+  code: Scalars["String"]["input"];
   id: Scalars["Float"]["input"];
   label: Scalars["String"]["input"];
 };
@@ -180,6 +214,7 @@ export type PaginatedUsers = {
 
 export type Query = {
   __typename?: "Query";
+  getAuthenticatedUser: AuthenticatedUserResponse;
   getBankAccounts: Array<BankAccount>;
   getBanks: Array<Bank>;
   getCategories: Array<Category>;
@@ -194,7 +229,6 @@ export type Query = {
   getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
-  login: Scalars["Boolean"]["output"];
 };
 
 export type QueryGetCurrentBudgetByCommissionIdArgs = {
@@ -214,11 +248,6 @@ export type QueryGetUserByIdArgs = {
 export type QueryGetUsersArgs = {
   limit?: Scalars["Int"]["input"];
   offset?: Scalars["Int"]["input"];
-};
-
-export type QueryLoginArgs = {
-  email: Scalars["String"]["input"];
-  password: Scalars["String"]["input"];
 };
 
 export type RestoreResponseStatus = {
@@ -267,6 +296,10 @@ export type User = {
   roles: Array<Role>;
 };
 
+export type UserIdInput = {
+  id: Scalars["Float"]["input"];
+};
+
 export type UserInput = {
   commissions: Array<CommissionsInput>;
   deletedAt?: InputMaybe<Scalars["String"]["input"]>;
@@ -277,16 +310,17 @@ export type UserInput = {
   roles: Array<RolesInput>;
 };
 
+export type UserRoleInput = {
+  __typename?: "UserRoleInput";
+  id: Scalars["Float"]["output"];
+};
+
 export type Vat = {
   __typename?: "Vat";
   id: Scalars["Float"]["output"];
   invoices: Array<Invoice>;
   label: Scalars["String"]["output"];
   rate: Scalars["Float"]["output"];
-};
-
-export type UserIdInput = {
-  id: Scalars["Float"]["input"];
 };
 
 export type AddCategoryMutationVariables = Exact<{
@@ -316,6 +350,23 @@ export type UpdateCategoryMutation = {
     id: number;
     label: string;
     creditDebit: { __typename?: "CreditDebit"; id: number };
+  };
+};
+
+export type UpdateSubcategoryMutationVariables = Exact<{
+  id: Scalars["Float"]["input"];
+  label: Scalars["String"]["input"];
+  code: Scalars["String"]["input"];
+  categoryId: Scalars["Float"]["input"];
+}>;
+
+export type UpdateSubcategoryMutation = {
+  __typename?: "Mutation";
+  updateSubcategory: {
+    __typename?: "Subcategory";
+    id: number;
+    label: string;
+    code: string;
   };
 };
 
@@ -398,6 +449,28 @@ export type RestoreUserMutation = {
   };
 };
 
+export type LoginMutationVariables = Exact<{
+  password: Scalars["String"]["input"];
+  email: Scalars["String"]["input"];
+}>;
+
+export type LoginMutation = {
+  __typename?: "Mutation";
+  login: {
+    __typename?: "LoginResponse";
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    token: string;
+    roles: Array<{ __typename?: "UserRoleInput"; id: number }>;
+  };
+};
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type LogoutMutation = { __typename?: "Mutation"; logout: string };
+
 export type GetUsersQueryVariables = Exact<{
   limit: Scalars["Int"]["input"];
   offset: Scalars["Int"]["input"];
@@ -445,7 +518,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: string;
+    date: unknown;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -522,7 +595,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: string;
+      date: unknown;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -565,6 +638,22 @@ export type GetCurrentBudgetByCommissionIdQuery = {
     __typename?: "Budget";
     amount: number;
   } | null;
+};
+
+export type GetAuthenticatedUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetAuthenticatedUserQuery = {
+  __typename?: "Query";
+  getAuthenticatedUser: {
+    __typename?: "AuthenticatedUserResponse";
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    roles: Array<{ __typename?: "UserRoleInput"; id: number }>;
+  };
 };
 
 export const AddCategoryDocument = gql`
@@ -680,6 +769,71 @@ export type UpdateCategoryMutationResult =
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<
   UpdateCategoryMutation,
   UpdateCategoryMutationVariables
+>;
+export const UpdateSubcategoryDocument = gql`
+  mutation UpdateSubcategory(
+    $id: Float!
+    $label: String!
+    $code: String!
+    $categoryId: Float!
+  ) {
+    updateSubcategory(
+      id: $id
+      label: $label
+      code: $code
+      categoryId: $categoryId
+    ) {
+      id
+      label
+      code
+    }
+  }
+`;
+export type UpdateSubcategoryMutationFn = Apollo.MutationFunction<
+  UpdateSubcategoryMutation,
+  UpdateSubcategoryMutationVariables
+>;
+
+/**
+ * __useUpdateSubcategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateSubcategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSubcategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSubcategoryMutation, { data, loading, error }] = useUpdateSubcategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      label: // value for 'label'
+ *      code: // value for 'code'
+ *      categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useUpdateSubcategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateSubcategoryMutation,
+    UpdateSubcategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateSubcategoryMutation,
+    UpdateSubcategoryMutationVariables
+  >(UpdateSubcategoryDocument, options);
+}
+export type UpdateSubcategoryMutationHookResult = ReturnType<
+  typeof useUpdateSubcategoryMutation
+>;
+export type UpdateSubcategoryMutationResult =
+  Apollo.MutationResult<UpdateSubcategoryMutation>;
+export type UpdateSubcategoryMutationOptions = Apollo.BaseMutationOptions<
+  UpdateSubcategoryMutation,
+  UpdateSubcategoryMutationVariables
 >;
 export const AddSubcategoryDocument = gql`
   mutation AddSubcategory(
@@ -861,7 +1015,7 @@ export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
   UpdateUserMutationVariables
 >;
 export const SoftDeleteUserDocument = gql`
-  mutation SoftDeleteUser($data: userIdInput!) {
+  mutation SoftDeleteUser($data: UserIdInput!) {
     softDeleteUser(data: $data) {
       message
       success
@@ -912,7 +1066,7 @@ export type SoftDeleteUserMutationOptions = Apollo.BaseMutationOptions<
   SoftDeleteUserMutationVariables
 >;
 export const RestoreUserDocument = gql`
-  mutation RestoreUser($data: userIdInput!) {
+  mutation RestoreUser($data: UserIdInput!) {
     restoreUser(data: $data) {
       message
       success
@@ -961,6 +1115,105 @@ export type RestoreUserMutationResult =
 export type RestoreUserMutationOptions = Apollo.BaseMutationOptions<
   RestoreUserMutation,
   RestoreUserMutationVariables
+>;
+export const LoginDocument = gql`
+  mutation Login($password: String!, $email: String!) {
+    login(password: $password, email: $email) {
+      id
+      firstname
+      lastname
+      email
+      roles {
+        id
+      }
+      token
+    }
+  }
+`;
+export type LoginMutationFn = Apollo.MutationFunction<
+  LoginMutation,
+  LoginMutationVariables
+>;
+
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      password: // value for 'password'
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LoginMutation,
+    LoginMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    options,
+  );
+}
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
+export const LogoutDocument = gql`
+  mutation Logout {
+    logout
+  }
+`;
+export type LogoutMutationFn = Apollo.MutationFunction<
+  LogoutMutation,
+  LogoutMutationVariables
+>;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LogoutMutation,
+    LogoutMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
+    LogoutDocument,
+    options,
+  );
+}
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<
+  LogoutMutation,
+  LogoutMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
@@ -1758,6 +2011,89 @@ export type GetCurrentBudgetByCommissionIdQueryResult = Apollo.QueryResult<
   GetCurrentBudgetByCommissionIdQuery,
   GetCurrentBudgetByCommissionIdQueryVariables
 >;
+export const GetAuthenticatedUserDocument = gql`
+  query GetAuthenticatedUser {
+    getAuthenticatedUser {
+      id
+      firstname
+      lastname
+      email
+      roles {
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAuthenticatedUserQuery__
+ *
+ * To run a query within a React component, call `useGetAuthenticatedUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAuthenticatedUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAuthenticatedUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAuthenticatedUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAuthenticatedUserQuery,
+    GetAuthenticatedUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAuthenticatedUserQuery,
+    GetAuthenticatedUserQueryVariables
+  >(GetAuthenticatedUserDocument, options);
+}
+export function useGetAuthenticatedUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAuthenticatedUserQuery,
+    GetAuthenticatedUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAuthenticatedUserQuery,
+    GetAuthenticatedUserQueryVariables
+  >(GetAuthenticatedUserDocument, options);
+}
+export function useGetAuthenticatedUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAuthenticatedUserQuery,
+        GetAuthenticatedUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAuthenticatedUserQuery,
+    GetAuthenticatedUserQueryVariables
+  >(GetAuthenticatedUserDocument, options);
+}
+export type GetAuthenticatedUserQueryHookResult = ReturnType<
+  typeof useGetAuthenticatedUserQuery
+>;
+export type GetAuthenticatedUserLazyQueryHookResult = ReturnType<
+  typeof useGetAuthenticatedUserLazyQuery
+>;
+export type GetAuthenticatedUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetAuthenticatedUserSuspenseQuery
+>;
+export type GetAuthenticatedUserQueryResult = Apollo.QueryResult<
+  GetAuthenticatedUserQuery,
+  GetAuthenticatedUserQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -1769,14 +2105,18 @@ export const namedOperations = {
     GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
     GetUserById: "GetUserById",
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
+    GetAuthenticatedUser: "GetAuthenticatedUser",
   },
   Mutation: {
     AddCategory: "AddCategory",
     UpdateCategory: "UpdateCategory",
+    UpdateSubcategory: "UpdateSubcategory",
     AddSubcategory: "AddSubcategory",
     CreateNewUser: "CreateNewUser",
     UpdateUser: "UpdateUser",
     SoftDeleteUser: "SoftDeleteUser",
     RestoreUser: "RestoreUser",
+    Login: "Login",
+    Logout: "Logout",
   },
 };
