@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\App;
 use Dotenv\Dotenv;
 
@@ -18,10 +17,7 @@ require_once __DIR__ . '/../config/database.php';
 return function (App $app) {
     // CORS Pre-Flight OPTIONS Request Handler
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
-        return $response
-        ->withHeader('Access-Control-Allow-Origin', '*')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization');
+        return $response;
     });
 
     /**
