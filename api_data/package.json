@@ -9,7 +9,8 @@
     "compile": "tsc",
     "dev": "ts-node-dev ./src/index.ts",
     "seed": "ts-node-dev ./src/db/seed.ts",
-    "devseed": "ts-node-dev ./src/db/seed.ts && ts-node-dev ./src/index.ts"
+    "devseed": "ts-node-dev ./src/db/seed.ts && ts-node-dev ./src/index.ts",
+    "initdataset": "ts-node-dev ./src/db/seed_dataset.ts && ./src/index.ts"
   },
   "keywords": [],
   "author": "",
