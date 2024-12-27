@@ -204,6 +204,16 @@ import { AppDataSource } from "./data-source";
       ON CONFLICT ("userId", "commissionId") DO NOTHING;
     `);
 
+    // insert exercise
+    await queryRunner.query(`
+      INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+        ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
+        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
+        ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
+        ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00');
+    `);
+
     // insert invoices
     await queryRunner.query(`
       INSERT INTO invoice (
@@ -248,6 +258,23 @@ import { AppDataSource } from "./data-source";
       JOIN bank_account ba ON ba.account_number = ci.num_act
       JOIN "user" u ON u.email = ci.representant_email
       JOIN vat v ON v.rate = ci.vat;
+    `);
+
+    // insert budget
+    await queryRunner.query(`
+      INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
+      SELECT DISTINCT
+          e.id as "exerciseId",
+          c.id as "commissionId",
+          0.0 as "amount"
+      FROM exercise e, commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
+      WHERE EXISTS (
+          SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
+          FROM invoice i
+          WHERE i."commissionId" = c.id
+          AND i.date >= e.start_date
+          AND i.date <= e.end_date
+      )
     `);
 
     await queryRunner.commitTransaction();
