@@ -4,7 +4,7 @@ import { AppDataSource } from "./data-source";
   // initializing data source
   await AppDataSource.initialize();
 
-  console.info("Starting Seeding...");
+  console.info("Starting Mega Seeding...");
 
   const queryRunner = AppDataSource.createQueryRunner();
 
@@ -12,19 +12,19 @@ import { AppDataSource } from "./data-source";
     await queryRunner.startTransaction();
 
     // big cleanup
+    await queryRunner.query(`DELETE FROM "invoice"`);
     await queryRunner.query(`DELETE FROM "bank_account"`);
     await queryRunner.query(`DELETE FROM "bank"`);
     await queryRunner.query(`DELETE FROM "subcategory"`);
     await queryRunner.query(`DELETE FROM "category"`);
+    await queryRunner.query(`DELETE FROM "user_commissions_commission"`);
     await queryRunner.query(`DELETE FROM "commission"`);
+    await queryRunner.query(`DELETE FROM "budget"`);
     await queryRunner.query(`DELETE FROM "exercise"`);
     await queryRunner.query(`DELETE FROM "credit_debit"`);
     await queryRunner.query(`DELETE FROM "vat"`);
     await queryRunner.query(`DELETE FROM "status"`);
-    await queryRunner.query(`DELETE FROM "invoice"`);
-    await queryRunner.query(`DELETE FROM "budget"`);
-    await queryRunner.query(`DELETE FROM "user_commissions_commission"`);
-    await queryRunner.query("DELETE FROM user_roles_role");
+    await queryRunner.query(`DELETE FROM "user_roles_role"`);
     await queryRunner.query(`DELETE FROM "user"`);
     await queryRunner.query(`DELETE FROM "role"`);
 
@@ -95,6 +95,7 @@ import { AppDataSource } from "./data-source";
       WHERE bank_act IS NOT NULL AND num_act IS NOT NULL
       ON CONFLICT (account_number) DO NOTHING;
     `);
+
     // insert unique categories with credit_debit relationship
     await queryRunner.query(`
       INSERT INTO category (label, "creditDebitId")
@@ -133,8 +134,8 @@ import { AppDataSource } from "./data-source";
       INSERT INTO vat (label, rate)
       SELECT DISTINCT
           CASE
-              WHEN vat = 0 THEN 'No VAT'
-              ELSE CONCAT(CAST(vat * 100 AS VARCHAR), '%')
+              WHEN vat = 0 THEN 'TVA 0%'
+              ELSE CONCAT('TVA ', vat, '%')
           END,
           vat
       FROM csv_import
@@ -189,6 +190,20 @@ import { AppDataSource } from "./data-source";
         (21, 3);
     `);
 
+    // insert user-commission relationships
+    await queryRunner.query(`
+      INSERT INTO user_commissions_commission ("userId", "commissionId")
+      SELECT DISTINCT
+          u.id as "userId",
+          c.id as "commissionId"
+      FROM csv_import ci
+      JOIN "user" u ON u.email = ci.representant_email
+      JOIN commission c ON c.name = ci.commission
+      WHERE ci.representant_email IS NOT NULL
+        AND ci.commission IS NOT NULL
+      ON CONFLICT ("userId", "commissionId") DO NOTHING;
+    `);
+
     // insert invoices
     await queryRunner.query(`
       INSERT INTO invoice (
@@ -204,7 +219,8 @@ import { AppDataSource } from "./data-source";
         "subcategoryId",
         "commissionId",
         "bankAccountId",
-        "userId"
+        "userId",
+        "invoiceNumber"
       )
       SELECT
           ci.amount_without_vat,
@@ -219,7 +235,12 @@ import { AppDataSource } from "./data-source";
           sc.id,
           com.id,
           ba.id,
-          u.id
+          u.id,
+          CASE
+              WHEN ci.receipt ~ '^Facture_.*.pdf$' THEN
+                  substring(ci.receipt from '^Facture_(.*?).pdf$')
+              ELSE NULL
+          END as "invoiceNumber"
       FROM csv_import ci
       JOIN credit_debit cd ON cd.label = ci.credit_debit
       JOIN subcategory sc ON sc.code = ci.code_subcategory
@@ -231,7 +252,7 @@ import { AppDataSource } from "./data-source";
 
     await queryRunner.commitTransaction();
 
-    console.info("Finished Seeding.");
+    console.info("Finished Mega Seeding.");
   } catch (error) {
     console.error(error);
     await queryRunner.rollbackTransaction();

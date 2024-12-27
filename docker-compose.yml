@@ -3,6 +3,8 @@ services:
     image: postgres
     env_file: ./.env
     restart: always
+    volumes:
+      - ./api_data/db_import:/docker-entrypoint-initdb.d/
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
       interval: 5s
@@ -21,7 +23,8 @@ services:
 
   api_data:
     build: ./api_data
-    command: npm run devseed
+    # command: npm run devseed
+    command: npm run initdataset
     restart: always
     env_file: .env
     volumes:
@@ -38,21 +41,21 @@ services:
   #   volumes:
   #     - ./api_email:/app/
 
-  api_upload:
-    build: ./api_upload
-    restart: always
-    volumes:
-      - ./api_upload/app:/var/www/html/app
-      - ./api_upload/src:/var/www/html/src
-      - ./api_upload/public:/var/www/html/public
-      - ./api_upload/config:/var/www/html/config
-      - ./api_upload/templates:/var/www/html/templates
-      - ./api_upload/upload:/var/www/html/upload
-    ports:
-      - 8081:8100 # to be removed when going in prod
-    depends_on:
-      db:
-        condition: service_healthy
+  # api_upload:
+  #   build: ./api_upload
+  #   restart: always
+  #   volumes:
+  #     - ./api_upload/app:/var/www/html/app
+  #     - ./api_upload/src:/var/www/html/src
+  #     - ./api_upload/public:/var/www/html/public
+  #     - ./api_upload/config:/var/www/html/config
+  #     - ./api_upload/templates:/var/www/html/templates
+  #     - ./api_upload/upload:/var/www/html/upload
+  #   ports:
+  #     - 8081:8100 # to be removed when going in prod
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
   client:
     build: ./client
@@ -75,4 +78,4 @@ services:
       - client
       - api_data
       # - api_email
-      - api_upload
+      # - api_upload
