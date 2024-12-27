@@ -48,8 +48,8 @@ services:
       - ./api_upload/config:/var/www/html/config
       - ./api_upload/templates:/var/www/html/templates
       - ./api_upload/upload:/var/www/html/upload
-    ports:
-      - 8081:8100 # to be removed when going in prod
+    # ports:
+    #   - 8081:8100 # to be removed when going in prod
     depends_on:
       db:
         condition: service_healthy
