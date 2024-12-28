@@ -15,13 +15,9 @@ $dotenv->load();
 require_once __DIR__ . '/../config/database.php';
 
 return function (App $app) {
+    // CORS Pre-Flight OPTIONS Request Handler
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
-        // CORS Pre-Flight OPTIONS Request Handler
-        return $response
-            ->withHeader('Access-Control-Allow-Origin', '*') // http://client:5173
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-            ->withHeader('Access-Control-Allow-Credentials', 'true');;
+        return $response;
     });
 
     /**
@@ -71,15 +67,12 @@ return function (App $app) {
      */
     $app->post('/upload', function (Request $request, Response $response) {
         // Some parameters
-        $uploadDir = __DIR__ . '/../upload';
+        $uploadDir = __DIR__ . $_ENV['UPL_DIR'];
         $allowedFileTypes = explode(',', $_ENV['ALLOWED_FILE_TYPES']);
         $maxFileSize = $_ENV['MAX_FILE_SIZE'];
 
-        // Get all parsed body parameters as array
-        $params = $request->getParsedBody();
-
-        // Get the string value
-        $description = $params['description'] ?? "Facture";
+        // Generate a new invoice number
+        $invoiceNumber = incrementInvoiceCode();
 
         // Create the upload directory if it doesn't exist
         if (!is_dir($uploadDir)) {
@@ -116,16 +109,10 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400); // Payload Too Large
             }
 
-            $filename = moveUploadedFile($uploadDir, $file, $description);
+            $filename = moveUploadedFile($file, $invoiceNumber);
 
             // Get database connection
             $db = getDbConnection();
-
-            // Get the next invoice number
-            $lastInvoiceNumber = $db->query('SELECT "invoiceNumber" FROM invoice ORDER BY id DESC LIMIT 1')
-                        ->fetch(PDO::FETCH_COLUMN);
-
-            $invoiceNumber = incrementInvoiceCode($lastInvoiceNumber);
 
             // Retrieve POST parameters from the form body
             $postData = $request->getParsedBody();
@@ -139,7 +126,6 @@ return function (App $app) {
             $creditDebitId = $postData['creditDebitId'];
             $subcategoryId = $postData['subcategoryId'];
             $commissionId = $postData['commissionId'];
-            // $bankAccountId = $postData['bankAccountId'];
             $userId = $postData['userId'];
 
             try {
@@ -196,18 +182,30 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             } catch (Exception $e) {
                 echo "Error: " . $e->getMessage();
+
+                // Delete the uploaded file
+                unlink($uploadDir . DIRECTORY_SEPARATOR . $filename);
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
             }
         }
     });
+
+    // Catch-all route to serve a 404 Not Found page if none of the routes match
+    // NOTE: make sure this route is defined last
+    $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+        $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+        return $handler($req, $res);
+    });
 };
 
 // Helper function to move uploaded file
-function moveUploadedFile($uploadDir, $uploadedFile, $desc)
+function moveUploadedFile($uploadedFile, $invoiceNumber)
 {
+    $uploadDir = __DIR__ . $_ENV['UPL_DIR'];
+    $filePrefix = $_ENV['UPL_FILE_PREFIX'];
+
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
-    $basename = bin2hex(random_bytes(8)); // Generate unique filename
-    $filename = sprintf('%s-%s.%s', $desc, $basename, $extension);
+    $filename = sprintf('%s%s.%s', $filePrefix, $invoiceNumber, $extension);
 
     $uploadedFile->moveTo($uploadDir . DIRECTORY_SEPARATOR . $filename);
 
@@ -215,9 +213,16 @@ function moveUploadedFile($uploadDir, $uploadedFile, $desc)
 }
 
 // Generate new invoice number (format: YYYY-000001)
-function incrementInvoiceCode($invoiceNumber) {
+function incrementInvoiceCode() {
+    // Get database connection
+    $db = getDbConnection();
+
+    // Get the next invoice number
+    $lastInvoiceNumber = $db->query('SELECT "invoiceNumber" FROM invoice ORDER BY id DESC LIMIT 1')
+                ->fetch(PDO::FETCH_COLUMN);
+
     // Split the invoice number
-    $parts = explode('-', $invoiceNumber);
+    $parts = explode('-', $lastInvoiceNumber);
     $number = end($parts);
 
     // Increment the numeric part and keep it zero-padded to 6 digits
