@@ -295,7 +295,33 @@ const InvoiceForm: React.FC = () => {
               }
             />
           </Grid>
-          <Grid size={6}>
+          <Grid
+            size={6}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={invoice.paid}
+                  onChange={(e) => handleInvoiceChange(e)}
+                  name="paid"
+                  aria-checked={invoice.paid ? "true" : "false"}
+                />
+              }
+              label="Payé"
+              aria-live="polite"
+            />
+          </Grid>
+          <Grid
+            size={12}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
             <Typography variant="h6">
               Total TTC :{" "}
               {invoice.category_id && invoice.category_id !== 0 ? (
@@ -325,20 +351,6 @@ const InvoiceForm: React.FC = () => {
                 ""
               )}
             </Typography>
-          </Grid>
-          <Grid size={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={invoice.paid}
-                  onChange={(e) => handleInvoiceChange(e)}
-                  name="paid"
-                  aria-checked={invoice.paid ? "true" : "false"}
-                />
-              }
-              label="Payé"
-              aria-live="polite"
-            />
           </Grid>
           <Grid
             size={12}
