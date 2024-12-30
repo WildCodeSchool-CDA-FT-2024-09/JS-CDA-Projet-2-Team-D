@@ -160,15 +160,11 @@ const InvoiceForm: React.FC = () => {
       formData.append("total", invoice.total.toString());
       formData.append("bankAccountId", ""); // optional field
 
-      const response = await axios.post(
-        "http://localhost:7100/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await axios.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
+      });
 
       console.info("Réponse du serveur :", response.data);
       alert("Facture envoyée avec succès !");
