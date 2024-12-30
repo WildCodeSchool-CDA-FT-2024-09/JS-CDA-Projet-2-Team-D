@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, TextFieldProps } from "@mui/material";
+import { TextField, TextFieldProps, FormHelperText } from "@mui/material";
 
 interface FormTextFieldProps extends Omit<TextFieldProps, "name"> {
   name: string;
@@ -11,8 +11,10 @@ interface FormTextFieldProps extends Omit<TextFieldProps, "name"> {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
+  error?: boolean;
+  helperText?: string;
   validate?: (value: unknown) => undefined | string | Promise<unknown>;
-  reset?: boolean; // Ajout d'un prop reset pour réinitialiser le champ
+  reset?: boolean;
 }
 
 const FormTextField: React.FC<FormTextFieldProps> = ({
@@ -23,20 +25,28 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
   rows,
   value,
   onChange,
+  error = false,
+  helperText,
 }) => {
   return (
-    <TextField
-      name={name}
-      fullWidth
-      label={label}
-      required={required}
-      multiline={multiline}
-      rows={rows}
-      value={value} // Utilisation de l'état local pour contrôler la valeur
-      onChange={(e) => {
-        onChange?.(e); // Appeler la fonction onChange, si elle est fournie
-      }}
-    />
+    <>
+      <TextField
+        name={name}
+        fullWidth
+        label={label}
+        required={required}
+        multiline={multiline}
+        rows={rows}
+        value={value}
+        onChange={(e) => {
+          onChange?.(e);
+        }}
+        error={error}
+      />
+      {error && helperText && (
+        <FormHelperText error>{helperText}</FormHelperText>
+      )}
+    </>
   );
 };
 

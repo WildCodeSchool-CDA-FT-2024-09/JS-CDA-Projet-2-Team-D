@@ -264,7 +264,9 @@ const InvoiceForm: React.FC = () => {
             label="Libellé"
             value={invoice.label || ""}
             onChange={handleInvoiceChange}
-            required
+            required={true}
+            error={invoice.label.length === 0}
+            helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
           />
           <Grid size={6}>
             <FormTextField
@@ -273,7 +275,11 @@ const InvoiceForm: React.FC = () => {
               type="number"
               value={invoice.price_without_vat.toString()}
               onChange={handleInvoiceChange}
-              required
+              required={true}
+              error={invoice.price_without_vat === 0}
+              helperText={
+                invoice.price_without_vat === 0 ? "Ce champ est requis" : ""
+              }
             />
           </Grid>
           <Grid size={6}>
