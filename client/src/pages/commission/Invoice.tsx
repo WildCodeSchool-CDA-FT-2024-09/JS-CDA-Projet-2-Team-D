@@ -110,6 +110,25 @@ const InvoiceForm: React.FC = () => {
     }
     console.info("Données de la facture :", invoice);
 
+    // Vérifications des champs obligatoires
+    const missingFields: string[] = [];
+    if (!invoice.commission_id) missingFields.push("Commissions");
+    if (!invoice.date) missingFields.push("Date de la facture");
+    if (!invoice.category_id) missingFields.push("Catégories");
+    if (!invoice.subcategory_id) missingFields.push("Sous-catégories");
+    if (!invoice.label) missingFields.push("Libellé");
+    if (!invoice.price_without_vat) missingFields.push("Prix HT");
+    if (!invoice.vat_id) missingFields.push("Taux de TVA");
+    if (!invoice.receipt) missingFields.push("Justificatif");
+
+    if (missingFields.length > 0) {
+      alert(
+        `Veuillez remplir les champs obligatoires suivants :\n- ${missingFields.join("\n- ")}`,
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       if (!userId) {
         throw new Error("Utilisateur non connecté");
