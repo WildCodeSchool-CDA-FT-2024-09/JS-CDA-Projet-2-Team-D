@@ -7,7 +7,9 @@ export const validateExerciseSchema = z
       .string()
       .min(1, { message: "Libellé requis" })
       .max(100, { message: "Libellé trop long (max 100 caractères)" })
-      .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, { message: "Libellé invalide" }),
+      .regex(/^[0-9a-zA-ZÀ-ÿ\s-]+$/, {
+        message: "Seuls les caractères alphanumériques sont autorisés",
+      }),
 
     start_date: z.date({
       required_error: "La date de début est requise",
@@ -21,5 +23,5 @@ export const validateExerciseSchema = z
   })
   .refine((data) => data.end_date > data.start_date, {
     message: "La date de fin doit être après la date de début",
-    path: ["end_date"], // This shows the error on the end_date field
+    path: ["end_date"],
   });

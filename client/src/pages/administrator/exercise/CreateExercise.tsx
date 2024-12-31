@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
 import { validateExerciseSchema } from "../../../utils/exerciseValidation";
 import { useCreateNewExerciseMutation } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
@@ -8,7 +9,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
 import BtnLink from "../../../components/BtnLink";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -26,6 +27,8 @@ type FormValues = {
 };
 
 export default function CreateExercise() {
+  const navigate = useNavigate();
+
   const [createNewExercise] = useCreateNewExerciseMutation();
 
   const handleStartDateChange = async (date: Date | null) => {
@@ -84,12 +87,11 @@ export default function CreateExercise() {
 
       notifySuccess("Exercice ajouté avec succès");
 
-      // Reset the form
-      if (formData.label) setValue("label", "");
-      if (formData.start_date) setValue("start_date", today);
-      if (formData.end_date) setValue("end_date", nextYear);
+      navigate("/administrator/exercise");
     } catch (error) {
-      notifyError("Erreur lors de l'ajout de l'exercice");
+      notifyError(
+        "Erreur lors de l'ajout de l'exercice. Le libellé existe-t-il déjà ?",
+      );
       console.error("Erreur lors de l'ajout de l'exercice", error);
     }
   };
@@ -136,11 +138,10 @@ export default function CreateExercise() {
       >
         <Grid container spacing={2}>
           <Grid size={12}>
-            {errors && (
-              <p>
-                {errors.label?.message} {errors.start_date?.message}{" "}
-                {errors.end_date?.message}
-              </p>
+            {errors.end_date && (
+              <Typography color="error" sx={{ marginBottom: "1em" }}>
+                Attention : {errors.end_date?.message}
+              </Typography>
             )}
             <TextField
               {...register("label")}
