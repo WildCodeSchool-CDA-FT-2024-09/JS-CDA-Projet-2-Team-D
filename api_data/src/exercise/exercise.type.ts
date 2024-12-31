@@ -1,5 +1,5 @@
 import { InputType, Field } from "type-graphql";
-import { IsString, IsNotEmpty, Length } from "class-validator";
+import { IsString, IsNotEmpty, Length, IsDate } from "class-validator";
 
 export type Exercise = {
   id: number;
@@ -16,15 +16,13 @@ export class ExerciseInput {
   @Length(1, 100)
   label: string;
 
-  @Field(() => String)
-  @IsString()
+  @Field(() => Date)
   @IsNotEmpty()
-  @Length(1, 50)
+  @IsDate()
   start_date: Date;
 
-  @Field(() => String)
-  @IsString()
+  @Field(() => Date)
   @IsNotEmpty()
-  @Length(1, 50)
+  @IsDate()
   end_date: Date;
 }
