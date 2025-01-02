@@ -8,9 +8,10 @@ import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
-import ManageExercise from "./pages/administrator/exercise/ManageExercise.tsx";
 import CreateUser from "./pages/administrator/user/CreateUser.tsx";
 import UpdateUser from "./pages/administrator/user/UpdateUser.tsx";
+import ManageExercise from "./pages/administrator/exercise/ManageExercise.tsx";
+import CreateExercise from "./pages/administrator/exercise/CreateExercise.tsx";
 import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <ManageExercise />,
+              },
+              {
+                path: "add",
+                element: <CreateExercise />,
               },
             ],
           },

@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Field, ObjectType, Int } from "type-graphql";
-import { IsNotEmpty, IsString, Length } from "class-validator";
+import { IsNotEmpty, IsString, Length, IsDate } from "class-validator";
 import { Budget } from "../budget/budget.entity";
 
 @ObjectType()
@@ -24,11 +24,15 @@ export class Exercise extends BaseEntity {
   @Column({ nullable: false, unique: true, type: "varchar", length: 100 })
   label: string;
 
-  @Field(() => String)
+  @Field(() => Date)
+  @IsNotEmpty()
+  @IsDate()
   @Column({ type: "timestamp" })
   start_date: Date;
 
-  @Field(() => String)
+  @Field(() => Date)
+  @IsNotEmpty()
+  @IsDate()
   @Column({ type: "timestamp" })
   end_date: Date;
 
