@@ -230,6 +230,11 @@ function incrementInvoiceCode() {
     // Fetch the result
     $lastInvoiceNumber = $query->fetchColumn();
 
+    // If there is no invoice (ex. at the beginning of a new year)
+    if (!$lastInvoiceNumber) {
+        $lastInvoiceNumber = "0";
+    }
+
     // Split the invoice number
     $parts = explode('_', $lastInvoiceNumber);
     $number = end($parts);
