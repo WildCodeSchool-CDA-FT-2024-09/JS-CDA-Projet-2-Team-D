@@ -162,32 +162,37 @@ import { AppDataSource } from "./data-source";
       ('super@admin.net', 'Super', 'Admin', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
     `);
 
-    // insert user_roles_role
+    // insert ADMINs in user_roles_role
     await queryRunner.query(`
-      INSERT INTO "user_roles_role" ("userId", "roleId") VALUES
-        (1,	3),
-        (2,	3),
-        (3,	3),
-        (4,	3),
-        (5, 3),
-        (6, 3),
-        (7, 3),
-        (8, 3),
-        (9, 3),
-        (10, 3),
-        (11, 3),
-        (12, 3),
-        (13, 3),
-        (14, 3),
-        (15, 3),
-        (16, 3),
-        (17, 3),
-        (18, 3),
-        (19, 3),
-        (20, 3),
-        (21, 1),
-        (21, 2),
-        (21, 3);
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT DISTINCT
+        id,
+        1
+      FROM "user"
+      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'super@admin.net')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
+    `);
+
+    // insert ACCOUNTANTs in user_roles_role
+    await queryRunner.query(`
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT
+        id,
+        2
+      FROM "user"
+      WHERE email IN ('claire.simon@association.com', 'nicolas.perret@association.com', 'super@admin.net')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
+    `);
+
+    // insert COMMISSION USERs in user_roles_role
+    await queryRunner.query(`
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT
+        id,
+        3
+      FROM "user"
+      WHERE email NOT IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'nicolas.perret@association.com')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
     // insert user-commission relationships
