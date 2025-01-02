@@ -113,7 +113,8 @@ import { AppDataSource } from "./data-source";
         ('ursula.rogers@example.com', 'Ursula', 'Rogers', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8'),
         ('vincent.harris@example.com', 'Vincent', 'Commission', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8'),
         ('wanda.hayes@example.com', 'Wanda', 'Comptable', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8'),
-        ('zen@noisette.net', 'Zen', 'Noisette', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
+        ('zen@noisette.net', 'Zen', 'Noisette', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8'),
+        ('super@admin.net', 'Super', 'Admin', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
     `);
 
     // insert user_roles_role
@@ -176,7 +177,10 @@ import { AppDataSource } from "./data-source";
         (52, 3),
         (53, 3),
         (54, 2),
-        (55, 1);
+        (55, 1),
+        (56, 1),
+        (56, 2),
+        (56, 3);
     `);
 
     // insert banks
@@ -367,7 +371,8 @@ import { AppDataSource } from "./data-source";
       (2,	3),
       (3,	3),
       (4,	1),
-      (4,	2);
+      (4,	2),
+      (56, 3);
   `);
 
     await queryRunner.commitTransaction();

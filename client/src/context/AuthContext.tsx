@@ -40,12 +40,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check authentication status on mount
     checkAuth();
-  }, []);
+  }, [window.location.pathname]);
 
-  const { data: loggedInUser, error: loggedInUserError } =
-    useGetAuthenticatedUserQuery();
+  const {
+    //data: loggedInUser,
+    error: loggedInUserError,
+    refetch,
+  } = useGetAuthenticatedUserQuery({
+    fetchPolicy: "network-only", // Don't use cache
+    errorPolicy: "all", // Handle errors without throwing
+    // This ensures the query runs on component mount
+    skip: false,
+    // Add credentials to all requests
+    context: {
+      credentials: "include",
+    },
+  });
 
   const checkAuth = async () => {
+    // Manually refetch to ensure fresh data
+    const { data: loggedInUser } = await refetch();
+
     try {
       if (!loggedInUserError && loggedInUser) {
         setUser({
@@ -57,8 +72,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             role.id.toString(),
           ),
         });
+      } else {
+        setUser(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("Auth check failed:", error);
       setUser(null);
     } finally {
       setLoading(false);

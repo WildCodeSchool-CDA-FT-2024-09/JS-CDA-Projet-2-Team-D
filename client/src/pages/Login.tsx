@@ -157,6 +157,7 @@ export default function Login() {
         <Stack spacing={2} sx={{ marginTop: "4em", marginBottom: "2em" }}>
           <Grid2 container spacing={12}>
             Comptes de démonstration : <br />
+            SUPERADMIN: super@admin.net (mdp : whS0@cqnuros ) <br />
             Administrateur : zen@noisette.net (mdp : whS0@cqnuros )
             <br />
             Comptable : wanda.hayes@example.com (mdp : whS0@cqnuros )

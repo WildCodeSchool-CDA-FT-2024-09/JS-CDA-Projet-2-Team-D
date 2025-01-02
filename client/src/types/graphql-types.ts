@@ -28,7 +28,16 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: string; output: string };
+  DateTimeISO: { input: unknown; output: unknown };
+};
+
+export type AuthenticatedUserResponse = {
+  __typename?: "AuthenticatedUserResponse";
+  email: Scalars["String"]["output"];
+  firstname: Scalars["String"]["output"];
+  id: Scalars["Float"]["output"];
+  lastname: Scalars["String"]["output"];
+  roles: Array<UserRoleInput>;
 };
 
 export type AuthenticatedUserResponse = {
@@ -525,7 +534,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: string;
+    date: unknown;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -602,7 +611,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: string;
+      date: unknown;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -645,37 +654,6 @@ export type GetCurrentBudgetByCommissionIdQuery = {
     __typename?: "Budget";
     amount: number;
   } | null;
-};
-
-export type GetAuthenticatedUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type GetAuthenticatedUserQuery = {
-  __typename?: "Query";
-  getAuthenticatedUser: {
-    __typename?: "AuthenticatedUserResponse";
-    id: number;
-    firstname: string;
-    lastname: string;
-    email: string;
-    roles: Array<{ __typename?: "UserRoleInput"; id: number }>;
-  };
-};
-
-export type GetBudgetOverviewQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GetBudgetOverviewQuery = {
-  __typename?: "Query";
-  getBudgetOverview: {
-    __typename?: "BudgetOverview";
-    globalBudget: number;
-    budgets: Array<{
-      __typename?: "Budget";
-      amount: number;
-      commissions: { __typename?: "Commission"; name: string };
-    }>;
-  };
 };
 
 export const AddCategoryDocument = gql`
@@ -2033,172 +2011,6 @@ export type GetCurrentBudgetByCommissionIdQueryResult = Apollo.QueryResult<
   GetCurrentBudgetByCommissionIdQuery,
   GetCurrentBudgetByCommissionIdQueryVariables
 >;
-export const GetAuthenticatedUserDocument = gql`
-  query GetAuthenticatedUser {
-    getAuthenticatedUser {
-      id
-      firstname
-      lastname
-      email
-      roles {
-        id
-      }
-    }
-  }
-`;
-
-/**
- * __useGetAuthenticatedUserQuery__
- *
- * To run a query within a React component, call `useGetAuthenticatedUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAuthenticatedUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAuthenticatedUserQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetAuthenticatedUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetAuthenticatedUserQuery,
-    GetAuthenticatedUserQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetAuthenticatedUserQuery,
-    GetAuthenticatedUserQueryVariables
-  >(GetAuthenticatedUserDocument, options);
-}
-export function useGetAuthenticatedUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAuthenticatedUserQuery,
-    GetAuthenticatedUserQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetAuthenticatedUserQuery,
-    GetAuthenticatedUserQueryVariables
-  >(GetAuthenticatedUserDocument, options);
-}
-export function useGetAuthenticatedUserSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetAuthenticatedUserQuery,
-        GetAuthenticatedUserQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetAuthenticatedUserQuery,
-    GetAuthenticatedUserQueryVariables
-  >(GetAuthenticatedUserDocument, options);
-}
-export type GetAuthenticatedUserQueryHookResult = ReturnType<
-  typeof useGetAuthenticatedUserQuery
->;
-export type GetAuthenticatedUserLazyQueryHookResult = ReturnType<
-  typeof useGetAuthenticatedUserLazyQuery
->;
-export type GetAuthenticatedUserSuspenseQueryHookResult = ReturnType<
-  typeof useGetAuthenticatedUserSuspenseQuery
->;
-export type GetAuthenticatedUserQueryResult = Apollo.QueryResult<
-  GetAuthenticatedUserQuery,
-  GetAuthenticatedUserQueryVariables
->;
-export const GetBudgetOverviewDocument = gql`
-  query GetBudgetOverview {
-    getBudgetOverview {
-      globalBudget
-      budgets {
-        amount
-        commissions {
-          name
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useGetBudgetOverviewQuery__
- *
- * To run a query within a React component, call `useGetBudgetOverviewQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetBudgetOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetBudgetOverviewQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetBudgetOverviewQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetBudgetOverviewQuery,
-    GetBudgetOverviewQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetBudgetOverviewQuery,
-    GetBudgetOverviewQueryVariables
-  >(GetBudgetOverviewDocument, options);
-}
-export function useGetBudgetOverviewLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetBudgetOverviewQuery,
-    GetBudgetOverviewQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetBudgetOverviewQuery,
-    GetBudgetOverviewQueryVariables
-  >(GetBudgetOverviewDocument, options);
-}
-export function useGetBudgetOverviewSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetBudgetOverviewQuery,
-        GetBudgetOverviewQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetBudgetOverviewQuery,
-    GetBudgetOverviewQueryVariables
-  >(GetBudgetOverviewDocument, options);
-}
-export type GetBudgetOverviewQueryHookResult = ReturnType<
-  typeof useGetBudgetOverviewQuery
->;
-export type GetBudgetOverviewLazyQueryHookResult = ReturnType<
-  typeof useGetBudgetOverviewLazyQuery
->;
-export type GetBudgetOverviewSuspenseQueryHookResult = ReturnType<
-  typeof useGetBudgetOverviewSuspenseQuery
->;
-export type GetBudgetOverviewQueryResult = Apollo.QueryResult<
-  GetBudgetOverviewQuery,
-  GetBudgetOverviewQueryVariables
->;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2210,8 +2022,6 @@ export const namedOperations = {
     GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
     GetUserById: "GetUserById",
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
-    GetAuthenticatedUser: "GetAuthenticatedUser",
-    GetBudgetOverview: "GetBudgetOverview",
   },
   Mutation: {
     AddCategory: "AddCategory",

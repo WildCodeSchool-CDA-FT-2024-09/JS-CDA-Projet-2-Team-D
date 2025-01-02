@@ -1,11 +1,5 @@
-import {
-  useGetCategoriesQuery,
-  useUpdateCategoryMutation,
-  useUpdateSubcategoryMutation,
-  useAddSubcategoryMutation,
-} from "../../types/graphql-types";
+import { useGetCategoriesQuery } from "../../types/graphql-types";
 import { useState } from "react";
-import useNotification from "../../hooks/useNotification";
 
 import {
   Table,
@@ -25,10 +19,7 @@ import {
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CreateIcon from "@mui/icons-material/Create";
-import AddCircleOutline from "@mui/icons-material/AddCircleOutline";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-
-import { Button } from "@mui/material";
 
 function createData(
   label: string,
@@ -50,6 +41,10 @@ function createData(
   };
 }
 
+import UpdateCategory from "../updateCategory/UpdateCategory";
+import AddSubcategory from "../addSubcategory/AddSubcategory";
+import UpdateSubcategory from "../updateSubcategory/UpdateSubcategory";
+
 function Row(props: {
   row: ReturnType<typeof createData>;
   rows: ReturnType<typeof createData>[];
@@ -57,127 +52,11 @@ function Row(props: {
 }) {
   const { row, rows, creditDebitOptions } = props;
   const [open, setOpen] = useState(false);
-  const [showInput, setShowInput] = useState(false);
   const [editCategory, setEditCategory] = useState(false);
 
   const [editSubcategoryId, setEditSubcategoryId] = useState<number>(0);
 
-  const [newCategoryLabel, setNewCategoryLabel] = useState("");
-  const [newCreditDebitId, setNewCreditDebitId] = useState<number>(0);
-
-  const [newSubcategoryLabel, setNewSubcategoryLabel] = useState("");
-  const [newSubcategoryCode, setNewSubcategoryCode] = useState("");
-
-  const [updateSubcategoryLabel, setUpdateSubcategoryLabel] = useState("");
-  const [updateSubcategoryCode, setUpdateSubcategoryCode] = useState("");
-
-  const [addASubcategory] = useAddSubcategoryMutation();
-
-  const [updateCategory] = useUpdateCategoryMutation();
-  const [updateSubcategory] = useUpdateSubcategoryMutation();
-
-  const { notifySuccess, notifyError } = useNotification();
-
   const theme = useTheme();
-
-  const handleValidation = (): boolean => {
-    if (!newSubcategoryLabel && !newSubcategoryCode) {
-      notifyError("Veuillez remplir les champs");
-      return false;
-    }
-    if (!newSubcategoryLabel) {
-      notifyError("Veuillez remplir le champ 'Nom de la sous-catégorie'");
-      return false;
-    }
-
-    if (!newSubcategoryCode) {
-      notifyError("Veuillez remplir le champ 'Code de la sous-catégorie'");
-      return false;
-    }
-    if (row.subcategory.find((sub) => sub.label === newSubcategoryLabel)) {
-      notifyError("Cette sous-catégorie existe déjà");
-      return false;
-    }
-    return true;
-  };
-
-  const handleClick = async () => {
-    if (!handleValidation()) return;
-
-    try {
-      await addASubcategory({
-        variables: {
-          label: newSubcategoryLabel,
-          code: newSubcategoryCode,
-          categoryId: row.categoryId,
-        },
-        refetchQueries: ["GetCategories"],
-      });
-
-      setNewSubcategoryLabel("");
-      setNewSubcategoryCode("");
-      setShowInput(!showInput);
-      notifySuccess("Sous-catégorie ajoutée avec succès");
-    } catch (err) {
-      console.info(err);
-      notifyError("Erreur lors de l'ajout de la sous-catégorie");
-    }
-  };
-
-  const handleValidationCategory = (): boolean => {
-    const isCreditDebitIdChanged =
-      newCreditDebitId && newCreditDebitId !== row.creditDebitId;
-    const isCategoryLabelChanged =
-      newCategoryLabel && newCategoryLabel !== row.categoryLabel;
-
-    if (!isCreditDebitIdChanged && !isCategoryLabelChanged) {
-      notifyError("Aucune modification effectuée");
-      return false;
-    }
-
-    if (newCreditDebitId === 0) {
-      notifyError("Veuillez sélectionner un type de crédit/débit valide !");
-      return false;
-    }
-
-    if (
-      rows.some(
-        (existingRow) =>
-          existingRow.categoryLabel === newCategoryLabel &&
-          existingRow.categoryId !== row.categoryId,
-      )
-    ) {
-      notifyError("Cette catégorie existe déjà");
-      return false;
-    }
-    return true;
-  };
-
-  const handleUpdateCategory = async () => {
-    if (!handleValidationCategory()) return;
-
-    const variables: {
-      id: number;
-      label: string;
-      creditDebitId: number;
-    } = {
-      id: row.categoryId,
-      label: newCategoryLabel || row.categoryLabel,
-      creditDebitId: newCreditDebitId || row.creditDebitId,
-    };
-
-    try {
-      await updateCategory({
-        variables,
-        refetchQueries: ["GetCategories"],
-      });
-      setEditCategory(false);
-      notifySuccess("Catégorie modifiée avec succès");
-    } catch (err) {
-      console.info(err);
-      notifyError("Erreur lors de la modification de la catégorie");
-    }
-  };
 
   interface Subcategory {
     id: number;
@@ -187,90 +66,10 @@ function Row(props: {
 
   const handleEditSubcategory = (sub: Subcategory) => {
     setEditSubcategoryId(sub.id);
-    setUpdateSubcategoryLabel(sub.label);
-    setUpdateSubcategoryCode(sub.code);
-  };
-
-  const handleCancelEditSubcategory = () => {
-    setEditSubcategoryId(0);
-    setUpdateSubcategoryCode("");
-    setUpdateSubcategoryLabel("");
   };
 
   const handleClickCategory = () => {
-    setNewCreditDebitId(row.creditDebitId);
-    setNewCategoryLabel(row.categoryLabel);
     setEditCategory(true);
-  };
-
-  const handleValidationSubcategory = (): boolean => {
-    const changingSubcategory = row.subcategory.find(
-      (sub) => sub.id === editSubcategoryId,
-    );
-
-    if (!changingSubcategory) {
-      notifyError("Sous-catégorie introuvable");
-      return false;
-    }
-
-    const isSubcategoryLabelChanged =
-      changingSubcategory.label !== updateSubcategoryLabel;
-
-    const isSubcategoryCodeChanged =
-      changingSubcategory.code !== updateSubcategoryCode;
-
-    if (!isSubcategoryLabelChanged && !isSubcategoryCodeChanged) {
-      notifyError("Aucune modification effectuée");
-      return false;
-    }
-
-    if (
-      row.subcategory.find(
-        (sub) =>
-          sub.label === updateSubcategoryLabel && sub.id !== editSubcategoryId,
-      )
-    ) {
-      notifyError("Cette sous-catégorie existe déjà");
-      return false;
-    }
-
-    if (
-      row.subcategory.find(
-        (sub) =>
-          sub.code === updateSubcategoryCode && sub.id !== editSubcategoryId,
-      )
-    ) {
-      notifyError("Ce code de sous-catégorie existe déjà");
-      return false;
-    }
-    return true;
-  };
-
-  const handleUpdateSubcategory = async (
-    id: number,
-    label: string,
-    code: string,
-  ) => {
-    if (!handleValidationSubcategory()) return;
-
-    const variables = {
-      id,
-      label,
-      code,
-      categoryId: row.categoryId,
-    };
-
-    try {
-      await updateSubcategory({
-        variables,
-        refetchQueries: ["GetCategories"],
-      });
-      setEditSubcategoryId(0);
-      notifySuccess("Sous-catégorie modifiée avec succès");
-    } catch (err) {
-      console.info(err);
-      notifyError("Erreur lors de la modification de la sous-catégorie");
-    }
   };
 
   return (
@@ -291,102 +90,18 @@ function Row(props: {
         </TableCell>
         <TableCell component="th" scope="row" sx={{ fontSize: "1.3rem" }}>
           {editCategory ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                border: "1px solid rgba(0, 0, 0, 0.1)",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                padding: "1rem",
-                borderRadius: "8px",
-                width: "100%",
-                backgroundColor: "white",
-              }}
-            >
-              <Box
-                component="input"
-                type="text"
-                placeholder={`${row.categoryLabel}`}
-                value={newCategoryLabel}
-                onChange={(e) => setNewCategoryLabel(e.target.value)}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
-                    handleUpdateCategory();
-                  }
-                  if (e.key === "Escape") {
-                    setEditCategory(false);
-                  }
-                }}
-                sx={{
-                  fontSize: "2rem",
-                  width: "100%",
-                  padding: "0.5rem",
-                  boxSizing: "border-box",
-                  border: "none",
-                }}
-              />
-              <Box
-                component="select"
-                value={newCreditDebitId}
-                onChange={(e) => setNewCreditDebitId(Number(e.target.value))}
-                sx={{
-                  fontSize: "1.2rem",
-                  color: theme.palette.primary.main,
-                  width: "50%",
-                  padding: "0.5rem",
-                  boxSizing: "border-box",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                {creditDebitOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </Box>
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: "1rem",
-                  marginTop: "1rem",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Button
-                  sx={{
-                    backgroundColor: theme.palette.error.main,
-                    color: "white",
-                    fontWeight: "bold",
-                    border: "none",
-                    width: "90%",
-                    maxWidth: "120px",
-                    height: "4vh",
-                    fontSize: "1.1rem",
-                    marginRight: "8rem",
-                  }}
-                  onClick={() => setEditCategory(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={() => handleUpdateCategory()}
-                  sx={{
-                    backgroundColor: theme.palette.success.main,
-                    color: "white",
-                    fontWeight: "bold",
-                    border: "none",
-                    width: "90%",
-                    maxWidth: "120px",
-                    height: "4vh",
-                    fontSize: "1.1rem",
-                    marginRight: "20rem",
-                  }}
-                >
-                  Valider
-                </Button>
-              </div>
-            </div>
+            <UpdateCategory
+              categoryId={row.categoryId}
+              categoryLabel={row.categoryLabel}
+              creditDebitId={row.creditDebitId}
+              creditDebitOptions={creditDebitOptions}
+              categories={rows.map((row) => ({
+                id: row.categoryId,
+                label: row.categoryLabel,
+                creditDebitId: row.creditDebitId,
+              }))}
+              onClose={() => setEditCategory(false)}
+            />
           ) : (
             <div>
               <div style={{ fontSize: "2rem" }}>{row.categoryLabel}</div>
@@ -460,95 +175,13 @@ function Row(props: {
                   {row.subcategory.map((sub) => (
                     <TableRow key={sub.id}>
                       {editSubcategoryId === sub.id ? (
-                        <TableCell
-                          sx={{
-                            display: "flex",
-                            gap: "1rem",
-                          }}
-                        >
-                          <IconButton onClick={() => setEditSubcategoryId(0)}>
-                            <CreateIcon />
-                          </IconButton>
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Nom de la sous-catégorie"
-                            sx={{
-                              width: "10vh",
-                              maxWidth: "200px",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              textAlign: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={updateSubcategoryLabel}
-                            onChange={(e) =>
-                              setUpdateSubcategoryLabel(e.target.value)
-                            }
-                          />
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Code de la sous-catégorie"
-                            sx={{
-                              width: "10vh",
-                              maxWidth: "200px",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              textAlign: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={updateSubcategoryCode}
-                            onChange={(e) =>
-                              setUpdateSubcategoryCode(e.target.value)
-                            }
-                          />
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: "1rem",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Button
-                              sx={{
-                                width: "10%",
-                                maxWidth: "50px",
-                                height: "4vh",
-                                fontSize: "0.6rem",
-                                backgroundColor: theme.palette.success.main,
-                                color: "white",
-                                border: "none",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUpdateSubcategory(
-                                  sub.id,
-                                  updateSubcategoryLabel,
-                                  updateSubcategoryCode,
-                                );
-                                setEditSubcategoryId(0);
-                              }}
-                            >
-                              Valider
-                            </Button>
-                            <Button
-                              sx={{
-                                width: "10%",
-                                maxWidth: "120px",
-                                height: "4vh",
-                                fontSize: "0.6rem",
-                                backgroundColor: theme.palette.error.main,
-                                color: "white",
-                                border: "none",
-                                fontWeight: "bold",
-                              }}
-                              onClick={handleCancelEditSubcategory}
-                            >
-                              Annuler
-                            </Button>
-                          </Box>
-                        </TableCell>
+                        <UpdateSubcategory
+                          sub={sub}
+                          categoryId={row.categoryId}
+                          subcategories={row.subcategory}
+                          editSubcategoryId={editSubcategoryId}
+                          onClose={() => setEditSubcategoryId(0)}
+                        />
                       ) : (
                         <>
                           <TableCell
@@ -588,110 +221,10 @@ function Row(props: {
                     </TableRow>
                   ))}
 
-                  <TableRow>
-                    <TableCell
-                      sx={{ paddingBottom: "5vh", fontSize: "1.1rem" }}
-                    >
-                      <Typography>
-                        <IconButton onClick={() => setShowInput(!showInput)}>
-                          <AddCircleOutline />
-                        </IconButton>
-                        Ajouter une sous-catégorie
-                      </Typography>
-                      {showInput && (
-                        <Box
-                          sx={{
-                            marginTop: "2rem",
-                            padding: "1rem",
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "1rem",
-                            }}
-                          >
-                            <Box
-                              component="input"
-                              type="text"
-                              placeholder="Nom de la sous-catégorie"
-                              sx={{
-                                width: "100%",
-                                maxWidth: "300px",
-                                height: "4vh",
-                                fontSize: "1.1rem",
-                                textAlign: "center",
-                                padding: "0.5vh",
-                              }}
-                              value={newSubcategoryLabel}
-                              onChange={(e) =>
-                                setNewSubcategoryLabel(e.target.value)
-                              }
-                            />
-                            <Box
-                              component="input"
-                              type="text"
-                              placeholder="Code de la sous-catégorie"
-                              sx={{
-                                width: "100%",
-                                maxWidth: "300px",
-                                height: "4vh",
-                                fontSize: "1.1rem",
-                                textAlign: "center",
-                                padding: "0.5vh",
-                              }}
-                              value={newSubcategoryCode}
-                              onChange={(e) =>
-                                setNewSubcategoryCode(e.target.value)
-                              }
-                            />
-                            <Box
-                              sx={{
-                                display: "flex",
-                                gap: "1rem",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Button
-                                sx={{
-                                  width: "100%",
-                                  maxWidth: "120px",
-                                  height: "4vh",
-                                  fontSize: "1.1rem",
-                                  backgroundColor: theme.palette.success.main,
-                                  color: "white",
-                                  border: "none",
-                                  fontWeight: "bold",
-                                }}
-                                onClick={handleClick}
-                              >
-                                Valider
-                              </Button>
-                              <Button
-                                sx={{
-                                  width: "100%",
-                                  maxWidth: "120px",
-                                  height: "4vh",
-                                  fontSize: "1.1rem",
-                                  backgroundColor: theme.palette.error.main,
-                                  color: "white",
-                                  border: "none",
-                                  fontWeight: "bold",
-                                }}
-                                onClick={() => setShowInput(false)}
-                              >
-                                Annuler
-                              </Button>
-                            </Box>
-                          </Box>
-                        </Box>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                  <AddSubcategory
+                    categoryId={row.categoryId}
+                    subcategories={row.subcategory}
+                  />
                 </TableBody>
               </Table>
             </Box>

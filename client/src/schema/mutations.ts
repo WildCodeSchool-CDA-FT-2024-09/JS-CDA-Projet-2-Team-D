@@ -135,3 +135,14 @@ export const LOGOUT = gql`
     logout
   }
 `;
+
+export const CREATE_EXERCISE = gql`
+  mutation CreateNewExercise($data: ExerciseInput!) {
+    createNewExercise(data: $data) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;

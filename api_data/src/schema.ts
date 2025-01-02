@@ -11,6 +11,7 @@ import CommissionResolver from "./commission/commission.resolver";
 import InvoiceResolver from "./invoice/invoice.resolver";
 import RoleResolver from "./role/role.resolver";
 import { BudgetResolver } from "./budget/budget.resolver";
+import ExerciseResolver from "./exercise/exercise.resolver";
 
 const getSchema = async () => {
   return await buildSchema({
@@ -27,6 +28,7 @@ const getSchema = async () => {
       InvoiceResolver,
       RoleResolver,
       BudgetResolver,
+      ExerciseResolver,
     ],
     validate: true,
     authChecker: ({ context }): boolean => {
