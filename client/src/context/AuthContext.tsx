@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check authentication status on mount
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.pathname]);
 
   const {
