@@ -110,7 +110,7 @@ const InvoiceForm: React.FC = () => {
     }
     console.info("Données de la facture :", invoice);
 
-    // Vérifications des champs obligatoires
+    // Checks of mandatory fields
     const missingFields: string[] = [];
     if (!invoice.commission_id) missingFields.push("Commissions");
     if (!invoice.date) missingFields.push("Date de la facture");
