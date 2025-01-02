@@ -8,4 +8,5 @@ COPY ./jest.config.ts .
 COPY tests tests
 EXPOSE 4000
 
-CMD ["npm", "run", "devseed"]
+# CMD ["npm", "run", "devseed"]
+CMD ["npm", "run", "initdataset"]

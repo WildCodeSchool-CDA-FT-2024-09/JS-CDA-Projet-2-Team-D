@@ -9,6 +9,11 @@ export default class CategoryResolver {
   async getCategories() {
     return Category.find({
       relations: ["subcategories", "creditDebit"],
+      order: {
+        subcategories: {
+          id: "ASC",
+        },
+      },
     });
   }
 

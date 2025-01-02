@@ -1,9 +1,5 @@
-import {
-  useGetCategoriesQuery,
-  useUpdateSubcategoryMutation,
-} from "../../types/graphql-types";
+import { useGetCategoriesQuery } from "../../types/graphql-types";
 import { useState } from "react";
-import useNotification from "../../hooks/useNotification";
 
 import {
   Table,
@@ -24,8 +20,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CreateIcon from "@mui/icons-material/Create";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-
-import { Button } from "@mui/material";
 
 function createData(
   label: string,
@@ -49,6 +43,7 @@ function createData(
 
 import UpdateCategory from "../updateCategory/UpdateCategory";
 import AddSubcategory from "../addSubcategory/AddSubcategory";
+import UpdateSubcategory from "../updateSubcategory/UpdateSubcategory";
 
 function Row(props: {
   row: ReturnType<typeof createData>;
@@ -61,13 +56,6 @@ function Row(props: {
 
   const [editSubcategoryId, setEditSubcategoryId] = useState<number>(0);
 
-  const [updateSubcategoryLabel, setUpdateSubcategoryLabel] = useState("");
-  const [updateSubcategoryCode, setUpdateSubcategoryCode] = useState("");
-
-  const [updateSubcategory] = useUpdateSubcategoryMutation();
-
-  const { notifySuccess, notifyError } = useNotification();
-
   const theme = useTheme();
 
   interface Subcategory {
@@ -78,88 +66,10 @@ function Row(props: {
 
   const handleEditSubcategory = (sub: Subcategory) => {
     setEditSubcategoryId(sub.id);
-    setUpdateSubcategoryLabel(sub.label);
-    setUpdateSubcategoryCode(sub.code);
-  };
-
-  const handleCancelEditSubcategory = () => {
-    setEditSubcategoryId(0);
-    setUpdateSubcategoryCode("");
-    setUpdateSubcategoryLabel("");
   };
 
   const handleClickCategory = () => {
     setEditCategory(true);
-  };
-
-  const handleValidationSubcategory = (): boolean => {
-    const changingSubcategory = row.subcategory.find(
-      (sub) => sub.id === editSubcategoryId,
-    );
-
-    if (!changingSubcategory) {
-      notifyError("Sous-catégorie introuvable");
-      return false;
-    }
-
-    const isSubcategoryLabelChanged =
-      changingSubcategory.label !== updateSubcategoryLabel;
-
-    const isSubcategoryCodeChanged =
-      changingSubcategory.code !== updateSubcategoryCode;
-
-    if (!isSubcategoryLabelChanged && !isSubcategoryCodeChanged) {
-      notifyError("Aucune modification effectuée");
-      return false;
-    }
-
-    if (
-      row.subcategory.find(
-        (sub) =>
-          sub.label === updateSubcategoryLabel && sub.id !== editSubcategoryId,
-      )
-    ) {
-      notifyError("Cette sous-catégorie existe déjà");
-      return false;
-    }
-
-    if (
-      row.subcategory.find(
-        (sub) =>
-          sub.code === updateSubcategoryCode && sub.id !== editSubcategoryId,
-      )
-    ) {
-      notifyError("Ce code de sous-catégorie existe déjà");
-      return false;
-    }
-    return true;
-  };
-
-  const handleUpdateSubcategory = async (
-    id: number,
-    label: string,
-    code: string,
-  ) => {
-    if (!handleValidationSubcategory()) return;
-
-    const variables = {
-      id,
-      label,
-      code,
-      categoryId: row.categoryId,
-    };
-
-    try {
-      await updateSubcategory({
-        variables,
-        refetchQueries: ["GetCategories"],
-      });
-      setEditSubcategoryId(0);
-      notifySuccess("Sous-catégorie modifiée avec succès");
-    } catch (err) {
-      console.info(err);
-      notifyError("Erreur lors de la modification de la sous-catégorie");
-    }
   };
 
   return (
@@ -265,95 +175,13 @@ function Row(props: {
                   {row.subcategory.map((sub) => (
                     <TableRow key={sub.id}>
                       {editSubcategoryId === sub.id ? (
-                        <TableCell
-                          sx={{
-                            display: "flex",
-                            gap: "1rem",
-                          }}
-                        >
-                          <IconButton onClick={() => setEditSubcategoryId(0)}>
-                            <CreateIcon />
-                          </IconButton>
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Nom de la sous-catégorie"
-                            sx={{
-                              width: "10vh",
-                              maxWidth: "200px",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              textAlign: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={updateSubcategoryLabel}
-                            onChange={(e) =>
-                              setUpdateSubcategoryLabel(e.target.value)
-                            }
-                          />
-                          <Box
-                            component="input"
-                            type="text"
-                            placeholder="Code de la sous-catégorie"
-                            sx={{
-                              width: "10vh",
-                              maxWidth: "200px",
-                              height: "4vh",
-                              fontSize: "1.1rem",
-                              textAlign: "center",
-                              padding: "0.5vh",
-                            }}
-                            value={updateSubcategoryCode}
-                            onChange={(e) =>
-                              setUpdateSubcategoryCode(e.target.value)
-                            }
-                          />
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: "1rem",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Button
-                              sx={{
-                                width: "10%",
-                                maxWidth: "50px",
-                                height: "4vh",
-                                fontSize: "0.6rem",
-                                backgroundColor: theme.palette.success.main,
-                                color: "white",
-                                border: "none",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUpdateSubcategory(
-                                  sub.id,
-                                  updateSubcategoryLabel,
-                                  updateSubcategoryCode,
-                                );
-                                setEditSubcategoryId(0);
-                              }}
-                            >
-                              Valider
-                            </Button>
-                            <Button
-                              sx={{
-                                width: "10%",
-                                maxWidth: "120px",
-                                height: "4vh",
-                                fontSize: "0.6rem",
-                                backgroundColor: theme.palette.error.main,
-                                color: "white",
-                                border: "none",
-                                fontWeight: "bold",
-                              }}
-                              onClick={handleCancelEditSubcategory}
-                            >
-                              Annuler
-                            </Button>
-                          </Box>
-                        </TableCell>
+                        <UpdateSubcategory
+                          sub={sub}
+                          categoryId={row.categoryId}
+                          subcategories={row.subcategory}
+                          editSubcategoryId={editSubcategoryId}
+                          onClose={() => setEditSubcategoryId(0)}
+                        />
                       ) : (
                         <>
                           <TableCell
