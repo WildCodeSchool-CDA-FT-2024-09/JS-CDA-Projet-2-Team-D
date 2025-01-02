@@ -1,7 +1,4 @@
-// import { getNullableType as _getNullableType, isNullableType as _isNullableType } from "graphql";
-
 export interface InvoiceState {
-  [key: string]: unknown;
   commission_id: number | null;
   date: Date | null;
   category_id: number | null;
@@ -21,7 +18,6 @@ export interface InvoiceState {
 
 // ValidInvoice doit aussi avoir l'index signature
 export interface ValidInvoice {
-  [key: string]: unknown; // Ajouter l'index signature ici aussi
   commission_id: number;
   date: Date;
   price_without_vat: number;
@@ -56,24 +52,6 @@ export const initialValues: InvoiceState = {
   user_id: null,
   total: 0,
 };
-
-export interface ValidInvoice {
-  commission_id: number;
-  date: Date;
-  price_without_vat: number;
-  category_id: number;
-  invoice_id: string;
-  subcategory_id: number;
-  label: string;
-  receipt: File;
-  credit_debit_id: number;
-  info: string;
-  paid: boolean;
-  vat_id: number;
-  status_id: number;
-  user_id: number;
-  total: number;
-}
 
 export const isValidInvoice = (
   invoice: InvoiceState,

@@ -7,11 +7,12 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import {
-  useGetCommissionsLazyQuery,
   useGetCategoriesLazyQuery,
-  GetCommissionsQuery,
   GetCategoriesQuery,
+  useGetUserByIdLazyQuery,
+  GetUserByIdQuery,
 } from "../../types/graphql-types";
+import { useUser } from "../../hooks/useUser";
 
 interface FormSelectProps {
   name: string;
@@ -19,7 +20,10 @@ interface FormSelectProps {
   value: string | number;
   subValue?: number | null;
   property: string;
-  handleSelect: (event: SelectChangeEvent<string | number>) => void;
+  handleSelect: (
+    event: SelectChangeEvent<string | number>,
+    creditDebitId?: number,
+  ) => void;
   error?: string;
   required?: boolean;
 }
@@ -31,29 +35,42 @@ const FormSelect: React.FC<FormSelectProps> = ({
   subValue,
   handleSelect,
 }) => {
-  const [getCommissions] = useGetCommissionsLazyQuery();
+  const { user } = useUser();
+  const [getUserById] = useGetUserByIdLazyQuery();
   const [getCategory] = useGetCategoriesLazyQuery();
   const [items, setItems] = useState<
-    GetCommissionsQuery | GetCategoriesQuery
+    GetUserByIdQuery["getUserById"]["commissions"] | GetCategoriesQuery
   >();
 
   useEffect(() => {
     const getItems = async () => {
-      let result: GetCommissionsQuery | GetCategoriesQuery | null = null;
-      if (name === "commission_id") {
-        const { data } = await getCommissions();
-        result = data as GetCommissionsQuery;
-      }
-      if (name === "category_id" || name === "subcategory_id") {
-        const { data } = await getCategory();
-        result = data as GetCategoriesQuery;
-      }
-      if (result) {
-        setItems(result);
+      try {
+        if (name === "commission_id") {
+          if (!user?.id) {
+            console.error(
+              "Impossible de récupérer les commissions sans utilisateur connecté.",
+            );
+            return;
+          }
+          const { data } = await getUserById({
+            variables: { userId: user.id },
+          });
+          if (data && data.getUserById) {
+            setItems(data.getUserById.commissions);
+          }
+        } else if (name === "category_id" || name === "subcategory_id") {
+          const { data } = await getCategory();
+          if (data) {
+            setItems(data);
+          }
+        }
+      } catch (err) {
+        console.error("Erreur lors du chargement des données :", err);
       }
     };
+
     getItems();
-  }, [name, getCategory, getCommissions]);
+  }, [name, user, getUserById, getCategory]); // Dépend de `user`
 
   const getCreditDebitId = (categoryId: number): number => {
     if (items && "getCategories" in items) {
@@ -82,54 +99,53 @@ const FormSelect: React.FC<FormSelectProps> = ({
     return subOptions?.subcategories || [];
   };
 
-  if (!items) return <p>Loading</p>;
+  if (!items) return <p>Loading...</p>;
 
-  if (items)
-    return (
-      <FormControl fullWidth>
-        <InputLabel>{label}</InputLabel>
-        <Select
-          name={name}
-          label={label}
-          value={value.toString() ?? ""}
-          onChange={launchSelect}
-          aria-label={`${label} sélectionné : $ ${value.toString() || "Non sélectionné"}`}
-        >
-          {name === "commission_id" &&
-            "getCommissions" in items &&
-            items.getCommissions.map((item) => (
-              <MenuItem key={item.id} value={item.id.toString()}>
-                {item.name}
-              </MenuItem>
-            ))}
+  return (
+    <FormControl fullWidth>
+      <InputLabel>{label}</InputLabel>
+      <Select
+        name={name}
+        label={label}
+        value={value.toString() ?? ""}
+        onChange={launchSelect}
+        aria-label={`${label} sélectionné : ${value.toString() || "Non sélectionné"}`}
+      >
+        {name === "commission_id" &&
+          Array.isArray(items) &&
+          items.map((item) => (
+            <MenuItem key={item.id} value={item.id.toString()}>
+              {item.name}
+            </MenuItem>
+          ))}
 
-          {name === "category_id" &&
-            "getCategories" in items &&
-            items.getCategories.map((item) => (
-              <MenuItem key={item.id} value={item.id.toString()}>
-                {item.label}
-              </MenuItem>
-            ))}
+        {name === "category_id" &&
+          "getCategories" in items &&
+          items.getCategories.map((item) => (
+            <MenuItem key={item.id} value={item.id.toString()}>
+              {item.label}
+            </MenuItem>
+          ))}
 
-          {name === "subcategory_id" &&
-            (() => {
-              const subcategories = getItemsToDisplay();
-              if (subcategories.length === 0) {
-                return (
-                  <MenuItem disabled>
-                    Veuillez choisir avant une catégorie
-                  </MenuItem>
-                );
-              }
-              return subcategories.map((subOption) => (
-                <MenuItem key={subOption.id} value={subOption.id.toString()}>
-                  {subOption.label}
+        {name === "subcategory_id" &&
+          (() => {
+            const subcategories = getItemsToDisplay();
+            if (subcategories.length === 0) {
+              return (
+                <MenuItem disabled>
+                  Veuillez choisir avant une catégorie
                 </MenuItem>
-              ));
-            })()}
-        </Select>
-      </FormControl>
-    );
+              );
+            }
+            return subcategories.map((subOption) => (
+              <MenuItem key={subOption.id} value={subOption.id.toString()}>
+                {subOption.label}
+              </MenuItem>
+            ));
+          })()}
+      </Select>
+    </FormControl>
+  );
 };
 
 export default FormSelect;

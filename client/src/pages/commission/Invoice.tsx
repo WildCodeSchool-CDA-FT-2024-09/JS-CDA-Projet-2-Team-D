@@ -68,7 +68,7 @@ const InvoiceForm: React.FC = () => {
     } else if (name === "price_without_vat" || name === "vat_id") {
       setInvoice((prevState) => ({
         ...prevState,
-        [name]: +value,
+        [name]: value ? +value : 0,
       }));
     } else if (name === "category_id" && options) {
       setInvoice((prevState) => ({
@@ -80,6 +80,11 @@ const InvoiceForm: React.FC = () => {
       setInvoice((prevState) => ({
         ...prevState,
         [name]: !prevState.paid,
+      }));
+    } else if (name === "label" || name === "info") {
+      setInvoice((prevState) => ({
+        ...prevState,
+        [name]: value || "",
       }));
     } else {
       setInvoice((prevState) => ({
@@ -104,6 +109,25 @@ const InvoiceForm: React.FC = () => {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
     console.info("Données de la facture :", invoice);
+
+    // Checks of mandatory fields
+    const missingFields: string[] = [];
+    if (!invoice.commission_id) missingFields.push("Commissions");
+    if (!invoice.date) missingFields.push("Date de la facture");
+    if (!invoice.category_id) missingFields.push("Catégories");
+    if (!invoice.subcategory_id) missingFields.push("Sous-catégories");
+    if (!invoice.label) missingFields.push("Libellé");
+    if (!invoice.price_without_vat) missingFields.push("Prix HT");
+    if (!invoice.vat_id) missingFields.push("Taux de TVA");
+    if (!invoice.receipt) missingFields.push("Justificatif");
+
+    if (missingFields.length > 0) {
+      alert(
+        `Veuillez remplir les champs obligatoires suivants :\n- ${missingFields.join("\n- ")}`,
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       if (!userId) {
@@ -144,6 +168,8 @@ const InvoiceForm: React.FC = () => {
 
       console.info("Réponse du serveur :", response.data);
       alert("Facture envoyée avec succès !");
+
+      resetForm();
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Erreur lors de l'envoi :", error.message);
@@ -154,6 +180,9 @@ const InvoiceForm: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+  const resetForm = () => {
+    setInvoice({ ...initialValues });
   };
 
   const loading = loadingVatRates;
@@ -172,8 +201,8 @@ const InvoiceForm: React.FC = () => {
       elevation={3}
       style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
     >
-      <Typography variant="h5" gutterBottom align="center">
-        Facture
+      <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
+        Nouvelle Facture
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -229,20 +258,24 @@ const InvoiceForm: React.FC = () => {
           <FormTextField
             name="label"
             label="Libellé"
-            value={invoice.label}
+            value={invoice.label || ""}
             onChange={handleInvoiceChange}
-            required
+            required={true}
+            error={invoice.label.length === 0}
+            helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
           />
           <Grid size={6}>
             <FormTextField
               name="price_without_vat"
               label="Prix HT"
               type="number"
-              value={
-                invoice.price_without_vat === 0 ? "" : invoice.price_without_vat
-              }
+              value={invoice.price_without_vat.toString()}
               onChange={handleInvoiceChange}
-              required
+              required={true}
+              error={invoice.price_without_vat === 0}
+              helperText={
+                invoice.price_without_vat === 0 ? "Ce champ est requis" : ""
+              }
             />
           </Grid>
           <Grid size={6}>
@@ -258,39 +291,13 @@ const InvoiceForm: React.FC = () => {
               }
             />
           </Grid>
-          <Grid size={6}>
-            <Typography variant="h6">
-              Total TTC :{" "}
-              {invoice.category_id !== 0 ? (
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color:
-                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
-                  }}
-                >
-                  {invoice.credit_debit_id === 1 ? "+" : "-"}
-                </span>
-              ) : (
-                ""
-              )}
-              {(invoice.total || 0).toFixed(2)} €
-              {invoice.category_id !== 0 && (
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color:
-                      invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
-                    marginLeft: "5px",
-                  }}
-                >
-                  ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
-                </span>
-              )}
-            </Typography>
-          </Grid>
-
-          <Grid size={6}>
+          <Grid
+            size={6}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
             <FormControlLabel
               control={
                 <Checkbox
@@ -303,6 +310,43 @@ const InvoiceForm: React.FC = () => {
               label="Payé"
               aria-live="polite"
             />
+          </Grid>
+          <Grid
+            size={12}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Typography variant="h6">
+              Total TTC :{" "}
+              {invoice.category_id && invoice.category_id !== 0 ? (
+                <>
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color:
+                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                    }}
+                  >
+                    {invoice.credit_debit_id === 1 ? "+" : "-"}
+                  </span>
+                  {(invoice.total || 0).toFixed(2)} €
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color:
+                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
+                  </span>
+                </>
+              ) : (
+                ""
+              )}
+            </Typography>
           </Grid>
           <Grid
             size={12}
