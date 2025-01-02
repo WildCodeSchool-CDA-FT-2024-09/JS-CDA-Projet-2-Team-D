@@ -117,7 +117,8 @@ import { AppDataSource } from "./data-source";
           c.id
       FROM csv_import ci
       JOIN category c ON c.label = ci.category
-      WHERE ci.subcategory IS NOT NULL AND ci.code_subcategory IS NOT NULL;
+      WHERE ci.subcategory IS NOT NULL AND ci.code_subcategory IS NOT NULL
+      -- ON CONFLICT (code) DO NOTHING;
     `);
 
     // insert unique commissions
@@ -212,13 +213,21 @@ import { AppDataSource } from "./data-source";
     // insert exercise
     await queryRunner.query(`
       INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
-        ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
-        ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
-        ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
-        ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
-        ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
-        ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
+        ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
+        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
+        ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
+        ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00');
     `);
+    // await queryRunner.query(`
+    //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+    //     ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
+    //     ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
+    //     ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
+    //     ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
+    //     ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
+    //     ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
+    // `);
 
     // insert invoices
     await queryRunner.query(`
@@ -286,15 +295,22 @@ import { AppDataSource } from "./data-source";
 
     await queryRunner.query(`
       INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
-      SELECT DISTINCT
+      SELECT
           e.id as "exerciseId",
           c.id as "commissionId",
-          COALESCE(SUM(i.price_without_vat), 0.0) as "amount"
+          COALESCE(SUM(
+              CASE
+                  WHEN cd.id = 1 THEN -1 * i.price_without_vat * (1 + v.rate/100)
+                  ELSE i.price_without_vat * (1 + v.rate/100)
+              END
+          ), 0.0) as "amount"
       FROM exercise e
       CROSS JOIN commission c
       LEFT JOIN invoice i ON i."commissionId" = c.id
           AND i.date >= e.start_date
           AND i.date <= e.end_date
+      LEFT JOIN vat v ON v.id = i."vatId"
+      LEFT JOIN credit_debit cd ON cd.id = i."creditDebitId"
       GROUP BY e.id, c.id
     `);
 
