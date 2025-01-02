@@ -267,20 +267,35 @@ import { AppDataSource } from "./data-source";
     `);
 
     // insert budget
+    // await queryRunner.query(`
+    //   INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
+    //   SELECT DISTINCT
+    //       e.id as "exerciseId",
+    //       c.id as "commissionId",
+    //       0.0 as "amount"
+    //   FROM exercise e
+    //   CROSS JOIN commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
+    //   WHERE EXISTS (
+    //       SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
+    //       FROM invoice i
+    //       WHERE i."commissionId" = c.id
+    //       AND i.date >= e.start_date
+    //       AND i.date <= e.end_date
+    //   )
+    // `);
+
     await queryRunner.query(`
       INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
       SELECT DISTINCT
           e.id as "exerciseId",
           c.id as "commissionId",
-          0.0 as "amount"
-      FROM exercise e, commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
-      WHERE EXISTS (
-          SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
-          FROM invoice i
-          WHERE i."commissionId" = c.id
+          COALESCE(SUM(i.price_without_vat), 0.0) as "amount"
+      FROM exercise e
+      CROSS JOIN commission c
+      LEFT JOIN invoice i ON i."commissionId" = c.id
           AND i.date >= e.start_date
           AND i.date <= e.end_date
-      )
+      GROUP BY e.id, c.id
     `);
 
     await queryRunner.commitTransaction();
