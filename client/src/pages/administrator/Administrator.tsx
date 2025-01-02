@@ -7,6 +7,25 @@ export default function Administrator() {
       <h1>Accès administrateur</h1>
       <Stack spacing={2}>
         <BtnLink
+          to="/administrator/overview"
+          sx={{
+            display: "inline-block",
+            marginLeft: "auto",
+            backgroundColor: "primary.main",
+            padding: "8px 16px",
+            color: "primary.contrastText",
+            textTransform: "uppercase",
+            borderRadius: "4px",
+            textDecoration: "none",
+            textAlign: "center",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+          }}
+        >
+          Vue globale du budget
+        </BtnLink>
+        <BtnLink
           to="/administrator/user"
           sx={{
             display: "inline-block",
