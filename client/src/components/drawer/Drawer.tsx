@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
+import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
 
@@ -84,6 +85,16 @@ function CustomDrawer() {
         {user?.roles.includes("1") && (
           <>
             <List>
+              <ListItem disablePadding>
+                <Link to={`/administrator/overview`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <PieChartSharpIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Vue globale du budget" />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
               <ListItem disablePadding>
                 <Link to={`/administrator/user`}>
                   <ListItemButton>
