@@ -29,7 +29,6 @@ export type Scalars = {
   Int: { input: number; output: number };
   Float: { input: number; output: number };
   DateTimeISO: { input: string; output: string };
-  DateTimeISO: { input: string; output: string };
 };
 
 export type AuthenticatedUserResponse = {
@@ -112,16 +111,8 @@ export type Exercise = {
   __typename?: "Exercise";
   budgets: Array<Budget>;
   end_date: Scalars["DateTimeISO"]["output"];
-  end_date: Scalars["DateTimeISO"]["output"];
   id: Scalars["Int"]["output"];
   label: Scalars["String"]["output"];
-  start_date: Scalars["DateTimeISO"]["output"];
-};
-
-export type ExerciseInput = {
-  end_date: Scalars["DateTimeISO"]["input"];
-  label: Scalars["String"]["input"];
-  start_date: Scalars["DateTimeISO"]["input"];
   start_date: Scalars["DateTimeISO"]["output"];
 };
 
@@ -165,7 +156,6 @@ export type Mutation = {
   addCategory: Category;
   addSubcategory: Subcategory;
   createNewExercise: Exercise;
-  createNewExercise: Exercise;
   createNewUser: User;
   login: LoginResponse;
   logout: Scalars["String"]["output"];
@@ -185,10 +175,6 @@ export type MutationAddSubcategoryArgs = {
   categoryId: Scalars["Float"]["input"];
   code: Scalars["String"]["input"];
   label: Scalars["String"]["input"];
-};
-
-export type MutationCreateNewExerciseArgs = {
-  data: ExerciseInput;
 };
 
 export type MutationCreateNewExerciseArgs = {
@@ -253,7 +239,6 @@ export type Query = {
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
   getCurrentBudgetByCommissionID?: Maybe<Budget>;
-  getExercises: Array<Exercise>;
   getExercises: Array<Exercise>;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
@@ -520,21 +505,6 @@ export type CreateNewExerciseMutation = {
   };
 };
 
-export type CreateNewExerciseMutationVariables = Exact<{
-  data: ExerciseInput;
-}>;
-
-export type CreateNewExerciseMutation = {
-  __typename?: "Mutation";
-  createNewExercise: {
-    __typename?: "Exercise";
-    id: number;
-    label: string;
-    start_date: string;
-    end_date: string;
-  };
-};
-
 export type GetUsersQueryVariables = Exact<{
   limit: Scalars["Int"]["input"];
   offset: Scalars["Int"]["input"];
@@ -582,7 +552,6 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: string;
     date: string;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
@@ -661,7 +630,6 @@ export type GetInvoicesByCommissionIdQuery = {
     invoices: Array<{
       __typename?: "Invoice";
       date: string;
-      date: string;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -739,6 +707,21 @@ export type GetExercisesQuery = {
       commissions: { __typename?: "Commission"; id: number; name: string };
     }>;
   }>;
+};
+
+export type GetBudgetOverviewQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBudgetOverviewQuery = {
+  __typename?: "Query";
+  getBudgetOverview: {
+    __typename?: "BudgetOverview";
+    globalBudget: number;
+    budgets: Array<{
+      __typename?: "Budget";
+      amount: number;
+      commissions: { __typename?: "Commission"; name: string };
+    }>;
+  };
 };
 
 export const AddCategoryDocument = gql`
@@ -1299,59 +1282,6 @@ export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<
   LogoutMutation,
   LogoutMutationVariables
->;
-export const CreateNewExerciseDocument = gql`
-  mutation CreateNewExercise($data: ExerciseInput!) {
-    createNewExercise(data: $data) {
-      id
-      label
-      start_date
-      end_date
-    }
-  }
-`;
-export type CreateNewExerciseMutationFn = Apollo.MutationFunction<
-  CreateNewExerciseMutation,
-  CreateNewExerciseMutationVariables
->;
-
-/**
- * __useCreateNewExerciseMutation__
- *
- * To run a mutation, you first call `useCreateNewExerciseMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateNewExerciseMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createNewExerciseMutation, { data, loading, error }] = useCreateNewExerciseMutation({
- *   variables: {
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useCreateNewExerciseMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateNewExerciseMutation,
-    CreateNewExerciseMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateNewExerciseMutation,
-    CreateNewExerciseMutationVariables
-  >(CreateNewExerciseDocument, options);
-}
-export type CreateNewExerciseMutationHookResult = ReturnType<
-  typeof useCreateNewExerciseMutation
->;
-export type CreateNewExerciseMutationResult =
-  Apollo.MutationResult<CreateNewExerciseMutation>;
-export type CreateNewExerciseMutationOptions = Apollo.BaseMutationOptions<
-  CreateNewExerciseMutation,
-  CreateNewExerciseMutationVariables
 >;
 export const CreateNewExerciseDocument = gql`
   mutation CreateNewExercise($data: ExerciseInput!) {
@@ -2373,6 +2303,89 @@ export type GetExercisesQueryResult = Apollo.QueryResult<
   GetExercisesQuery,
   GetExercisesQueryVariables
 >;
+export const GetBudgetOverviewDocument = gql`
+  query GetBudgetOverview {
+    getBudgetOverview {
+      globalBudget
+      budgets {
+        amount
+        commissions {
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetBudgetOverviewQuery__
+ *
+ * To run a query within a React component, call `useGetBudgetOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBudgetOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBudgetOverviewQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBudgetOverviewQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetBudgetOverviewQuery,
+        GetBudgetOverviewQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export type GetBudgetOverviewQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewQuery
+>;
+export type GetBudgetOverviewLazyQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewLazyQuery
+>;
+export type GetBudgetOverviewSuspenseQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewSuspenseQuery
+>;
+export type GetBudgetOverviewQueryResult = Apollo.QueryResult<
+  GetBudgetOverviewQuery,
+  GetBudgetOverviewQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2386,6 +2399,7 @@ export const namedOperations = {
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
     GetAuthenticatedUser: "GetAuthenticatedUser",
     GetExercises: "GetExercises",
+    GetBudgetOverview: "GetBudgetOverview",
   },
   Mutation: {
     AddCategory: "AddCategory",
@@ -2398,7 +2412,6 @@ export const namedOperations = {
     RestoreUser: "RestoreUser",
     Login: "Login",
     Logout: "Logout",
-    CreateNewExercise: "CreateNewExercise",
     CreateNewExercise: "CreateNewExercise",
   },
 };
