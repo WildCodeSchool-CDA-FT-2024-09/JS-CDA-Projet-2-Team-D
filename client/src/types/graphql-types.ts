@@ -28,7 +28,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  DateTimeISO: { input: unknown; output: unknown };
+  DateTimeISO: { input: string; output: string };
 };
 
 export type AuthenticatedUserResponse = {
@@ -104,10 +104,16 @@ export type DeleteResponseStatus = {
 export type Exercise = {
   __typename?: "Exercise";
   budgets: Array<Budget>;
-  end_date: Scalars["String"]["output"];
+  end_date: Scalars["DateTimeISO"]["output"];
   id: Scalars["Int"]["output"];
   label: Scalars["String"]["output"];
-  start_date: Scalars["String"]["output"];
+  start_date: Scalars["DateTimeISO"]["output"];
+};
+
+export type ExerciseInput = {
+  end_date: Scalars["DateTimeISO"]["input"];
+  label: Scalars["String"]["input"];
+  start_date: Scalars["DateTimeISO"]["input"];
 };
 
 export type Invoice = {
@@ -143,6 +149,7 @@ export type Mutation = {
   __typename?: "Mutation";
   addCategory: Category;
   addSubcategory: Subcategory;
+  createNewExercise: Exercise;
   createNewUser: User;
   login: LoginResponse;
   logout: Scalars["String"]["output"];
@@ -162,6 +169,10 @@ export type MutationAddSubcategoryArgs = {
   categoryId: Scalars["Float"]["input"];
   code: Scalars["String"]["input"];
   label: Scalars["String"]["input"];
+};
+
+export type MutationCreateNewExerciseArgs = {
+  data: ExerciseInput;
 };
 
 export type MutationCreateNewUserArgs = {
@@ -221,6 +232,7 @@ export type Query = {
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
   getCurrentBudgetByCommissionID?: Maybe<Budget>;
+  getExercises: Array<Exercise>;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
   getRoles: Array<Role>;
@@ -471,6 +483,21 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
 export type LogoutMutation = { __typename?: "Mutation"; logout: string };
 
+export type CreateNewExerciseMutationVariables = Exact<{
+  data: ExerciseInput;
+}>;
+
+export type CreateNewExerciseMutation = {
+  __typename?: "Mutation";
+  createNewExercise: {
+    __typename?: "Exercise";
+    id: number;
+    label: string;
+    start_date: string;
+    end_date: string;
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{
   limit: Scalars["Int"]["input"];
   offset: Scalars["Int"]["input"];
@@ -518,7 +545,7 @@ export type GetInvoicesQuery = {
     receipt: string;
     info: string;
     paid: boolean;
-    date: unknown;
+    date: string;
     invoiceNumber: string;
     status: { __typename?: "Status"; id: number; label: string };
     vat: { __typename?: "Vat"; id: number; rate: number };
@@ -595,7 +622,7 @@ export type GetInvoicesByCommissionIdQuery = {
     totalAmount: number;
     invoices: Array<{
       __typename?: "Invoice";
-      date: unknown;
+      date: string;
       id: number;
       invoiceNumber: string;
       label: string;
@@ -654,6 +681,25 @@ export type GetAuthenticatedUserQuery = {
     email: string;
     roles: Array<{ __typename?: "UserRoleInput"; id: number }>;
   };
+};
+
+export type GetExercisesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetExercisesQuery = {
+  __typename?: "Query";
+  getExercises: Array<{
+    __typename?: "Exercise";
+    id: number;
+    label: string;
+    start_date: string;
+    end_date: string;
+    budgets: Array<{
+      __typename?: "Budget";
+      commissionId: number;
+      amount: number;
+      commissions: { __typename?: "Commission"; id: number; name: string };
+    }>;
+  }>;
 };
 
 export const AddCategoryDocument = gql`
@@ -1214,6 +1260,59 @@ export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<
   LogoutMutation,
   LogoutMutationVariables
+>;
+export const CreateNewExerciseDocument = gql`
+  mutation CreateNewExercise($data: ExerciseInput!) {
+    createNewExercise(data: $data) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;
+export type CreateNewExerciseMutationFn = Apollo.MutationFunction<
+  CreateNewExerciseMutation,
+  CreateNewExerciseMutationVariables
+>;
+
+/**
+ * __useCreateNewExerciseMutation__
+ *
+ * To run a mutation, you first call `useCreateNewExerciseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateNewExerciseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createNewExerciseMutation, { data, loading, error }] = useCreateNewExerciseMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateNewExerciseMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateNewExerciseMutation,
+    CreateNewExerciseMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateNewExerciseMutation,
+    CreateNewExerciseMutationVariables
+  >(CreateNewExerciseDocument, options);
+}
+export type CreateNewExerciseMutationHookResult = ReturnType<
+  typeof useCreateNewExerciseMutation
+>;
+export type CreateNewExerciseMutationResult =
+  Apollo.MutationResult<CreateNewExerciseMutation>;
+export type CreateNewExerciseMutationOptions = Apollo.BaseMutationOptions<
+  CreateNewExerciseMutation,
+  CreateNewExerciseMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
@@ -2094,6 +2193,94 @@ export type GetAuthenticatedUserQueryResult = Apollo.QueryResult<
   GetAuthenticatedUserQuery,
   GetAuthenticatedUserQueryVariables
 >;
+export const GetExercisesDocument = gql`
+  query GetExercises {
+    getExercises {
+      id
+      label
+      start_date
+      end_date
+      budgets {
+        commissionId
+        amount
+        commissions {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetExercisesQuery__
+ *
+ * To run a query within a React component, call `useGetExercisesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetExercisesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetExercisesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetExercisesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetExercisesQuery,
+    GetExercisesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export function useGetExercisesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetExercisesQuery,
+    GetExercisesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export function useGetExercisesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetExercisesQuery,
+        GetExercisesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export type GetExercisesQueryHookResult = ReturnType<
+  typeof useGetExercisesQuery
+>;
+export type GetExercisesLazyQueryHookResult = ReturnType<
+  typeof useGetExercisesLazyQuery
+>;
+export type GetExercisesSuspenseQueryHookResult = ReturnType<
+  typeof useGetExercisesSuspenseQuery
+>;
+export type GetExercisesQueryResult = Apollo.QueryResult<
+  GetExercisesQuery,
+  GetExercisesQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2106,6 +2293,7 @@ export const namedOperations = {
     GetUserById: "GetUserById",
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
     GetAuthenticatedUser: "GetAuthenticatedUser",
+    GetExercises: "GetExercises",
   },
   Mutation: {
     AddCategory: "AddCategory",
@@ -2118,5 +2306,6 @@ export const namedOperations = {
     RestoreUser: "RestoreUser",
     Login: "Login",
     Logout: "Logout",
+    CreateNewExercise: "CreateNewExercise",
   },
 };

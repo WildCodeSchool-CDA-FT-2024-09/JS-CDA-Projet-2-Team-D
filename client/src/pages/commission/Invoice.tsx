@@ -201,8 +201,8 @@ const InvoiceForm: React.FC = () => {
       elevation={3}
       style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
     >
-      <Typography variant="h5" gutterBottom align="center">
-        Facture
+      <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
+        Nouvelle Facture
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>

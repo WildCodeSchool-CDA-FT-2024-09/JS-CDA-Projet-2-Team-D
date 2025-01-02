@@ -15,6 +15,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
+import InboxIcon from "@mui/icons-material/Inbox";
 
 const drawerWidth = 280;
 
@@ -153,7 +154,7 @@ function CustomDrawer() {
                     <ListItemIcon>
                       <InboxIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Factures" />
+                    <ListItemText primary="Nouvelle Facture" />
                   </ListItemButton>
                 </Link>
               </ListItem>
