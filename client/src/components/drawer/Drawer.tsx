@@ -13,8 +13,10 @@ import {
 } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
+import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
+import InboxIcon from "@mui/icons-material/Inbox";
 
 const drawerWidth = 280;
 
@@ -85,6 +87,16 @@ function CustomDrawer() {
           <>
             <List>
               <ListItem disablePadding>
+                <Link to={`/administrator/overview`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <PieChartSharpIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Vue globale du budget" />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
+              <ListItem disablePadding>
                 <Link to={`/administrator/user`}>
                   <ListItemButton>
                     <ListItemIcon>
@@ -146,6 +158,17 @@ function CustomDrawer() {
                   <ListItemText primary="Aucune commission assignée" />
                 </ListItem>
               )}
+              {/* Bouton Facture pour les membres des commissions */}
+              <ListItem disablePadding>
+                <Link to={`/commission/invoice`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Nouvelle Facture" />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
             </List>
           </>
         )}

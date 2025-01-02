@@ -212,22 +212,36 @@ function moveUploadedFile($uploadedFile, $invoiceNumber)
     return $filename;
 }
 
-// Generate new invoice number (format: YYYY-000001)
+// Generate new invoice number (format: YYYY_000001)
 function incrementInvoiceCode() {
     // Get database connection
     $db = getDbConnection();
 
-    // Get the next invoice number
-    $lastInvoiceNumber = $db->query('SELECT "invoiceNumber" FROM invoice ORDER BY id DESC LIMIT 1')
-                ->fetch(PDO::FETCH_COLUMN);
+    // Get the last invoice number of the current year
+    $sql = "SELECT \"invoiceNumber\" FROM invoice
+        WHERE date_part('year', \"date\") = :year
+        ORDER BY id DESC
+        LIMIT 1";
+
+    $query = $db->prepare($sql);
+
+    $query->execute([':year' => date("Y")]);
+
+    // Fetch the result
+    $lastInvoiceNumber = $query->fetchColumn();
+
+    // If there is no invoice (ex. at the beginning of a new year)
+    if (!$lastInvoiceNumber) {
+        $lastInvoiceNumber = "0";
+    }
 
     // Split the invoice number
-    $parts = explode('-', $lastInvoiceNumber);
+    $parts = explode('_', $lastInvoiceNumber);
     $number = end($parts);
 
     // Increment the numeric part and keep it zero-padded to 6 digits
     $newNumber = str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
 
     // Combine the current year and the new number
-    return date("Y") . '-' . $newNumber;
+    return date("Y") . '_' . $newNumber;
 }

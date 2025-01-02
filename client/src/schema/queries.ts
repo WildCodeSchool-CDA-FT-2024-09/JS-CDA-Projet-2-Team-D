@@ -214,3 +214,17 @@ export const GET_EXERCISES = gql`
     }
   }
 `;
+
+export const GET_BUDGET_OVERVIEW = gql`
+  query GetBudgetOverview {
+    getBudgetOverview {
+      globalBudget
+      budgets {
+        amount
+        commissions {
+          name
+        }
+      }
+    }
+  }
+`;
