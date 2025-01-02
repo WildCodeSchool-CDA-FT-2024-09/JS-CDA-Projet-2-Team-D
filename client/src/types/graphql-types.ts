@@ -66,6 +66,12 @@ export type Budget = {
   exerciseId: Scalars["Float"]["output"];
 };
 
+export type BudgetOverview = {
+  __typename?: "BudgetOverview";
+  budgets: Array<Budget>;
+  globalBudget: Scalars["Float"]["output"];
+};
+
 export type Category = {
   __typename?: "Category";
   creditDebit: CreditDebit;
@@ -228,6 +234,7 @@ export type Query = {
   getAuthenticatedUser: AuthenticatedUserResponse;
   getBankAccounts: Array<BankAccount>;
   getBanks: Array<Bank>;
+  getBudgetOverview: BudgetOverview;
   getCategories: Array<Category>;
   getCommissions: Array<Commission>;
   getCreditDebits: Array<CreditDebit>;
@@ -700,6 +707,21 @@ export type GetExercisesQuery = {
       commissions: { __typename?: "Commission"; id: number; name: string };
     }>;
   }>;
+};
+
+export type GetBudgetOverviewQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBudgetOverviewQuery = {
+  __typename?: "Query";
+  getBudgetOverview: {
+    __typename?: "BudgetOverview";
+    globalBudget: number;
+    budgets: Array<{
+      __typename?: "Budget";
+      amount: number;
+      commissions: { __typename?: "Commission"; name: string };
+    }>;
+  };
 };
 
 export const AddCategoryDocument = gql`
@@ -2281,6 +2303,89 @@ export type GetExercisesQueryResult = Apollo.QueryResult<
   GetExercisesQuery,
   GetExercisesQueryVariables
 >;
+export const GetBudgetOverviewDocument = gql`
+  query GetBudgetOverview {
+    getBudgetOverview {
+      globalBudget
+      budgets {
+        amount
+        commissions {
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetBudgetOverviewQuery__
+ *
+ * To run a query within a React component, call `useGetBudgetOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBudgetOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBudgetOverviewQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBudgetOverviewQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetBudgetOverviewQuery,
+        GetBudgetOverviewQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export type GetBudgetOverviewQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewQuery
+>;
+export type GetBudgetOverviewLazyQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewLazyQuery
+>;
+export type GetBudgetOverviewSuspenseQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewSuspenseQuery
+>;
+export type GetBudgetOverviewQueryResult = Apollo.QueryResult<
+  GetBudgetOverviewQuery,
+  GetBudgetOverviewQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2294,6 +2399,7 @@ export const namedOperations = {
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
     GetAuthenticatedUser: "GetAuthenticatedUser",
     GetExercises: "GetExercises",
+    GetBudgetOverview: "GetBudgetOverview",
   },
   Mutation: {
     AddCategory: "AddCategory",
