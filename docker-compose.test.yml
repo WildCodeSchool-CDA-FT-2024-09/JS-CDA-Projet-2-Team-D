@@ -7,7 +7,7 @@ services:
       - POSTGRES_USER=staging_user
       - POSTGRES_HOST=staging_postgres
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -d postgres -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -d staging_db -U staging_user']
       interval: 5s
       timeout: 5s
       retries: 5
