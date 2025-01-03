@@ -6,7 +6,7 @@ export default class BankResolver {
   // Methode GET pour toutes les banques
   @Query(() => [Bank])
   async getBanks() {
-    const banks = await Bank.find({});
+    const banks = await Bank.find({ relations: ["bankAccounts"] });
     return banks;
   }
 }
