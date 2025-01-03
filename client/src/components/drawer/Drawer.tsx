@@ -116,6 +116,16 @@ function CustomDrawer() {
                   </ListItemButton>
                 </Link>
               </ListItem>
+              <ListItem disablePadding>
+                <Link to={`/administrator/bank`}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <CardTravelIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Comptes bancaires" />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
             </List>
           </>
         )}
