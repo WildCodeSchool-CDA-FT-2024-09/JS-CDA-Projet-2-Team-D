@@ -111,14 +111,16 @@ import { AppDataSource } from "./data-source";
     // insert unique subcategories
     await queryRunner.query(`
       INSERT INTO subcategory (code, label, "categoryId")
-      SELECT DISTINCT
+      SELECT DISTINCT ON (ci.code_subcategory, c.id, cd.label)
           ci.code_subcategory,
           ci.subcategory,
           c.id
       FROM csv_import ci
       JOIN category c ON c.label = ci.category
-      WHERE ci.subcategory IS NOT NULL AND ci.code_subcategory IS NOT NULL
-      -- ON CONFLICT (code) DO NOTHING;
+      JOIN credit_debit cd ON cd.label = ci.credit_debit
+      WHERE ci.subcategory IS NOT NULL
+        AND ci.code_subcategory IS NOT NULL
+        AND ci.credit_debit IS NOT NULL
     `);
 
     // insert unique commissions
