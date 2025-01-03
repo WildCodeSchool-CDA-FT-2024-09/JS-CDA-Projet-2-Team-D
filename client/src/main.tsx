@@ -18,6 +18,7 @@ import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
 import Administrator from "./pages/administrator/Administrator.tsx";
 import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
+import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
           </RoleProtectedRoute>
         ),
         children: [
+          {
+            index: true,
+            element: <HomePageAccountant />,
+          },
           {
             path: "category",
             element: <Outlet />,

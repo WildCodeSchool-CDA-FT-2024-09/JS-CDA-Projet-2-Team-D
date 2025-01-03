@@ -111,7 +111,7 @@ export default class InvoiceResolver {
   }
 
   @Query(() => [Invoice])
-  async getInvoiceToValidateorRefused(): Promise<Invoice[]> {
+  async getInvoicesToValidateOrRefused(): Promise<Invoice[]> {
     try {
       const invoices = await Invoice.find({
         where: [{ status: Equal(2) }, { status: Equal(3) }],
