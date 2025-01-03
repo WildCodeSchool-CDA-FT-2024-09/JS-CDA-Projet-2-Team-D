@@ -26,6 +26,7 @@ export class Subcategory extends BaseEntity {
     nullable: false,
     type: "varchar",
     length: 30,
+    unique: true,
     transformer: {
       to: (value: string) => value.toUpperCase(),
       from: (value: string) => value,

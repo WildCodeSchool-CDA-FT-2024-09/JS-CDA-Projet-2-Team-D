@@ -96,28 +96,32 @@ import { AppDataSource } from "./data-source";
       ON CONFLICT (account_number) DO NOTHING;
     `);
 
-    // insert unique categories with credit_debit relationship
+    // insert unique categories
     await queryRunner.query(`
       INSERT INTO category (label, "creditDebitId")
       SELECT DISTINCT
-          ci.category,
-          cd.id
+          ci.category AS label,
+          cd.id AS "creditDebitId"
       FROM csv_import ci
       JOIN credit_debit cd ON cd.label = ci.credit_debit
       WHERE ci.category IS NOT NULL
-      ON CONFLICT (label) DO NOTHING;
     `);
 
     // insert unique subcategories
     await queryRunner.query(`
       INSERT INTO subcategory (code, label, "categoryId")
-      SELECT DISTINCT
+      SELECT DISTINCT ON (ci.code_subcategory)
           ci.code_subcategory,
           ci.subcategory,
           c.id
       FROM csv_import ci
+      JOIN credit_debit cd ON cd.label = ci.credit_debit
       JOIN category c ON c.label = ci.category
-      WHERE ci.subcategory IS NOT NULL AND ci.code_subcategory IS NOT NULL;
+          AND c."creditDebitId" = cd.id
+      WHERE ci.subcategory IS NOT NULL
+          AND ci.code_subcategory IS NOT NULL
+          AND ci.credit_debit IS NOT NULL
+      ORDER BY ci.code_subcategory
     `);
 
     // insert unique commissions
@@ -162,32 +166,37 @@ import { AppDataSource } from "./data-source";
       ('super@admin.net', 'Super', 'Admin', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
     `);
 
-    // insert user_roles_role
+    // insert ADMINs in user_roles_role
     await queryRunner.query(`
-      INSERT INTO "user_roles_role" ("userId", "roleId") VALUES
-        (1,	3),
-        (2,	3),
-        (3,	3),
-        (4,	3),
-        (5, 3),
-        (6, 3),
-        (7, 3),
-        (8, 3),
-        (9, 3),
-        (10, 3),
-        (11, 3),
-        (12, 3),
-        (13, 3),
-        (14, 3),
-        (15, 3),
-        (16, 3),
-        (17, 3),
-        (18, 3),
-        (19, 3),
-        (20, 3),
-        (21, 1),
-        (21, 2),
-        (21, 3);
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT DISTINCT
+        id,
+        1
+      FROM "user"
+      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'super@admin.net')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
+    `);
+
+    // insert ACCOUNTANTs in user_roles_role
+    await queryRunner.query(`
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT
+        id,
+        2
+      FROM "user"
+      WHERE email IN ('claire.simon@association.com', 'nicolas.perret@association.com', 'super@admin.net')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
+    `);
+
+    // insert COMMISSION USERs in user_roles_role
+    await queryRunner.query(`
+      INSERT INTO "user_roles_role" ("userId", "roleId")
+      SELECT
+        id,
+        3
+      FROM "user"
+      WHERE email NOT IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'nicolas.perret@association.com')
+      ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
     // insert user-commission relationships
@@ -204,14 +213,25 @@ import { AppDataSource } from "./data-source";
       ON CONFLICT ("userId", "commissionId") DO NOTHING;
     `);
 
-    // insert exercise
+    // insert exercise (civil year)
+    // await queryRunner.query(`
+    //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+    //     ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
+    //     ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+    //     ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
+    //     ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
+    //     ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00');
+    // `);
+
+    // insert exercise (school year)
     await queryRunner.query(`
       INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
-        ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
-        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
-        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
-        ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
-        ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00');
+        ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
+        ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
+        ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
+        ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
+        ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
+        ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
     `);
 
     // insert invoices
@@ -261,20 +281,42 @@ import { AppDataSource } from "./data-source";
     `);
 
     // insert budget
+    // await queryRunner.query(`
+    //   INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
+    //   SELECT DISTINCT
+    //       e.id as "exerciseId",
+    //       c.id as "commissionId",
+    //       0.0 as "amount"
+    //   FROM exercise e
+    //   CROSS JOIN commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
+    //   WHERE EXISTS (
+    //       SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
+    //       FROM invoice i
+    //       WHERE i."commissionId" = c.id
+    //       AND i.date >= e.start_date
+    //       AND i.date <= e.end_date
+    //   )
+    // `);
+
     await queryRunner.query(`
       INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
-      SELECT DISTINCT
+      SELECT
           e.id as "exerciseId",
           c.id as "commissionId",
-          0.0 as "amount"
-      FROM exercise e, commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
-      WHERE EXISTS (
-          SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
-          FROM invoice i
-          WHERE i."commissionId" = c.id
+          COALESCE(SUM(
+              CASE
+                  WHEN cd.id = 1 THEN -1 * i.price_without_vat * (1 + v.rate/100)
+                  ELSE i.price_without_vat * (1 + v.rate/100)
+              END
+          ), 0.0) as "amount"
+      FROM exercise e
+      CROSS JOIN commission c
+      LEFT JOIN invoice i ON i."commissionId" = c.id
           AND i.date >= e.start_date
           AND i.date <= e.end_date
-      )
+      LEFT JOIN vat v ON v.id = i."vatId"
+      LEFT JOIN credit_debit cd ON cd.id = i."creditDebitId"
+      GROUP BY e.id, c.id
     `);
 
     await queryRunner.commitTransaction();
