@@ -1,0 +1,20 @@
+meta {
+  name: /send-email
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/send-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "recipient": "f@feub.net",
+    "subject": "Sending from Express",
+    "text_email": "This is a plain text email",
+    "html_email": "This is an <b>HTML email</b><br><a href='https://www.ecosia.org/'>link</a>"
+  }
+}

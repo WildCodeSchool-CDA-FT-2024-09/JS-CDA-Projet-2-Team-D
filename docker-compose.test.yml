@@ -1,0 +1,23 @@
+services:
+  staging_postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d staging_db -U staging_user']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  staging_api_data:
+    build: ./api_data
+    command: npm run test
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres

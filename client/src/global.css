@@ -1,0 +1,14 @@
+body {
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+  font-family: Montserrat, sans-serif !important;
+}
+
+.linkNoStyle {
+  text-decoration: none;
+}
+
+.linkNoStyle:hover {
+  text-decoration: none;
+}
+
