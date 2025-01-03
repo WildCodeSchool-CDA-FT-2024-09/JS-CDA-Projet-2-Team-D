@@ -10,14 +10,15 @@ import {
 import { generatePassword } from "../../../utils/generatePassword";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
+import PasswordField from "../../../components/user/PasswordField";
 import {
   Box,
   Button,
   Checkbox,
   FormControl,
-  FormHelperText,
-  IconButton,
-  InputAdornment,
+  // FormHelperText,
+  // IconButton,
+  // InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -28,8 +29,8 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+// import Visibility from "@mui/icons-material/Visibility";
+// import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
@@ -51,36 +52,22 @@ export default function CreateUser() {
   const [createNewUser] = useCreateNewUserMutation();
 
   // Password texfield
-  const [showPassword, setShowPassword] = useState(false);
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
-  const handleClickShowConfirmPassword = () =>
-    setShowConfirmPassword((show) => !show);
+  // const [showConfirmPassword, setShowConfirmPassword] =
+  //   useState<boolean>(false);
+  // const handleClickShowConfirmPassword = () =>
+  //   setShowConfirmPassword((show) => !show);
 
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-  };
+  // const handleMouseDownConfirmPassword = (
+  //   event: React.MouseEvent<HTMLButtonElement>,
+  // ) => {
+  //   event.preventDefault();
+  // };
 
-  const handleMouseUpPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-  };
-
-  const handleMouseDownConfirmPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpConfirmPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-  };
+  // const handleMouseUpConfirmPassword = (
+  //   event: React.MouseEvent<HTMLButtonElement>,
+  // ) => {
+  //   event.preventDefault();
+  // };
 
   const handleGeneratePassword = () => {
     const pwd = generatePassword(12);
@@ -332,47 +319,42 @@ export default function CreateUser() {
             </FormControl>
           </Grid>
           <Grid size={6}>
-            <FormControl error={!!errors.password} fullWidth>
-              <InputLabel htmlFor="password">Mot de passe</InputLabel>
-              <OutlinedInput
-                {...register("password")}
-                fullWidth
-                required
-                id="password"
-                name="password"
-                label="Mot de passe"
-                type={showPassword ? "text" : "password"}
-                value={watch("password")} // Explicitly set value using watch
-                error={!!errors.password}
-                onChange={async (e) => {
-                  setValue("password", e.target.value, {
-                    shouldValidate: true,
-                  });
-                  await trigger(["password", "passwordConfirm"]);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showPassword
-                          ? "Cacher le mot de passe"
-                          : "Afficher le mot de passe"
-                      }
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      onMouseUp={handleMouseUpPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-              <FormHelperText>{errors.password?.message}</FormHelperText>
-            </FormControl>
+            <PasswordField
+              label="Mot de passe"
+              error={
+                errors.password?.message
+                  ? { message: errors.password.message }
+                  : undefined
+              }
+              {...register("password")}
+              value={watch("password")} // Explicitly set value using watch
+              onChange={async (e) => {
+                setValue("password", e.target.value, {
+                  shouldValidate: true,
+                });
+                await trigger(["password", "passwordConfirm"]);
+              }}
+            />
           </Grid>
           <Grid size={6}>
-            <FormControl error={!!errors.passwordConfirm} fullWidth>
+            <PasswordField
+              label="password"
+              //name="Confirmer le mot de passe"
+              error={
+                errors.password?.message
+                  ? { message: errors.password.message }
+                  : undefined
+              }
+              {...register("passwordConfirm")}
+              value={watch("passwordConfirm")} // Explicitly set value using watch
+              onChange={async (e) => {
+                setValue("passwordConfirm", e.target.value, {
+                  shouldValidate: true,
+                });
+                await trigger(["password", "passwordConfirm"]);
+              }}
+            />
+            {/* <FormControl error={!!errors.passwordConfirm} fullWidth>
               <InputLabel htmlFor="passwordConfirm">
                 Confirmer le mot de passe
               </InputLabel>
@@ -411,7 +393,7 @@ export default function CreateUser() {
                 }
               />
               <FormHelperText>{errors.passwordConfirm?.message}</FormHelperText>
-            </FormControl>
+            </FormControl> */}
           </Grid>
           <Grid size={12}>
             <Button
