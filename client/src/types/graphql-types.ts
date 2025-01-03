@@ -122,12 +122,6 @@ export type ExerciseInput = {
   start_date: Scalars["DateTimeISO"]["input"];
 };
 
-export type ExerciseInput = {
-  end_date: Scalars["String"]["input"];
-  label: Scalars["String"]["input"];
-  start_date: Scalars["String"]["input"];
-};
-
 export type Invoice = {
   __typename?: "Invoice";
   bankAccount?: Maybe<BankAccount>;
@@ -693,6 +687,40 @@ export type GetAuthenticatedUserQuery = {
     lastname: string;
     email: string;
     roles: Array<{ __typename?: "UserRoleInput"; id: number }>;
+  };
+};
+
+export type GetExercisesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetExercisesQuery = {
+  __typename?: "Query";
+  getExercises: Array<{
+    __typename?: "Exercise";
+    id: number;
+    label: string;
+    start_date: string;
+    end_date: string;
+    budgets: Array<{
+      __typename?: "Budget";
+      commissionId: number;
+      amount: number;
+      commissions: { __typename?: "Commission"; id: number; name: string };
+    }>;
+  }>;
+};
+
+export type GetBudgetOverviewQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBudgetOverviewQuery = {
+  __typename?: "Query";
+  getBudgetOverview: {
+    __typename?: "BudgetOverview";
+    globalBudget: number;
+    budgets: Array<{
+      __typename?: "Budget";
+      amount: number;
+      commissions: { __typename?: "Commission"; name: string };
+    }>;
   };
 };
 
@@ -2187,6 +2215,177 @@ export type GetAuthenticatedUserQueryResult = Apollo.QueryResult<
   GetAuthenticatedUserQuery,
   GetAuthenticatedUserQueryVariables
 >;
+export const GetExercisesDocument = gql`
+  query GetExercises {
+    getExercises {
+      id
+      label
+      start_date
+      end_date
+      budgets {
+        commissionId
+        amount
+        commissions {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetExercisesQuery__
+ *
+ * To run a query within a React component, call `useGetExercisesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetExercisesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetExercisesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetExercisesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetExercisesQuery,
+    GetExercisesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export function useGetExercisesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetExercisesQuery,
+    GetExercisesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export function useGetExercisesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetExercisesQuery,
+        GetExercisesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetExercisesQuery, GetExercisesQueryVariables>(
+    GetExercisesDocument,
+    options,
+  );
+}
+export type GetExercisesQueryHookResult = ReturnType<
+  typeof useGetExercisesQuery
+>;
+export type GetExercisesLazyQueryHookResult = ReturnType<
+  typeof useGetExercisesLazyQuery
+>;
+export type GetExercisesSuspenseQueryHookResult = ReturnType<
+  typeof useGetExercisesSuspenseQuery
+>;
+export type GetExercisesQueryResult = Apollo.QueryResult<
+  GetExercisesQuery,
+  GetExercisesQueryVariables
+>;
+export const GetBudgetOverviewDocument = gql`
+  query GetBudgetOverview {
+    getBudgetOverview {
+      globalBudget
+      budgets {
+        amount
+        commissions {
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetBudgetOverviewQuery__
+ *
+ * To run a query within a React component, call `useGetBudgetOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBudgetOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBudgetOverviewQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBudgetOverviewQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export function useGetBudgetOverviewSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetBudgetOverviewQuery,
+        GetBudgetOverviewQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetBudgetOverviewQuery,
+    GetBudgetOverviewQueryVariables
+  >(GetBudgetOverviewDocument, options);
+}
+export type GetBudgetOverviewQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewQuery
+>;
+export type GetBudgetOverviewLazyQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewLazyQuery
+>;
+export type GetBudgetOverviewSuspenseQueryHookResult = ReturnType<
+  typeof useGetBudgetOverviewSuspenseQuery
+>;
+export type GetBudgetOverviewQueryResult = Apollo.QueryResult<
+  GetBudgetOverviewQuery,
+  GetBudgetOverviewQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2199,6 +2398,8 @@ export const namedOperations = {
     GetUserById: "GetUserById",
     GetCurrentBudgetByCommissionID: "GetCurrentBudgetByCommissionID",
     GetAuthenticatedUser: "GetAuthenticatedUser",
+    GetExercises: "GetExercises",
+    GetBudgetOverview: "GetBudgetOverview",
   },
   Mutation: {
     AddCategory: "AddCategory",
