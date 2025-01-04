@@ -175,17 +175,6 @@ export default class InvoiceResolver {
           invoice.commission = { id: 0, name: "Non défini" } as Commission;
         }
 
-        // Vérification pour BankAccount
-        if (!invoice.bankAccount) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de compte bancaire, valeur par défaut utilisée`
-          );
-          invoice.bankAccount = {
-            id: 0,
-            bankName: "Non défini",
-          } as unknown as BankAccount;
-        }
-
         return invoice;
       });
 
