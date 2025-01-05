@@ -238,6 +238,7 @@ import { AppDataSource } from "./data-source";
     await queryRunner.query(`
       INSERT INTO invoice (
         price_without_vat,
+        amount_with_vat,
         label,
         receipt,
         info,
@@ -254,6 +255,7 @@ import { AppDataSource } from "./data-source";
       )
       SELECT
           ci.amount_without_vat,
+          ci.amount_with_vat,
           ci.label,
           ci.receipt,
           ci.info,

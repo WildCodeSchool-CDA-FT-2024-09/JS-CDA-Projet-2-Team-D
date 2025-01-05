@@ -5,6 +5,7 @@ CREATE TABLE csv_import (
   credit_debit VARCHAR(20),
   amount_without_vat FLOAT(4),
   vat FLOAT(4),
+  amount_with_vat FLOAT(4),
   label VARCHAR(50),
   date VARCHAR(20),
   bank VARCHAR(50),
@@ -16,8 +17,6 @@ CREATE TABLE csv_import (
   representant_email VARCHAR(100),
   info VARCHAR(255)
 );
-
--- categorie,subcategory,code_subcategory,credit_debit,amount_without_vat,vat,label,date,bank,bank_act,num_act,receipt,commission,representant,representant_email,info
 
 COPY csv_import
 FROM '/docker-entrypoint-initdb.d/dataset.csv'
