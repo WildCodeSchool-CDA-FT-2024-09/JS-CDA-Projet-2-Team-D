@@ -1,0 +1,43 @@
+name: static-test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - dev
+
+jobs:
+  lint:
+    name: Run linters + unit
+    runs-on: ubuntu-latest
+
+    permissions:
+      checks: write
+      contents: write
+
+    steps:
+      - name: Step 1 Check out git repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./node_modules
+            ./api_data/node_modules
+            ./client/node_modules
+          key: ${{ runner.os }}-${{  hashfiles('**/package-lock.json')}}
+
+      - name: Install package dependence
+        run: cd client && npm install && cd ../api_data && npm install
+
+      - name: Run linters
+        run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
+
+      #- name: Run Unit test on client
+      # run: cd ./client && npm run test
+
+      #- name: Run Unit test on api data
+      #  run: cd ./api_data && npm run test
