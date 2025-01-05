@@ -58,7 +58,6 @@ function CustomDrawer() {
             text="Commission"
           />
         </List>
-        <Divider />
         {/* Menu Administrateur */}
         {user?.roles.includes("1") && (
           <>
