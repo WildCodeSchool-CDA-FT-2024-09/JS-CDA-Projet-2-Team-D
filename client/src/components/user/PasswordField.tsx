@@ -54,6 +54,7 @@ function PasswordField({
           id={name}
           name={name}
           label={label}
+          aria-label={label}
           type={showPassword ? "text" : "password"}
           error={!!error}
           endAdornment={

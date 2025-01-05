@@ -16,9 +16,6 @@ import {
   Button,
   Checkbox,
   FormControl,
-  // FormHelperText,
-  // IconButton,
-  // InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -29,8 +26,6 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-// import Visibility from "@mui/icons-material/Visibility";
-// import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
@@ -50,24 +45,6 @@ export default function CreateUser() {
   const { data: rolesData } = useGetRolesQuery();
   const { data: commissionsData } = useGetCommissionsQuery();
   const [createNewUser] = useCreateNewUserMutation();
-
-  // Password texfield
-  // const [showConfirmPassword, setShowConfirmPassword] =
-  //   useState<boolean>(false);
-  // const handleClickShowConfirmPassword = () =>
-  //   setShowConfirmPassword((show) => !show);
-
-  // const handleMouseDownConfirmPassword = (
-  //   event: React.MouseEvent<HTMLButtonElement>,
-  // ) => {
-  //   event.preventDefault();
-  // };
-
-  // const handleMouseUpConfirmPassword = (
-  //   event: React.MouseEvent<HTMLButtonElement>,
-  // ) => {
-  //   event.preventDefault();
-  // };
 
   const handleGeneratePassword = () => {
     const pwd = generatePassword(12);
@@ -184,7 +161,10 @@ export default function CreateUser() {
       if (formData.firstname) setValue("firstname", "");
       if (formData.lastname) setValue("lastname", "");
       if (formData.email) setValue("email", "");
-      if (formData.password) setValue("password", "");
+      if (formData.password) {
+        setValue("password", "");
+        setValue("passwordConfirm", "");
+      }
       setRoles([]);
       setCommissions([]);
     } catch (error) {
@@ -241,6 +221,7 @@ export default function CreateUser() {
               required
               id="firstname"
               label="Prénom"
+              aria-label="Prénom"
               name="firstname"
               variant="outlined"
               error={!!errors.firstname}
@@ -258,6 +239,7 @@ export default function CreateUser() {
               required
               id="lastname"
               label="Nom"
+              aria-label="Nom"
               name="lastname"
               variant="outlined"
               error={!!errors.lastname}
@@ -275,6 +257,7 @@ export default function CreateUser() {
               required
               id="email"
               label="Email"
+              aria-label="Email"
               name="email"
               type="email"
               variant="outlined"
@@ -288,12 +271,13 @@ export default function CreateUser() {
           </Grid>
           <Grid size={6}>
             <FormControl sx={{ width: "100%" }}>
-              <InputLabel id="role-select-label">Roles</InputLabel>
+              <InputLabel id="role-select-label">Rôles</InputLabel>
               <Select
                 {...register("roles")}
                 fullWidth
                 required
                 labelId="role-select-label"
+                aria-label="Rôles"
                 id="roles"
                 name="roles"
                 multiple
@@ -338,11 +322,10 @@ export default function CreateUser() {
           </Grid>
           <Grid size={6}>
             <PasswordField
-              label="password"
-              //name="Confirmer le mot de passe"
+              label="Confirmer le mot de passe"
               error={
-                errors.password?.message
-                  ? { message: errors.password.message }
+                errors.passwordConfirm?.message
+                  ? { message: errors.passwordConfirm.message }
                   : undefined
               }
               {...register("passwordConfirm")}
@@ -354,53 +337,14 @@ export default function CreateUser() {
                 await trigger(["password", "passwordConfirm"]);
               }}
             />
-            {/* <FormControl error={!!errors.passwordConfirm} fullWidth>
-              <InputLabel htmlFor="passwordConfirm">
-                Confirmer le mot de passe
-              </InputLabel>
-              <OutlinedInput
-                {...register("passwordConfirm")}
-                fullWidth
-                required
-                id="passwordConfirm"
-                name="passwordConfirm"
-                label="Confirmer le mot de passe"
-                type={showConfirmPassword ? "text" : "password"}
-                value={watch("passwordConfirm")} // Explicitly set value using watch
-                error={!!errors.passwordConfirm}
-                onChange={async (e) => {
-                  setValue("passwordConfirm", e.target.value, {
-                    shouldValidate: true,
-                  });
-                  await trigger(["password", "passwordConfirm"]);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showConfirmPassword
-                          ? "Cacher le mot de passe"
-                          : "Afficher le mot de passe"
-                      }
-                      onClick={handleClickShowConfirmPassword}
-                      onMouseDown={handleMouseDownConfirmPassword}
-                      onMouseUp={handleMouseUpConfirmPassword}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-              <FormHelperText>{errors.passwordConfirm?.message}</FormHelperText>
-            </FormControl> */}
           </Grid>
           <Grid size={12}>
             <Button
+              aria-label="Générer un mot de passe aléatoire"
               startIcon={<SyncLockIcon />}
               onClick={handleGeneratePassword}
             >
-              Générer un mot de passe
+              Générer un mot de passe aléatoire
             </Button>
           </Grid>
           <Grid size={12}>
@@ -414,6 +358,7 @@ export default function CreateUser() {
                 {...register("commissions")}
                 fullWidth
                 labelId="commission-select-label"
+                aria-label="Commissions"
                 id="commissions"
                 name="commissions"
                 multiple
@@ -442,6 +387,7 @@ export default function CreateUser() {
               type="submit"
               variant="contained"
               startIcon={<AddIcon />}
+              aria-label="Ajouter l'utilisateur"
             >
               Ajouter
             </Button>
