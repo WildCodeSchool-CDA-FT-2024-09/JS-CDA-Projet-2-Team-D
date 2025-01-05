@@ -1,6 +1,7 @@
 import React from "react";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
 import { PieChart } from "@mui/x-charts/PieChart";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 const colors = [
   "#018571",
@@ -13,6 +14,9 @@ const colors = [
 ];
 
 const BudgetOverview: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const { data, loading, error } = useGetBudgetOverviewQuery();
 
   if (loading) return <p>Chargement...</p>;
@@ -22,25 +26,24 @@ const BudgetOverview: React.FC = () => {
   const globalBudget = data?.getBudgetOverview.globalBudget || 0;
 
   const pieChartData = budgetsData.map((budget, index) => ({
-    value: budget.amount,
+    value: parseFloat(budget.amount.toFixed(2)),
     label: budget.commissions.name,
     color: colors[index % colors.length],
   }));
 
-  console.info("pieChartData:", pieChartData);
-
   return (
     <article style={{ textAlign: "center" }}>
       <h2>Vue d'ensemble des budgets</h2>
-      <h3>Budget global : {globalBudget.toLocaleString()} €</h3>
+      <h3>Budget global : {globalBudget.toFixed(2)} €</h3>
       <PieChart
         series={[
           {
-            arcLabel: (item) => `${item.value}€`,
-            arcLabelRadius: "70%",
+            arcLabel: (item) => `${item.value.toFixed(2)}€`,
+            arcLabelMinAngle: 20,
+            arcLabelRadius: isMobile ? "70%" : "60%",
             data: pieChartData,
             innerRadius: 50,
-            outerRadius: 190,
+            outerRadius: isMobile ? 140 : 190,
             startAngle: 0,
             endAngle: 360,
             cornerRadius: 0,
@@ -50,16 +53,30 @@ const BudgetOverview: React.FC = () => {
               additionalRadius: -30,
               color: "gray",
             },
-            valueFormatter: (value: { value: number }) => `${value.value} €`,
+            valueFormatter: (value: { value: number }) =>
+              `${value.value.toFixed(2)} €`,
           },
         ]}
-        height={400}
+        height={isMobile ? 400 : 500}
         slotProps={{
           legend: {
-            direction: "row",
-            position: { vertical: "bottom", horizontal: "middle" },
-            padding: 20,
+            direction: isMobile ? "row" : "column",
+            position: {
+              vertical: isMobile ? "bottom" : "middle",
+              horizontal: isMobile ? "middle" : "right",
+            },
+            padding: isMobile ? 10 : 90,
+            itemMarkWidth: isMobile ? 10 : 20,
+            itemMarkHeight: isMobile ? 10 : 20,
+            markGap: isMobile ? 5 : 15,
+            itemGap: isMobile ? 5 : 30,
           },
+        }}
+        margin={{
+          top: 20,
+          right: isMobile ? 20 : 100,
+          bottom: isMobile ? 120 : 20,
+          left: 20,
         }}
       />
     </article>
