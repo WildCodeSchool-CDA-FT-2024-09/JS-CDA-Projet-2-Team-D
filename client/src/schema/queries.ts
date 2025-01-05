@@ -228,3 +228,18 @@ export const GET_BUDGET_OVERVIEW = gql`
     }
   }
 `;
+
+export const GET_BANKS = gql`
+  query GetBanks {
+    getBanks {
+      label
+      id
+      bankAccounts {
+        name
+        account_number
+        balance
+        id
+      }
+    }
+  }
+`;
