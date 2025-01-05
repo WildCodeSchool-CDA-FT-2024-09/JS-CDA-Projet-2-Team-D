@@ -10,6 +10,7 @@ import {
 import { generatePassword } from "../../../utils/generatePassword";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
+import GeneratePassword from "../../../components/user/GeneratePassword";
 import PasswordField from "../../../components/user/PasswordField";
 import {
   Box,
@@ -26,7 +27,6 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -202,6 +202,12 @@ export default function CreateUser() {
         </BtnLink>
       </Box>
 
+      {Object.keys(errors).length > 0 && (
+        <Box sx={{ color: "red", mt: 2, textAlign: "center" }}>
+          Veuillez corriger les erreurs dans le formulaire
+        </Box>
+      )}
+
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -339,13 +345,7 @@ export default function CreateUser() {
             />
           </Grid>
           <Grid size={12}>
-            <Button
-              aria-label="Générer un mot de passe aléatoire"
-              startIcon={<SyncLockIcon />}
-              onClick={handleGeneratePassword}
-            >
-              Générer un mot de passe aléatoire
-            </Button>
+            <GeneratePassword handleGeneratePassword={handleGeneratePassword} />
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs

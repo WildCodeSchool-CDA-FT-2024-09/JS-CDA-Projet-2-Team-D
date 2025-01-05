@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -13,6 +12,7 @@ import {
 } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
+import GeneratePassword from "../../../components/user/GeneratePassword";
 import PasswordField from "../../../components/user/PasswordField";
 import {
   Box,
@@ -29,7 +29,6 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Grid from "@mui/material/Grid2";
-import SyncLockIcon from "@mui/icons-material/SyncLock";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -347,44 +346,6 @@ export default function UpdateUser() {
                 await trigger(["password", "passwordConfirm"]);
               }}
             />
-            {/* <FormControl error={!!errors.password} fullWidth>
-              <InputLabel htmlFor="password">Mot de passe</InputLabel>
-              <OutlinedInput
-                {...register("password")}
-                fullWidth
-                required
-                id="password"
-                name="password"
-                label="Mot de passe"
-                type={showPassword ? "text" : "password"}
-                value={watch("password")} // Explicitly set value using watch
-                error={!!errors.password}
-                onChange={async (e) => {
-                  setValue("password", e.target.value, {
-                    shouldValidate: true,
-                  });
-                  await trigger(["password", "passwordConfirm"]);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showPassword
-                          ? "Cacher le mot de passe"
-                          : "Afficher le mot de passe"
-                      }
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      onMouseUp={handleMouseUpPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-              <FormHelperText>{errors.password?.message}</FormHelperText>
-            </FormControl> */}
           </Grid>
           <Grid size={6}>
             <PasswordField
@@ -403,55 +364,9 @@ export default function UpdateUser() {
                 await trigger(["password", "passwordConfirm"]);
               }}
             />
-            {/* <FormControl error={!!errors.passwordConfirm} fullWidth>
-              <InputLabel htmlFor="passwordConfirm">
-                Confirmer le mot de passe
-              </InputLabel>
-              <OutlinedInput
-                {...register("passwordConfirm")}
-                fullWidth
-                required
-                id="passwordConfirm"
-                name="passwordConfirm"
-                label="Confirmer le mot de passe"
-                type={showConfirmPassword ? "text" : "password"}
-                value={watch("passwordConfirm")} // Explicitly set value using watch
-                error={!!errors.passwordConfirm}
-                onChange={async (e) => {
-                  setValue("passwordConfirm", e.target.value, {
-                    shouldValidate: true,
-                  });
-                  await trigger(["password", "passwordConfirm"]);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showConfirmPassword
-                          ? "Cacher le mot de passe"
-                          : "Afficher le mot de passe"
-                      }
-                      onClick={handleClickShowConfirmPassword}
-                      onMouseDown={handleMouseDownConfirmPassword}
-                      onMouseUp={handleMouseUpConfirmPassword}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              /> */}
-            {/* <FormHelperText>{errors.passwordConfirm?.message}</FormHelperText>
-            </FormControl> */}
           </Grid>
           <Grid size={12}>
-            <Button
-              aria-label="Générer un mot de passe aléatoire"
-              startIcon={<SyncLockIcon />}
-              onClick={handleGeneratePassword}
-            >
-              Générer un mot de passe aléatoire
-            </Button>
+            <GeneratePassword handleGeneratePassword={handleGeneratePassword} />
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs
