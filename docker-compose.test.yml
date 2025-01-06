@@ -1,19 +1,23 @@
 services:
-  client:
-    build: ./client
-    # entrypoint: ["/bin/sh", "-c"]
+  staging_postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d staging_db -U staging_user']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  staging_api_data:
+    build: ./api_data
     command: npm run test
     restart: always
     environment:
-      - VITE_API_URL=http://localhost:7100/graph
-    volumes:
-      - ./client:/app/
-
-  reverse_proxy:
-    image: nginx
-    ports:
-      - 7100:80
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - client
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres

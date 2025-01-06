@@ -44,6 +44,25 @@ export default function Administrator() {
         >
           Gestion des utilisateurs
         </BtnLink>
+        <BtnLink
+          to="/administrator/bank"
+          sx={{
+            display: "inline-block",
+            marginLeft: "auto",
+            backgroundColor: "primary.main",
+            padding: "8px 16px",
+            color: "primary.contrastText",
+            textTransform: "uppercase",
+            borderRadius: "4px",
+            textDecoration: "none",
+            textAlign: "center",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+          }}
+        >
+          Liste des comptes bancaires
+        </BtnLink>
       </Stack>
     </>
   );
