@@ -42,7 +42,7 @@ export type AuthenticatedUserResponse = {
 
 export type Bank = {
   __typename?: "Bank";
-  bankAccounts: Array<BankAccount>;
+  bankAccounts?: Maybe<Array<BankAccount>>;
   id: Scalars["Int"]["output"];
   label: Scalars["String"]["output"];
 };
@@ -757,6 +757,24 @@ export type GetInvoicesToValidateOrRefusedQuery = {
       firstname: string;
       lastname: string;
     };
+  }>;
+};
+
+export type GetBanksQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBanksQuery = {
+  __typename?: "Query";
+  getBanks: Array<{
+    __typename?: "Bank";
+    label: string;
+    id: number;
+    bankAccounts?: Array<{
+      __typename?: "BankAccount";
+      name: string;
+      account_number: string;
+      balance: number;
+      id: number;
+    }> | null;
   }>;
 };
 
@@ -2535,6 +2553,82 @@ export type GetInvoicesToValidateOrRefusedQueryResult = Apollo.QueryResult<
   GetInvoicesToValidateOrRefusedQuery,
   GetInvoicesToValidateOrRefusedQueryVariables
 >;
+export const GetBanksDocument = gql`
+  query GetBanks {
+    getBanks {
+      label
+      id
+      bankAccounts {
+        name
+        account_number
+        balance
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetBanksQuery__
+ *
+ * To run a query within a React component, call `useGetBanksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBanksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBanksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBanksQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetBanksQuery, GetBanksQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export function useGetBanksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBanksQuery,
+    GetBanksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export function useGetBanksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetBanksQuery, GetBanksQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export type GetBanksQueryHookResult = ReturnType<typeof useGetBanksQuery>;
+export type GetBanksLazyQueryHookResult = ReturnType<
+  typeof useGetBanksLazyQuery
+>;
+export type GetBanksSuspenseQueryHookResult = ReturnType<
+  typeof useGetBanksSuspenseQuery
+>;
+export type GetBanksQueryResult = Apollo.QueryResult<
+  GetBanksQuery,
+  GetBanksQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2550,6 +2644,7 @@ export const namedOperations = {
     GetExercises: "GetExercises",
     GetBudgetOverview: "GetBudgetOverview",
     GetInvoicesToValidateOrRefused: "GetInvoicesToValidateOrRefused",
+    GetBanks: "GetBanks",
   },
   Mutation: {
     AddCategory: "AddCategory",
