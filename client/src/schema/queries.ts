@@ -272,3 +272,18 @@ export const GET_INVOICES_TO_VALIDATE_OR_REFUSED = gql`
     }
   }
 `;
+
+export const GET_BANKS = gql`
+  query GetBanks {
+    getBanks {
+      label
+      id
+      bankAccounts {
+        name
+        account_number
+        balance
+        id
+      }
+    }
+  }
+`;
