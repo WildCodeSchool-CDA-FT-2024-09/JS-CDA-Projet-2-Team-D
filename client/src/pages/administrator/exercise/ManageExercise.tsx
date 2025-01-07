@@ -54,6 +54,7 @@ export default function ManageExercise() {
               <TableCell align="left">Libellé</TableCell>
               <TableCell align="left">Début</TableCell>
               <TableCell align="left">Fin</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

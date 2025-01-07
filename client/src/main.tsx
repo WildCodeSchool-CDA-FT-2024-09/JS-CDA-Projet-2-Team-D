@@ -20,6 +20,7 @@ import Administrator from "./pages/administrator/Administrator.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
 import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
+import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
               {
                 path: "add",
                 element: <CreateExercise />,
+              },
+              {
+                path: ":idExercise/budgets",
+                element: <SetupBudgets />,
               },
             ],
           },
