@@ -55,7 +55,9 @@ function AddCategory() {
 
     if (
       existingCategories.data?.getCategories.find(
-        (c) => c.label.toLowerCase() === category,
+        (c) =>
+          c.label.toLowerCase() === category.toLowerCase() &&
+          c.creditDebit.id === creditDebitId,
       )
     ) {
       notifyError("Cette catégorie existe déjà !");
