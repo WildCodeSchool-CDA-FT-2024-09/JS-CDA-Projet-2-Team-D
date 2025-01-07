@@ -8,6 +8,7 @@ import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
 import InboxIcon from "@mui/icons-material/Inbox";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 
 const drawerWidth = 280;
 
@@ -83,6 +84,11 @@ function CustomDrawer() {
                 to="/administrator/exercise"
                 icon={<CardTravelIcon />}
                 text="Gestion des exercises"
+              />
+              <DrawerMenuItem
+                to="/administrator/bank"
+                icon={<AccountBalanceIcon />}
+                text="Consultation des comptes bancaires "
               />
             </List>
           </>
