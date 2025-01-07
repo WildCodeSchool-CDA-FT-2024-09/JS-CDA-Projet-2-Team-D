@@ -4,6 +4,7 @@ WORKDIR /app
 COPY *.json ./
 RUN npm install
 COPY src src
+COPY db_import db_import
 COPY ./jest.config.ts .
 COPY tests tests
 EXPOSE 4000

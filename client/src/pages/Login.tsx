@@ -7,7 +7,6 @@ import Stack from "@mui/material/Stack";
 import {
   Button,
   FormControl,
-  Grid2,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -155,15 +154,8 @@ export default function Login() {
         </form>
 
         <Stack spacing={2} sx={{ marginTop: "4em", marginBottom: "2em" }}>
-          <Grid2 container spacing={12}>
-            Comptes de démonstration : <br />
-            SUPERADMIN: super@admin.net (mdp : whS0@cqnuros ) <br />
-            Administrateur : zen@noisette.net (mdp : whS0@cqnuros )
-            <br />
-            Comptable : wanda.hayes@example.com (mdp : whS0@cqnuros )
-            <br />
-            Commission : vincent.harris@example.com (mdp : whS0@cqnuros )
-          </Grid2>
+          Compte de démonstration SUPERADMIN: super@admin.net (mdp :
+          whS0@cqnuros )
         </Stack>
       </Box>
     </>
