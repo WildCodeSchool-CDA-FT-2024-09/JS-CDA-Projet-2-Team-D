@@ -301,9 +301,12 @@ const InvoiceForm: React.FC = () => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Grid size={8} alignItems="center" justifyContent="center">
+            <Grid size={9} alignItems="center" justifyContent="center">
               <FormControl component="fieldset">
-                <Typography>Type de transaction</Typography>
+                <Typography>
+                  <strong>Type de transaction</strong> (
+                  <em>Cocher pour voir les catégories</em>)
+                </Typography>
                 <RadioGroup
                   row
                   name="credit-debit-type"
@@ -324,7 +327,7 @@ const InvoiceForm: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid
-              size={4}
+              size={3}
               container
               direction="column"
               alignItems="center"
@@ -345,7 +348,7 @@ const InvoiceForm: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* N'afficher les catégories que si un type crédit/débit est sélectionné */}
+          {/* Only show categories if a credit/debit type is selected */}
           {creditDebitType !== 0 && (
             <>
               <Grid size={isMobile ? 12 : 6}>
@@ -380,9 +383,6 @@ const InvoiceForm: React.FC = () => {
             label="Libellé"
             value={invoice.label || ""}
             onChange={handleInvoiceChange}
-            required={true}
-            // error={invoice.label.length === 0}
-            // helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
           />
           <Grid size={isMobile ? 12 : 6}>
             <FormTextField
@@ -392,10 +392,6 @@ const InvoiceForm: React.FC = () => {
               value={invoice.price_without_vat.toString()}
               onChange={handleInvoiceChange}
               required={true}
-              error={invoice.price_without_vat === 0}
-              helperText={
-                invoice.price_without_vat === 0 ? "Ce champ est requis" : ""
-              }
             />
           </Grid>
           <Grid size={isMobile ? 12 : 6}>

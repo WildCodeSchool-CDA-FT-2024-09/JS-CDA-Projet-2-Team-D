@@ -42,7 +42,7 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
 
       if (selectedVat) {
         const vatRate = selectedVat.rate;
-        const parsedPriceWithoutVat = parseFloat(priceWithoutVat) || 0;
+        const parsedPriceWithoutVat = priceWithoutVat || 0;
         const totalTTC =
           parsedPriceWithoutVat + (parsedPriceWithoutVat * vatRate) / 100;
 
