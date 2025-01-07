@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   useAddCategoryMutation,
   useGetCategoriesQuery,
+  useGetCreditDebitsQuery,
 } from "../../types/graphql-types";
 
 import useNotification from "../../hooks/useNotification";
@@ -33,6 +34,10 @@ function AddCategory() {
   const [category, setCategory] = useState<string>("");
   const [creditDebitId, setCreditDebitId] = useState<number>(0);
   const [addCategoryMutation, { loading, error }] = useAddCategoryMutation();
+
+  const { data } = useGetCreditDebitsQuery();
+
+  const creditDebits = data?.getCreditDebits;
 
   const { notifyError, notifySuccess } = useNotification();
 
@@ -146,14 +151,13 @@ function AddCategory() {
                 }}
               >
                 <MenuItem value={0} sx={{ color: "#9e9e9e" }} disabled>
-                  Crédit ou Débit
+                  Selectionner une option
                 </MenuItem>
-                <MenuItem value={1} sx={{ color: "#9e9e9e" }}>
-                  Crédit
-                </MenuItem>
-                <MenuItem value={2} sx={{ color: "#9e9e9e" }}>
-                  Débit
-                </MenuItem>
+                {creditDebits?.map((cd) => (
+                  <MenuItem key={cd.id} value={cd.id} sx={{ color: "#9e9e9e" }}>
+                    {cd.label}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <Button

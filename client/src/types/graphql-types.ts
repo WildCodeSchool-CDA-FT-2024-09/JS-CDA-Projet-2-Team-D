@@ -592,6 +592,17 @@ export type GetCategoriesQuery = {
   }>;
 };
 
+export type GetCreditDebitsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCreditDebitsQuery = {
+  __typename?: "Query";
+  getCreditDebits: Array<{
+    __typename?: "CreditDebit";
+    id: number;
+    label: string;
+  }>;
+};
+
 export type GetVatsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetVatsQuery = {
@@ -1746,6 +1757,84 @@ export type GetCategoriesQueryResult = Apollo.QueryResult<
   GetCategoriesQuery,
   GetCategoriesQueryVariables
 >;
+export const GetCreditDebitsDocument = gql`
+  query GetCreditDebits {
+    getCreditDebits {
+      id
+      label
+    }
+  }
+`;
+
+/**
+ * __useGetCreditDebitsQuery__
+ *
+ * To run a query within a React component, call `useGetCreditDebitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCreditDebitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCreditDebitsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCreditDebitsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCreditDebitsQuery,
+    GetCreditDebitsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCreditDebitsQuery, GetCreditDebitsQueryVariables>(
+    GetCreditDebitsDocument,
+    options,
+  );
+}
+export function useGetCreditDebitsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCreditDebitsQuery,
+    GetCreditDebitsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCreditDebitsQuery,
+    GetCreditDebitsQueryVariables
+  >(GetCreditDebitsDocument, options);
+}
+export function useGetCreditDebitsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCreditDebitsQuery,
+        GetCreditDebitsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCreditDebitsQuery,
+    GetCreditDebitsQueryVariables
+  >(GetCreditDebitsDocument, options);
+}
+export type GetCreditDebitsQueryHookResult = ReturnType<
+  typeof useGetCreditDebitsQuery
+>;
+export type GetCreditDebitsLazyQueryHookResult = ReturnType<
+  typeof useGetCreditDebitsLazyQuery
+>;
+export type GetCreditDebitsSuspenseQueryHookResult = ReturnType<
+  typeof useGetCreditDebitsSuspenseQuery
+>;
+export type GetCreditDebitsQueryResult = Apollo.QueryResult<
+  GetCreditDebitsQuery,
+  GetCreditDebitsQueryVariables
+>;
 export const GetVatsDocument = gql`
   query GetVats {
     getVats {
@@ -2635,6 +2724,7 @@ export const namedOperations = {
     GetRoles: "GetRoles",
     GetInvoices: "GetInvoices",
     GetCategories: "GetCategories",
+    GetCreditDebits: "GetCreditDebits",
     GetVats: "GetVats",
     GetCommissions: "GetCommissions",
     GetInvoicesByCommissionId: "GetInvoicesByCommissionId",
