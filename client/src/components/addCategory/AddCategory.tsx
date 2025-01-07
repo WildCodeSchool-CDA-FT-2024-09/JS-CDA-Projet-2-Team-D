@@ -60,7 +60,9 @@ function AddCategory() {
           c.creditDebit.id === creditDebitId,
       )
     ) {
-      notifyError("Cette catégorie existe déjà !");
+      notifyError(
+        "Cette catégorie existe déjà pour cette option de crédit/débit !",
+      );
       return false;
     }
 
