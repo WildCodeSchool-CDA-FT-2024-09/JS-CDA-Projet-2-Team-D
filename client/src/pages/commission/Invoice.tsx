@@ -295,12 +295,7 @@ const InvoiceForm: React.FC = () => {
             </LocalizationProvider>
           </Grid>
 
-          <Grid
-            container
-            size={12}
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Grid container size={12} alignItems="center" justifyContent="center">
             <Grid size={9} alignItems="center" justifyContent="center">
               <FormControl component="fieldset">
                 <Typography>
@@ -447,18 +442,26 @@ const InvoiceForm: React.FC = () => {
           <Grid
             size={12}
             container
-            direction="column"
+            direction="row"
             alignItems="center"
             justifyContent="center"
+            spacing={2}
           >
-            <Typography>Justificatif</Typography>
-            <BtnUpload onFileChange={handleFileUpload} />
+            <Grid>
+              <Typography>Justificatif</Typography>
+            </Grid>
+            <Grid>
+              <BtnUpload onFileChange={handleFileUpload} />
+            </Grid>
             {invoice.receipt && (
-              <Typography variant="body2" color="textSecondary">
-                {invoice.receipt.name}
-              </Typography>
+              <Grid>
+                <Typography variant="body2" color="textSecondary">
+                  {invoice.receipt.name}
+                </Typography>
+              </Grid>
             )}
           </Grid>
+
           <Grid size={12}>
             <FormTextField
               name="info"
