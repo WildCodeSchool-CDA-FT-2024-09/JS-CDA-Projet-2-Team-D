@@ -30,8 +30,16 @@ export default class CategoryResolver {
     if (label.trim() === "") {
       throw new Error("Veuillez entrer un libellé de catégorie !");
     }
-    if (await Category.findOneBy({ label })) {
-      throw new Error("Cette catégorie existe déjà !");
+
+    const existingCategory = await Category.findOneBy({
+      label,
+      creditDebit: { id: creditDebitId },
+    });
+
+    if (existingCategory) {
+      throw new Error(
+        "Cette catégorie existe déjà pour cette option de crédit/débit !"
+      );
     }
 
     const category = new Category();

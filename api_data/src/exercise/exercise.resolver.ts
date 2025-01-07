@@ -1,6 +1,8 @@
 import { Resolver, Query, Mutation, Arg } from "type-graphql";
 import { validate } from "class-validator";
 import { Exercise } from "./exercise.entity";
+import { Budget } from "../budget/budget.entity";
+import { Commission } from "../commission/commission.entity";
 import { ExerciseInput } from "./exercise.type";
 
 @Resolver(Exercise)
@@ -33,6 +35,18 @@ export default class ExerciseResolver {
         );
 
       const newExercise = await exercise.save();
+
+      // Init all commissions' budgets
+      const commissions = await Commission.find();
+
+      commissions.forEach(async (commission) => {
+        const budget = new Budget();
+        budget.commissionId = commission.id;
+        budget.exerciseId = newExercise.id;
+        budget.amount = 0;
+
+        await budget.save();
+      });
 
       return newExercise;
     } catch (error) {

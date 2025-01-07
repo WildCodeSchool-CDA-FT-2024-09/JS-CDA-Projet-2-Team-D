@@ -1,6 +1,6 @@
 import { useState } from "react";
-// import { Exercise } from "../../types/graphql-types";
 import { formatDate } from "../../utils/dateUtils";
+import BtnLink from "../BtnLink";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
@@ -54,6 +54,27 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         </TableCell>
         <TableCell align="left">{formatDate(exercise.start_date)}</TableCell>
         <TableCell align="left">{formatDate(exercise.end_date)}</TableCell>
+        <TableCell align="right">
+          <BtnLink
+            to={`/administrator/exercise/${exercise.id}/budgets`}
+            sx={{
+              display: "inline-block",
+              marginLeft: "auto",
+              backgroundColor: "primary.main",
+              padding: "8px 16px",
+              color: "primary.contrastText",
+              textTransform: "uppercase",
+              borderRadius: "4px",
+              textDecoration: "none",
+              textAlign: "center",
+              "&:hover": {
+                backgroundColor: "primary.dark",
+              },
+            }}
+          >
+            Gérer
+          </BtnLink>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -79,7 +100,9 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
                       >
                         {budget.commissions.name}
                       </TableCell>
-                      <TableCell align="right">{budget.amount} €</TableCell>
+                      <TableCell align="right">
+                        {budget.amount.toFixed(2)} €
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
