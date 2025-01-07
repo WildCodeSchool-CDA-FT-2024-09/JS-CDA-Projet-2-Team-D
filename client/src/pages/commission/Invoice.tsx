@@ -8,6 +8,9 @@ import {
   SelectChangeEvent,
   Checkbox,
   FormControlLabel,
+  FormControl,
+  RadioGroup,
+  Radio,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
@@ -28,9 +31,23 @@ import { useUser } from "../../hooks/useUser";
 
 const InvoiceForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { user } = useUser();
   const userId = user?.id;
+  const [creditDebitType, setCreditDebitType] = useState<number>(0);
+
+  const handleCreditDebitChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = parseInt(event.target.value);
+    setCreditDebitType(value);
+    setInvoice((prevState) => ({
+      ...prevState,
+      credit_debit_id: value,
+      // Reset the category when changing credit/debit type
+      category_id: 0,
+      subcategory_id: 0,
+    }));
+  };
 
   const {
     data: vatRatesData,
@@ -216,7 +233,6 @@ const InvoiceForm: React.FC = () => {
               required
             />
           </Grid>
-
           <Grid size={6}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
@@ -234,27 +250,55 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={6}>
-            <FormSelect
-              name="category_id"
-              label="Catégories"
-              property="label"
-              value={invoice.category_id ?? ""}
-              handleSelect={handleInvoiceChange}
-              required
-            />
+          <Grid size={12}>
+            <FormControl component="fieldset">
+              <Typography>Type de transaction</Typography>
+              <RadioGroup
+                row
+                name="credit-debit-type"
+                value={creditDebitType.toString()}
+                onChange={handleCreditDebitChange}
+              >
+                <FormControlLabel
+                  value="1"
+                  control={<Radio />}
+                  label="Crédit"
+                />
+                <FormControlLabel value="2" control={<Radio />} label="Débit" />
+              </RadioGroup>
+            </FormControl>
           </Grid>
-          <Grid size={6}>
-            <FormSelect
-              name="subcategory_id"
-              label="Sous-catégories"
-              property="label"
-              value={invoice.subcategory_id?.toString() ?? ""}
-              subValue={invoice.category_id ?? undefined}
-              handleSelect={handleInvoiceChange}
-              required
-            />
-          </Grid>
+
+          {/* N'afficher les catégories que si un type crédit/débit est sélectionné */}
+          {creditDebitType !== 0 && (
+            <>
+              <Grid size={6}>
+                <FormSelect
+                  name="category_id"
+                  label="Catégories"
+                  property="label"
+                  value={invoice.category_id ?? ""}
+                  handleSelect={handleInvoiceChange}
+                  creditDebitId={creditDebitType}
+                  required
+                />
+              </Grid>
+
+              {invoice.category_id !== 0 && (
+                <Grid size={6}>
+                  <FormSelect
+                    name="subcategory_id"
+                    label="Sous-catégories"
+                    property="label"
+                    value={invoice.subcategory_id?.toString() ?? ""}
+                    subValue={invoice.category_id ?? undefined}
+                    handleSelect={handleInvoiceChange}
+                    required
+                  />
+                </Grid>
+              )}
+            </>
+          )}
           <FormTextField
             name="label"
             label="Libellé"
