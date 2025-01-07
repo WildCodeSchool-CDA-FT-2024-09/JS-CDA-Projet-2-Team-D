@@ -8,6 +8,8 @@ import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
 import InboxIcon from "@mui/icons-material/Inbox";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import ReceiptLongSharpIcon from "@mui/icons-material/ReceiptLongSharp";
 
 const drawerWidth = 280;
 
@@ -75,6 +77,11 @@ function CustomDrawer() {
                 text="Vue globale du budget"
               />
               <DrawerMenuItem
+                to="/administrator/invoiceOverview"
+                icon={<ReceiptLongSharpIcon />}
+                text="Factures par exercice"
+              />
+              <DrawerMenuItem
                 to="/administrator/user"
                 icon={<GroupIcon />}
                 text="Gestion des utilisateurs"
@@ -83,6 +90,11 @@ function CustomDrawer() {
                 to="/administrator/exercise"
                 icon={<CardTravelIcon />}
                 text="Gestion des exercises"
+              />
+              <DrawerMenuItem
+                to="/administrator/bank"
+                icon={<AccountBalanceIcon />}
+                text="Consultation des comptes bancaires "
               />
             </List>
           </>

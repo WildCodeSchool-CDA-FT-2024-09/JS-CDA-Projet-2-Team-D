@@ -14,6 +14,10 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  // BeforeInsert,
+  // BeforeUpdate,
 } from "typeorm";
 import { Status } from "../status/status.entity";
 import { Vat } from "../vat/vat.entity";
@@ -112,4 +116,14 @@ export class Invoice extends BaseEntity {
   @Field(() => User, { nullable: false })
   @ManyToOne(() => User, (user) => user.id, { nullable: false })
   user: User;
+
+  @Field(() => Number)
+  @Column({ nullable: true, type: "decimal", precision: 10, scale: 2 })
+  amount_with_vat?: number;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  calculatePrixTTC() {
+    this.amount_with_vat = this.price_without_vat * (1 + this.vat.rate / 100);
+  }
 }

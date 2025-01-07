@@ -53,6 +53,18 @@ const theme = createTheme({
       xl: 1280,
     },
   },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          backgroundColor: "#D9D9D9",
+          fontWeight: "bold",
+          whiteSpace: "nowrap",
+          padding: "16px",
+        },
+      },
+    },
+  },
 });
 
 function App() {

@@ -21,6 +21,7 @@ import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
 import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
+import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,16 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <BudgetOverview />,
+              },
+            ],
+          },
+          {
+            path: "invoiceOverview",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <InvoiceOverview />,
               },
             ],
           },

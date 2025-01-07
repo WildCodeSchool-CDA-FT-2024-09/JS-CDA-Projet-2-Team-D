@@ -100,7 +100,9 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
                       >
                         {budget.commissions.name}
                       </TableCell>
-                      <TableCell align="right">{budget.amount} €</TableCell>
+                      <TableCell align="right">
+                        {budget.amount.toFixed(2)} €
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

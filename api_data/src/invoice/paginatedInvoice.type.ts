@@ -9,6 +9,6 @@ export class PaginatedInvoices {
   @Field(() => Int)
   totalCount: number;
 
-  @Field(() => Float)
-  totalAmount: number;
+  @Field(() => Float, { nullable: true })
+  totalAmount?: number | null;
 }

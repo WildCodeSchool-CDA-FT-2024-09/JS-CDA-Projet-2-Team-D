@@ -1,4 +1,4 @@
-import { Resolver, Query } from "type-graphql";
+import { Resolver, Query, Arg } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
@@ -8,6 +8,9 @@ import { Commission } from "../commission/commission.entity";
 import { BankAccount } from "../bankAccount/bank_account.entity";
 import { User } from "../user/user.entity";
 import { Equal } from "typeorm";
+import { PaginatedInvoices } from "./paginatedInvoice.type";
+import { Between } from "typeorm";
+import { Exercise } from "../exercise/exercise.entity";
 
 @Resolver(Invoice)
 export default class InvoiceResolver {
@@ -189,6 +192,46 @@ export default class InvoiceResolver {
       console.error("Erreur lors de la récupération des factures:", error);
 
       throw new Error("Erreur lors de la récupération des factures");
+    }
+  }
+
+  @Query(() => PaginatedInvoices)
+  async getInvoicesByExercise(
+    @Arg("exerciseId") exerciseId: number,
+    @Arg("offset", { defaultValue: 0 }) offset: number,
+    @Arg("limit", { defaultValue: 10 }) limit: number
+  ): Promise<PaginatedInvoices> {
+    try {
+      const exercise = await Exercise.findOne({
+        where: { id: exerciseId },
+      });
+
+      if (!exercise) {
+        throw new Error("Exercise not found.");
+      }
+
+      const [invoices, totalCount] = await Invoice.findAndCount({
+        where: {
+          date: Between(exercise.start_date, exercise.end_date),
+        },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+        order: { date: "DESC" },
+        take: limit,
+        skip: offset,
+      });
+
+      return { invoices, totalCount };
+    } catch (error) {
+      console.error("Error fetching invoices by exercise:", error);
+      throw new Error("Unable to fetch invoices for the given exercise.");
     }
   }
 }
