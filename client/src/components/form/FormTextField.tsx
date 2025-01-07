@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, TextFieldProps, FormHelperText } from "@mui/material";
+import { TextField, TextFieldProps } from "@mui/material";
 
 interface FormTextFieldProps extends Omit<TextFieldProps, "name"> {
   name: string;
@@ -25,8 +25,8 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
   rows,
   value,
   onChange,
-  error = false,
-  helperText,
+  // error = false,
+  // helperText,
 }) => {
   return (
     <>
@@ -41,11 +41,11 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
         onChange={(e) => {
           onChange?.(e);
         }}
-        error={error}
+        // error={error}
       />
-      {error && helperText && (
+      {/* {error && helperText && (
         <FormHelperText error>{helperText}</FormHelperText>
-      )}
+      )} */}
     </>
   );
 };

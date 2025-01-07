@@ -23,6 +23,7 @@ import {
   isValidInvoice,
 } from "../../types/InvoiceInputType";
 import { useGetVatsQuery } from "../../types/graphql-types";
+import useNotification from "../../hooks/useNotification";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -34,6 +35,7 @@ const InvoiceForm: React.FC = () => {
   const { user } = useUser();
   const userId = user?.id;
   const [creditDebitType, setCreditDebitType] = useState<number>(0);
+  const { notifySuccess, notifyError } = useNotification();
 
   const handleCreditDebitChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -139,7 +141,7 @@ const InvoiceForm: React.FC = () => {
     if (!invoice.receipt) missingFields.push("Justificatif");
 
     if (missingFields.length > 0) {
-      alert(
+      notifyError(
         `Veuillez remplir les champs obligatoires suivants :\n- ${missingFields.join("\n- ")}`,
       );
       setIsSubmitting(false);
@@ -184,7 +186,7 @@ const InvoiceForm: React.FC = () => {
       });
 
       console.info("Réponse du serveur :", response.data);
-      alert("Facture envoyée avec succès !");
+      notifySuccess("Facture envoyée avec succès !");
 
       resetForm();
     } catch (error: unknown) {
@@ -192,7 +194,7 @@ const InvoiceForm: React.FC = () => {
         console.error("Erreur lors de l'envoi :", error.message);
       } else {
         console.error("Erreur inconnue :", error);
-        alert("Échec de l'envoi de la facture.");
+        notifyError("Échec de l'envoi de la facture.");
       }
     } finally {
       setIsSubmitting(false);
