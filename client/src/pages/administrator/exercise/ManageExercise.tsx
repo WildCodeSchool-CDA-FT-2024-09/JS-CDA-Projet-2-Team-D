@@ -9,6 +9,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
 
 export default function ManageExercise() {
   const { data, loading, error } = useGetExercisesQuery();
@@ -17,15 +18,16 @@ export default function ManageExercise() {
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   return (
-    <div>
-      <h1>Gestion des exercices</h1>
-
+    <>
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
         }}
       >
+        <Typography variant="h2" sx={{ marginBottom: "1em", fontSize: "2em" }}>
+          Gestion des exercices
+        </Typography>
         <BtnLink
           to="/administrator/exercise/add"
           sx={{
@@ -54,6 +56,7 @@ export default function ManageExercise() {
               <TableCell align="left">Libellé</TableCell>
               <TableCell align="left">Début</TableCell>
               <TableCell align="left">Fin</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -64,6 +67,6 @@ export default function ManageExercise() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </>
   );
 }

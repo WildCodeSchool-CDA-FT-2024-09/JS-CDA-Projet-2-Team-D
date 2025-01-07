@@ -124,6 +124,7 @@ export type ExerciseInput = {
 
 export type Invoice = {
   __typename?: "Invoice";
+  amount_with_vat: Scalars["Float"]["output"];
   bankAccount?: Maybe<BankAccount>;
   commission: Commission;
   creditDebit: CreditDebit;
@@ -219,7 +220,7 @@ export type MutationUpdateUserArgs = {
 export type PaginatedInvoices = {
   __typename?: "PaginatedInvoices";
   invoices: Array<Invoice>;
-  totalAmount: Scalars["Float"]["output"];
+  totalAmount?: Maybe<Scalars["Float"]["output"]>;
   totalCount: Scalars["Int"]["output"];
 };
 
@@ -242,6 +243,7 @@ export type Query = {
   getExercises: Array<Exercise>;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
+  getInvoicesByExercise: PaginatedInvoices;
   getInvoicesToValidateOrRefused: Array<Invoice>;
   getRoles: Array<Role>;
   getStatus: Array<Status>;
@@ -257,6 +259,12 @@ export type QueryGetCurrentBudgetByCommissionIdArgs = {
 
 export type QueryGetInvoicesByCommissionIdArgs = {
   commissionId: Scalars["Float"]["input"];
+  limit?: Scalars["Float"]["input"];
+  offset?: Scalars["Float"]["input"];
+};
+
+export type QueryGetInvoicesByExerciseArgs = {
+  exerciseId: Scalars["Float"]["input"];
   limit?: Scalars["Float"]["input"];
   offset?: Scalars["Float"]["input"];
 };
@@ -638,7 +646,7 @@ export type GetInvoicesByCommissionIdQuery = {
   getInvoicesByCommissionId: {
     __typename?: "PaginatedInvoices";
     totalCount: number;
-    totalAmount: number;
+    totalAmount?: number | null;
     invoices: Array<{
       __typename?: "Invoice";
       date: string;
@@ -787,6 +795,32 @@ export type GetBanksQuery = {
       id: number;
     }> | null;
   }>;
+};
+
+export type GetInvoicesByExerciseQueryVariables = Exact<{
+  exerciseId: Scalars["Float"]["input"];
+  limit: Scalars["Float"]["input"];
+  offset: Scalars["Float"]["input"];
+}>;
+
+export type GetInvoicesByExerciseQuery = {
+  __typename?: "Query";
+  getInvoicesByExercise: {
+    __typename?: "PaginatedInvoices";
+    totalCount: number;
+    invoices: Array<{
+      __typename?: "Invoice";
+      id: number;
+      invoiceNumber: string;
+      label: string;
+      date: string;
+      amount_with_vat: number;
+      status: { __typename?: "Status"; label: string };
+      commission: { __typename?: "Commission"; name: string };
+      creditDebit: { __typename?: "CreditDebit"; label: string };
+      subcategory: { __typename?: "Subcategory"; label: string };
+    }>;
+  };
 };
 
 export const AddCategoryDocument = gql`
@@ -2718,6 +2752,117 @@ export type GetBanksQueryResult = Apollo.QueryResult<
   GetBanksQuery,
   GetBanksQueryVariables
 >;
+export const GetInvoicesByExerciseDocument = gql`
+  query GetInvoicesByExercise(
+    $exerciseId: Float!
+    $limit: Float!
+    $offset: Float!
+  ) {
+    getInvoicesByExercise(
+      exerciseId: $exerciseId
+      limit: $limit
+      offset: $offset
+    ) {
+      totalCount
+      invoices {
+        id
+        invoiceNumber
+        label
+        date
+        amount_with_vat
+        status {
+          label
+        }
+        commission {
+          name
+        }
+        creditDebit {
+          label
+        }
+        subcategory {
+          label
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetInvoicesByExerciseQuery__
+ *
+ * To run a query within a React component, call `useGetInvoicesByExerciseQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoicesByExerciseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoicesByExerciseQuery({
+ *   variables: {
+ *      exerciseId: // value for 'exerciseId'
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useGetInvoicesByExerciseQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetInvoicesByExerciseQuery,
+    GetInvoicesByExerciseQueryVariables
+  > &
+    (
+      | { variables: GetInvoicesByExerciseQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetInvoicesByExerciseQuery,
+    GetInvoicesByExerciseQueryVariables
+  >(GetInvoicesByExerciseDocument, options);
+}
+export function useGetInvoicesByExerciseLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetInvoicesByExerciseQuery,
+    GetInvoicesByExerciseQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetInvoicesByExerciseQuery,
+    GetInvoicesByExerciseQueryVariables
+  >(GetInvoicesByExerciseDocument, options);
+}
+export function useGetInvoicesByExerciseSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetInvoicesByExerciseQuery,
+        GetInvoicesByExerciseQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetInvoicesByExerciseQuery,
+    GetInvoicesByExerciseQueryVariables
+  >(GetInvoicesByExerciseDocument, options);
+}
+export type GetInvoicesByExerciseQueryHookResult = ReturnType<
+  typeof useGetInvoicesByExerciseQuery
+>;
+export type GetInvoicesByExerciseLazyQueryHookResult = ReturnType<
+  typeof useGetInvoicesByExerciseLazyQuery
+>;
+export type GetInvoicesByExerciseSuspenseQueryHookResult = ReturnType<
+  typeof useGetInvoicesByExerciseSuspenseQuery
+>;
+export type GetInvoicesByExerciseQueryResult = Apollo.QueryResult<
+  GetInvoicesByExerciseQuery,
+  GetInvoicesByExerciseQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2735,6 +2880,7 @@ export const namedOperations = {
     GetBudgetOverview: "GetBudgetOverview",
     GetInvoicesToValidateOrRefused: "GetInvoicesToValidateOrRefused",
     GetBanks: "GetBanks",
+    GetInvoicesByExercise: "GetInvoicesByExercise",
   },
   Mutation: {
     AddCategory: "AddCategory",

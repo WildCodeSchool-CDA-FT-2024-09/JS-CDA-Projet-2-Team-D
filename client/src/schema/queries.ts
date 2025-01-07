@@ -296,3 +296,57 @@ export const GET_BANKS = gql`
     }
   }
 `;
+
+export const GET_EXERCISE_BUDGETS = gql`
+  query GetExerciseBudgets($exerciseId: Float!) {
+    getExerciseBudgets(exerciseId: $exerciseId) {
+      commissionId
+      amount
+      exercise {
+        id
+        label
+        start_date
+        end_date
+      }
+      commissions {
+        id
+        name
+        }
+    }
+  }
+`;
+
+export const GET_INVOICE_BY_EXERCISE = gql`
+  query GetInvoicesByExercise(
+    $exerciseId: Float!
+    $limit: Float!
+    $offset: Float!
+  ) {
+    getInvoicesByExercise(
+      exerciseId: $exerciseId
+      limit: $limit
+      offset: $offset
+    ) {
+      totalCount
+      invoices {
+        id
+        invoiceNumber
+        label
+        date
+        amount_with_vat
+        status {
+          label
+        }
+        commission {
+          name
+        }
+        creditDebit {
+          label
+        }
+        subcategory {
+          label
+        }
+      }
+    }
+  }
+`;
