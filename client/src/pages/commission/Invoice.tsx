@@ -309,12 +309,12 @@ const InvoiceForm: React.FC = () => {
                   onChange={handleCreditDebitChange}
                 >
                   <FormControlLabel
-                    value="1"
+                    value="2"
                     control={<Radio />}
                     label="Crédit"
                   />
                   <FormControlLabel
-                    value="2"
+                    value="1"
                     control={<Radio />}
                     label="Débit"
                   />
@@ -417,21 +417,21 @@ const InvoiceForm: React.FC = () => {
                     style={{
                       fontWeight: "bold",
                       color:
-                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                        invoice.credit_debit_id === 2 ? "#6EBF8B" : "#E21818",
                     }}
                   >
-                    {invoice.credit_debit_id === 1 ? "+" : "-"}
+                    {invoice.credit_debit_id === 2 ? "+" : "-"}
                   </span>
                   {(invoice.total || 0).toFixed(2)} €
                   <span
                     style={{
                       fontWeight: "bold",
                       color:
-                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                        invoice.credit_debit_id === 2 ? "#6EBF8B" : "#E21818",
                       marginLeft: "5px",
                     }}
                   >
-                    ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
+                    ({invoice.credit_debit_id === 2 ? "crédit" : "débit"})
                   </span>
                 </>
               ) : (
