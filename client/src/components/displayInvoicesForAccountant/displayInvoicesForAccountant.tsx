@@ -66,7 +66,6 @@ function DisplayInvoicesForAccountant() {
               <TableRow
                 sx={{
                   backgroundColor: theme.palette.primary.main,
-                  color: "white",
                   fontWeight: "bold",
                   fontSize: "1rem",
                   "& .MuiTableCell-root": {

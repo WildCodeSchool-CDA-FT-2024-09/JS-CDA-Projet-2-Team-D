@@ -94,4 +94,7 @@ export class Invoice {
 
   @Field(() => Int)
   user_id: number;
+
+  @Field(() => Int, { nullable: true })
+  price_with_vat?: number;
 }
