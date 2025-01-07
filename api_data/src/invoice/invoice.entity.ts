@@ -119,7 +119,7 @@ export class Invoice extends BaseEntity {
 
   @Field(() => Number)
   @Column({ nullable: true, type: "decimal", precision: 10, scale: 2 })
-  amount_with_vat?: number;
+  amount_with_vat: number;
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -80,20 +80,30 @@ const HomePageCommission = () => {
   const totalPages = Math.ceil(totalCount / limit);
 
   const getChipStyles = (status: string) => {
-    let backgroundColor;
-    switch (status) {
-      case "Validé":
-        backgroundColor = theme.palette.success.main;
-        break;
-      case "En attente":
-        backgroundColor = theme.palette.warning.main;
-        break;
-      case "Refusé":
-        backgroundColor = theme.palette.error.main;
-        break;
-      default:
-        backgroundColor = theme.palette.primary.main;
-    }
+    // let backgroundColor;
+    // switch (status) {
+    //   case "Validé":
+    //     backgroundColor = theme.palette.success.main;
+    //     break;
+    //   case "En attente":
+    //     backgroundColor = theme.palette.warning.main;
+    //     break;
+    //   case "Refusé":
+    //     backgroundColor = theme.palette.error.main;
+    //     break;
+    //   default:
+    //     backgroundColor = theme.palette.primary.main;
+    // }
+    const statusColors = {
+      Validé: theme.palette.success.main,
+      "En attente": theme.palette.warning.main,
+      Refusé: theme.palette.error.main,
+    };
+
+    const backgroundColor =
+      statusColors[status as keyof typeof statusColors] ||
+      theme.palette.primary.main;
+
     return {
       backgroundColor,
       color: theme.palette.getContrastText(backgroundColor),
@@ -111,7 +121,9 @@ const HomePageCommission = () => {
       >
         Récapitulatif des Factures de Commission
       </Typography>
+
       <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
+
       <TableContainer component={Paper}>
         <Table sx={{ tableLayout: "auto" }}>
           <TableHead>
@@ -136,7 +148,6 @@ const HomePageCommission = () => {
               </TableRow>
             ) : (
               invoices.map((row) => {
-                // Ajustement des montants HT et TTC en fonction du type (Débit ou Crédit)
                 const montantHT =
                   row.creditDebit?.label?.toLowerCase() === "débit"
                     ? -row.price_without_vat
@@ -144,8 +155,8 @@ const HomePageCommission = () => {
 
                 const montantTTC =
                   row.creditDebit?.label?.toLowerCase() === "débit"
-                    ? -row.price_without_vat * (1 + (row.vat?.rate || 0) / 100)
-                    : row.price_without_vat * (1 + (row.vat?.rate || 0) / 100);
+                    ? -row.amount_with_vat
+                    : row.amount_with_vat;
 
                 return (
                   <TableRow key={row.id}>
@@ -179,12 +190,12 @@ const HomePageCommission = () => {
             )}
           </TableBody>
         </Table>
+
         {invoices.length > 0 && (
           <Stack
             spacing={2}
             sx={{
-              marginBottom: "1em",
-              marginTop: "1em",
+              margin: "1em 0",
               display: "flex",
               alignItems: "center",
             }}
