@@ -287,3 +287,22 @@ export const GET_BANKS = gql`
     }
   }
 `;
+
+export const GET_EXERCISE_BUDGETS = gql`
+  query GetExerciseBudgets($exerciseId: Float!) {
+    getExerciseBudgets(exerciseId: $exerciseId) {
+      commissionId
+      amount
+      exercise {
+        id
+        label
+        start_date
+        end_date
+      }
+      commissions {
+        id
+        name
+      }
+    }
+  }
+`;

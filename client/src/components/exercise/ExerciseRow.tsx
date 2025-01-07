@@ -54,9 +54,9 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         </TableCell>
         <TableCell align="left">{formatDate(exercise.start_date)}</TableCell>
         <TableCell align="left">{formatDate(exercise.end_date)}</TableCell>
-        <TableCell>
+        <TableCell align="right">
           <BtnLink
-            href={`/administrator/exercise/${exercise.id}/budgets`}
+            to={`/administrator/exercise/${exercise.id}/budgets`}
             sx={{
               display: "inline-block",
               marginLeft: "auto",

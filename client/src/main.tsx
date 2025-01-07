@@ -95,7 +95,7 @@ const router = createBrowserRouter([
                 element: <CreateExercise />,
               },
               {
-                path: ":idExercise/budgets",
+                path: ":exerciseId/budgets",
                 element: <SetupBudgets />,
               },
             ],
