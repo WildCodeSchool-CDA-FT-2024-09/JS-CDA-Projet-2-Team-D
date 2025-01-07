@@ -213,6 +213,18 @@ import { AppDataSource } from "./data-source";
       ON CONFLICT ("userId", "commissionId") DO NOTHING;
     `);
 
+    // superadmin gets all the commissions
+    await queryRunner.query(`
+      INSERT INTO user_commissions_commission ("userId", "commissionId") VALUES
+        (21, 1),
+        (21, 2),
+        (21, 3),
+        (21, 4),
+        (21, 5),
+        (21, 6),
+        (21, 7);
+    `);
+
     // insert exercise (civil year)
     // await queryRunner.query(`
     //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES

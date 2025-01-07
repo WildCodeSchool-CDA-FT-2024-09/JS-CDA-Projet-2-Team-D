@@ -1,0 +1,60 @@
+services:
+  predeploy-db:
+    image: postgres
+    env_file: .env-predeploy
+    restart: always
+    volumes:
+      - ./api_data/db_import:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d root -U root"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  predeploy-adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    container_name: adminer
+    restart: always
+    depends_on:
+      predeploy-db:
+        condition: service_healthy
+
+  predeploy-api_data:
+    image: pierrejeanroggy/clubcompta-image-api-data:latest
+    command: npm run initdataset
+    restart: always
+    env_file: .env-predeploy
+    depends_on:
+      predeploy-db:
+        condition: service_healthy
+
+  predeploy-api_upload:
+    image: pierrejeanroggy/clubcompta-image-api-upload:latest
+    restart: always
+    env_file: .env-predeploy
+    volumes:
+      - ./api_upload/upload:/var/www/html/upload
+    depends_on:
+      predeploy-db:
+        condition: service_healthy
+
+  predeploy-client:
+    image: pierrejeanroggy/clubcompta-image-client:latest
+    command: npm run dev -- --host
+    restart: always
+    environment:
+      - VITE_API_URL=/graph
+
+  predeploy-reverse_proxy:
+    image: nginx
+    ports:
+      - 8000:80
+    restart: always
+    volumes:
+      - ./nginx.predeploy.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - predeploy-client
+      - predeploy-api_data
+      - predeploy-api_upload
