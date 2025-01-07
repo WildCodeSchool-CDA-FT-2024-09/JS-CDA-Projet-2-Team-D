@@ -146,3 +146,21 @@ export const CREATE_EXERCISE = gql`
     }
   }
 `;
+
+export const SET_COMMISSION_BUDGET_AMOUNT = gql`
+  mutation SetCommissionBudgetAmount(
+    $exerciseId: Float!
+    $commissionId: Float!
+    $amount: Float!
+  ) {
+    setCommissionBudgetAmount(
+      exerciseId: $exerciseId
+      commissionId: $commissionId
+      amount: $amount
+    ) {
+      commissionId
+      exerciseId
+      amount
+    }
+  }
+`;

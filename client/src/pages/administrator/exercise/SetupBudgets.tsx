@@ -1,18 +1,27 @@
-import { useGetExercisesQuery } from "../../../types/graphql-types";
-import ExerciseRow from "../../../components/exercise/ExerciseRow";
+import { useParams } from "react-router-dom";
+import { useGetExerciseBudgetsQuery } from "../../../types/graphql-types";
 import BtnLink from "../../../components/BtnLink";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import { Box } from "@mui/system";
 import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
+import BudgetRow from "../../../components/exercise/BudgetRow";
 
-export default function ManageExercise() {
-  const { data, loading, error } = useGetExercisesQuery();
+function SetupBudgets() {
+  const { exerciseId } = useParams();
+
+  const { data, loading, error } = useGetExerciseBudgetsQuery({
+    variables: {
+      exerciseId: parseInt(exerciseId as string),
+    },
+  });
 
   if (loading) return <p>🥁 Chargement...</p>;
   if (error) return <p>☠️ Erreur: {error.message}</p>;
@@ -26,10 +35,10 @@ export default function ManageExercise() {
         }}
       >
         <Typography variant="h2" sx={{ marginBottom: "1em", fontSize: "2em" }}>
-          Gestion des exercices
+          Mise en place des budgets {data?.getExerciseBudgets[0].exercise.label}
         </Typography>
         <BtnLink
-          to="/administrator/exercise/add"
+          to="/administrator/exercise"
           sx={{
             marginLeft: "auto",
             backgroundColor: "primary.main",
@@ -44,7 +53,7 @@ export default function ManageExercise() {
             },
           }}
         >
-          Ajouter un exercise
+          Retour
         </BtnLink>
       </Box>
 
@@ -52,17 +61,18 @@ export default function ManageExercise() {
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des exercices">
           <TableHead>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell align="left">Libellé</TableCell>
-              <TableCell align="left">Début</TableCell>
-              <TableCell align="left">Fin</TableCell>
-              <TableCell align="right"></TableCell>
+              <TableCell align="left">Commission</TableCell>
+              <TableCell align="right">Montant</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data &&
-              data.getExercises.map((exercise) => (
-                <ExerciseRow key={exercise.id} exercise={exercise} />
+              data.getExerciseBudgets.map((commission) => (
+                <BudgetRow
+                  key={commission.commissionId}
+                  commission={commission}
+                  exerciseId={parseInt(exerciseId as string)}
+                />
               ))}
           </TableBody>
         </Table>
@@ -70,3 +80,5 @@ export default function ManageExercise() {
     </>
   );
 }
+
+export default SetupBudgets;
