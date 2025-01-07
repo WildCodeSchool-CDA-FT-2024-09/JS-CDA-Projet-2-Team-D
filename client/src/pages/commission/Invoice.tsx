@@ -11,6 +11,8 @@ import {
   FormControl,
   RadioGroup,
   Radio,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
@@ -36,6 +38,9 @@ const InvoiceForm: React.FC = () => {
   const { user } = useUser();
   const userId = user?.id;
   const [creditDebitType, setCreditDebitType] = useState<number>(0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const { notifySuccess, notifyError } = useNotification();
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -220,7 +225,11 @@ const InvoiceForm: React.FC = () => {
   return (
     <Paper
       elevation={3}
-      style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
+      style={{
+        padding: "20px",
+        maxWidth: isMobile ? "100%" : "800px",
+        margin: "auto",
+      }}
     >
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Nouvelle Facture
@@ -253,8 +262,12 @@ const InvoiceForm: React.FC = () => {
       </Snackbar>
 
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid size={6}>
+        <Grid
+          container
+          spacing={isMobile ? 2 : 3}
+          direction={isMobile ? "column" : "row"}
+        >
+          <Grid size={isMobile ? 12 : 6}>
             <FormSelect
               name="commission_id"
               property="name"
@@ -264,7 +277,7 @@ const InvoiceForm: React.FC = () => {
               required
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
@@ -281,49 +294,61 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={6}>
-            <FormControl component="fieldset">
-              <Typography>Type de transaction</Typography>
-              <RadioGroup
-                row
-                name="credit-debit-type"
-                value={creditDebitType.toString()}
-                onChange={handleCreditDebitChange}
-              >
-                <FormControlLabel
-                  value="1"
-                  control={<Radio />}
-                  label="Crédit"
-                />
-                <FormControlLabel value="2" control={<Radio />} label="Débit" />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
+
           <Grid
-            size={6}
             container
-            direction="column"
+            size={12}
             alignItems="center"
-            justifyContent="center"
+            justifyContent="space-between"
           >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={invoice.paid}
-                  onChange={(e) => handleInvoiceChange(e)}
-                  name="paid"
-                  aria-checked={invoice.paid ? "true" : "false"}
-                />
-              }
-              label="Payé"
-              aria-live="polite"
-            />
+            <Grid size={8} alignItems="center" justifyContent="center">
+              <FormControl component="fieldset">
+                <Typography>Type de transaction</Typography>
+                <RadioGroup
+                  row
+                  name="credit-debit-type"
+                  value={creditDebitType.toString()}
+                  onChange={handleCreditDebitChange}
+                >
+                  <FormControlLabel
+                    value="1"
+                    control={<Radio />}
+                    label="Crédit"
+                  />
+                  <FormControlLabel
+                    value="2"
+                    control={<Radio />}
+                    label="Débit"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid
+              size={4}
+              container
+              direction="column"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={invoice.paid}
+                    onChange={(e) => handleInvoiceChange(e)}
+                    name="paid"
+                    aria-checked={invoice.paid ? "true" : "false"}
+                  />
+                }
+                label="Payé"
+                aria-live="polite"
+              />
+            </Grid>
           </Grid>
 
           {/* N'afficher les catégories que si un type crédit/débit est sélectionné */}
           {creditDebitType !== 0 && (
             <>
-              <Grid size={6}>
+              <Grid size={isMobile ? 12 : 6}>
                 <FormSelect
                   name="category_id"
                   label="Catégories"
@@ -336,7 +361,7 @@ const InvoiceForm: React.FC = () => {
               </Grid>
 
               {invoice.category_id !== 0 && (
-                <Grid size={6}>
+                <Grid size={isMobile ? 12 : 6}>
                   <FormSelect
                     name="subcategory_id"
                     label="Sous-catégories"
@@ -356,10 +381,10 @@ const InvoiceForm: React.FC = () => {
             value={invoice.label || ""}
             onChange={handleInvoiceChange}
             required={true}
-            error={invoice.label.length === 0}
-            helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
+            // error={invoice.label.length === 0}
+            // helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
           />
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <FormTextField
               name="price_without_vat"
               label="Prix HT"
@@ -373,7 +398,7 @@ const InvoiceForm: React.FC = () => {
               }
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <FormSelectVat
               name="vat_id"
               label="Taux de TVA"
