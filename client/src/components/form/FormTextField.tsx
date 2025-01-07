@@ -25,8 +25,6 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
   rows,
   value,
   onChange,
-  // error = false,
-  // helperText,
 }) => {
   return (
     <>
@@ -41,11 +39,7 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
         onChange={(e) => {
           onChange?.(e);
         }}
-        // error={error}
       />
-      {/* {error && helperText && (
-        <FormHelperText error>{helperText}</FormHelperText>
-      )} */}
     </>
   );
 };

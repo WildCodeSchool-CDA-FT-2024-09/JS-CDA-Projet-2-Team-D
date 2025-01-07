@@ -24,6 +24,7 @@ import {
 } from "../../types/InvoiceInputType";
 import { useGetVatsQuery } from "../../types/graphql-types";
 import useNotification from "../../hooks/useNotification";
+import { Snackbar, Alert, AlertTitle } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -36,6 +37,8 @@ const InvoiceForm: React.FC = () => {
   const userId = user?.id;
   const [creditDebitType, setCreditDebitType] = useState<number>(0);
   const { notifySuccess, notifyError } = useNotification();
+  const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [errorOpen, setErrorOpen] = useState(false);
 
   const handleCreditDebitChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -141,9 +144,8 @@ const InvoiceForm: React.FC = () => {
     if (!invoice.receipt) missingFields.push("Justificatif");
 
     if (missingFields.length > 0) {
-      notifyError(
-        `Veuillez remplir les champs obligatoires suivants :\n- ${missingFields.join("\n- ")}`,
-      );
+      setMissingFields(missingFields); // Saves missing fields
+      setErrorOpen(true);
       setIsSubmitting(false);
       return;
     }
@@ -223,6 +225,33 @@ const InvoiceForm: React.FC = () => {
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Nouvelle Facture
       </Typography>
+      <Snackbar
+        open={errorOpen}
+        onClose={() => setErrorOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={8000}
+      >
+        <Alert
+          onClose={() => setErrorOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{
+            backgroundColor: "#F03D3D",
+            color: "black",
+            fontWeight: "bold",
+            fontSize: "1.25rem",
+          }}
+        >
+          <AlertTitle>Erreur</AlertTitle>
+          Veuillez remplir les champs obligatoires suivants :
+          <ul style={{ margin: 0, paddingLeft: "20px" }}>
+            {missingFields.map((field, index) => (
+              <li key={index}>{field}</li>
+            ))}
+          </ul>
+        </Alert>
+      </Snackbar>
+
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid size={6}>
@@ -252,7 +281,7 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={12}>
+          <Grid size={6}>
             <FormControl component="fieldset">
               <Typography>Type de transaction</Typography>
               <RadioGroup
@@ -269,6 +298,26 @@ const InvoiceForm: React.FC = () => {
                 <FormControlLabel value="2" control={<Radio />} label="Débit" />
               </RadioGroup>
             </FormControl>
+          </Grid>
+          <Grid
+            size={6}
+            container
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={invoice.paid}
+                  onChange={(e) => handleInvoiceChange(e)}
+                  name="paid"
+                  aria-checked={invoice.paid ? "true" : "false"}
+                />
+              }
+              label="Payé"
+              aria-live="polite"
+            />
           </Grid>
 
           {/* N'afficher les catégories que si un type crédit/débit est sélectionné */}
@@ -335,26 +384,6 @@ const InvoiceForm: React.FC = () => {
               setInvoice={
                 setInvoice as React.Dispatch<React.SetStateAction<Invoice>>
               }
-            />
-          </Grid>
-          <Grid
-            size={6}
-            container
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={invoice.paid}
-                  onChange={(e) => handleInvoiceChange(e)}
-                  name="paid"
-                  aria-checked={invoice.paid ? "true" : "false"}
-                />
-              }
-              label="Payé"
-              aria-live="polite"
             />
           </Grid>
           <Grid
