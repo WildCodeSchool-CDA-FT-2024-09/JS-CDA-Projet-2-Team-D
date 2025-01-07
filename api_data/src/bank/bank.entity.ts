@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Field, Int, ObjectType } from "type-graphql";
+import { IsNotEmpty, IsString, Length } from "class-validator";
 import { BankAccount } from "../bankAccount/bank_account.entity";
 
 @ObjectType()
@@ -17,10 +18,13 @@ export class Bank extends BaseEntity {
   id: number;
 
   @Field(() => String)
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 100)
   @Column({ nullable: false, unique: true, type: "varchar", length: 50 })
   label: string;
 
-  @Field(() => [BankAccount])
+  @Field(() => [BankAccount], { nullable: true })
   @OneToMany(() => BankAccount, (bankAccount) => bankAccount.bank)
   bankAccounts: BankAccount[];
 }

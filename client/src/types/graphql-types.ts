@@ -42,7 +42,7 @@ export type AuthenticatedUserResponse = {
 
 export type Bank = {
   __typename?: "Bank";
-  bankAccounts: Array<BankAccount>;
+  bankAccounts?: Maybe<Array<BankAccount>>;
   id: Scalars["Int"]["output"];
   label: Scalars["String"]["output"];
 };
@@ -242,6 +242,7 @@ export type Query = {
   getExercises: Array<Exercise>;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
+  getInvoicesToValidateOrRefused: Array<Invoice>;
   getRoles: Array<Role>;
   getStatus: Array<Status>;
   getSubcategories: Array<Subcategory>;
@@ -722,6 +723,59 @@ export type GetBudgetOverviewQuery = {
       commissions: { __typename?: "Commission"; name: string };
     }>;
   };
+};
+
+export type GetInvoicesToValidateOrRefusedQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetInvoicesToValidateOrRefusedQuery = {
+  __typename?: "Query";
+  getInvoicesToValidateOrRefused: Array<{
+    __typename?: "Invoice";
+    id: number;
+    price_without_vat: number;
+    label: string;
+    receipt: string;
+    info: string;
+    paid: boolean;
+    date: string;
+    invoiceNumber: string;
+    status: { __typename?: "Status"; id: number; label: string };
+    vat: { __typename?: "Vat"; id: number; rate: number };
+    creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
+    subcategory: { __typename?: "Subcategory"; id: number; label: string };
+    commission: { __typename?: "Commission"; id: number; name: string };
+    bankAccount?: {
+      __typename?: "BankAccount";
+      id: number;
+      name: string;
+    } | null;
+    user: {
+      __typename?: "User";
+      id: number;
+      firstname: string;
+      lastname: string;
+    };
+  }>;
+};
+
+export type GetBanksQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBanksQuery = {
+  __typename?: "Query";
+  getBanks: Array<{
+    __typename?: "Bank";
+    label: string;
+    id: number;
+    bankAccounts?: Array<{
+      __typename?: "BankAccount";
+      name: string;
+      account_number: string;
+      balance: number;
+      id: number;
+    }> | null;
+  }>;
 };
 
 export const AddCategoryDocument = gql`
@@ -2386,6 +2440,195 @@ export type GetBudgetOverviewQueryResult = Apollo.QueryResult<
   GetBudgetOverviewQuery,
   GetBudgetOverviewQueryVariables
 >;
+export const GetInvoicesToValidateOrRefusedDocument = gql`
+  query GetInvoicesToValidateOrRefused {
+    getInvoicesToValidateOrRefused {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        label
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetInvoicesToValidateOrRefusedQuery__
+ *
+ * To run a query within a React component, call `useGetInvoicesToValidateOrRefusedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoicesToValidateOrRefusedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoicesToValidateOrRefusedQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetInvoicesToValidateOrRefusedQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetInvoicesToValidateOrRefusedQuery,
+    GetInvoicesToValidateOrRefusedQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetInvoicesToValidateOrRefusedQuery,
+    GetInvoicesToValidateOrRefusedQueryVariables
+  >(GetInvoicesToValidateOrRefusedDocument, options);
+}
+export function useGetInvoicesToValidateOrRefusedLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetInvoicesToValidateOrRefusedQuery,
+    GetInvoicesToValidateOrRefusedQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetInvoicesToValidateOrRefusedQuery,
+    GetInvoicesToValidateOrRefusedQueryVariables
+  >(GetInvoicesToValidateOrRefusedDocument, options);
+}
+export function useGetInvoicesToValidateOrRefusedSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetInvoicesToValidateOrRefusedQuery,
+        GetInvoicesToValidateOrRefusedQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetInvoicesToValidateOrRefusedQuery,
+    GetInvoicesToValidateOrRefusedQueryVariables
+  >(GetInvoicesToValidateOrRefusedDocument, options);
+}
+export type GetInvoicesToValidateOrRefusedQueryHookResult = ReturnType<
+  typeof useGetInvoicesToValidateOrRefusedQuery
+>;
+export type GetInvoicesToValidateOrRefusedLazyQueryHookResult = ReturnType<
+  typeof useGetInvoicesToValidateOrRefusedLazyQuery
+>;
+export type GetInvoicesToValidateOrRefusedSuspenseQueryHookResult = ReturnType<
+  typeof useGetInvoicesToValidateOrRefusedSuspenseQuery
+>;
+export type GetInvoicesToValidateOrRefusedQueryResult = Apollo.QueryResult<
+  GetInvoicesToValidateOrRefusedQuery,
+  GetInvoicesToValidateOrRefusedQueryVariables
+>;
+export const GetBanksDocument = gql`
+  query GetBanks {
+    getBanks {
+      label
+      id
+      bankAccounts {
+        name
+        account_number
+        balance
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetBanksQuery__
+ *
+ * To run a query within a React component, call `useGetBanksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBanksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBanksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBanksQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetBanksQuery, GetBanksQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export function useGetBanksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBanksQuery,
+    GetBanksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export function useGetBanksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetBanksQuery, GetBanksQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetBanksQuery, GetBanksQueryVariables>(
+    GetBanksDocument,
+    options,
+  );
+}
+export type GetBanksQueryHookResult = ReturnType<typeof useGetBanksQuery>;
+export type GetBanksLazyQueryHookResult = ReturnType<
+  typeof useGetBanksLazyQuery
+>;
+export type GetBanksSuspenseQueryHookResult = ReturnType<
+  typeof useGetBanksSuspenseQuery
+>;
+export type GetBanksQueryResult = Apollo.QueryResult<
+  GetBanksQuery,
+  GetBanksQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -2400,6 +2643,8 @@ export const namedOperations = {
     GetAuthenticatedUser: "GetAuthenticatedUser",
     GetExercises: "GetExercises",
     GetBudgetOverview: "GetBudgetOverview",
+    GetInvoicesToValidateOrRefused: "GetInvoicesToValidateOrRefused",
+    GetBanks: "GetBanks",
   },
   Mutation: {
     AddCategory: "AddCategory",

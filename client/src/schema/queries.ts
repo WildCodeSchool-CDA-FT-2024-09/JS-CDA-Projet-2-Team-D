@@ -228,3 +228,62 @@ export const GET_BUDGET_OVERVIEW = gql`
     }
   }
 `;
+
+export const GET_INVOICES_TO_VALIDATE_OR_REFUSED = gql`
+  query GetInvoicesToValidateOrRefused {
+    getInvoicesToValidateOrRefused {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        label
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
+export const GET_BANKS = gql`
+  query GetBanks {
+    getBanks {
+      label
+      id
+      bankAccounts {
+        name
+        account_number
+        balance
+        id
+      }
+    }
+  }
+`;
