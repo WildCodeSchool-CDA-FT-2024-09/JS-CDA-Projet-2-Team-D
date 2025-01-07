@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { validateExerciseSchema } from "../../../utils/exerciseValidation";
 import { useCreateNewExerciseMutation } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
+import PageTitle from "../../../components/PageTitle";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -97,14 +98,8 @@ export default function CreateExercise() {
   };
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <h1>Ajouter un exercice</h1>
+    <>
+      <PageTitle title="Ajouter un exercice">
         <BtnLink
           to="/administrator/exercise"
           sx={{
@@ -123,7 +118,7 @@ export default function CreateExercise() {
         >
           Liste des exercices
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       <Box
         component="form"
@@ -207,6 +202,6 @@ export default function CreateExercise() {
           <Grid size={4}></Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   );
 }

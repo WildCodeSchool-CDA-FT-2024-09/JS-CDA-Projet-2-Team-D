@@ -1,3 +1,6 @@
+import { useGetBanksQuery, Bank } from "../../../types/graphql-types";
+import BankAccountRow from "../../../components/bank/BankAccountRow";
+import PageTitle from "../../../components/PageTitle";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
@@ -5,9 +8,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import Paper from "@mui/material/Paper";
-import { Box } from "@mui/material";
-import { useGetBanksQuery, Bank } from "../../../types/graphql-types";
-import BankAccountRow from "../../../components/bank/BankAccountRow";
 
 export default function BankAccount() {
   const { data, loading, error } = useGetBanksQuery();
@@ -34,15 +34,9 @@ export default function BankAccount() {
     })) ?? [];
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <h1>Soldes des comptes bancaires</h1>
-      </Box>
+    <>
+      <PageTitle title="Comptes bancaires" />
+
       <TableContainer component={Paper} sx={{ marginTop: "1em" }}>
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des exercices">
           <TableHead>
@@ -58,6 +52,6 @@ export default function BankAccount() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </>
   );
 }

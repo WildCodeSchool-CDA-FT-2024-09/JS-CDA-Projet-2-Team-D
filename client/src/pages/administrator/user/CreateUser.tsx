@@ -12,6 +12,7 @@ import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
 import GeneratePassword from "../../../components/user/GeneratePassword";
 import PasswordField from "../../../components/user/PasswordField";
+import PageTitle from "../../../components/PageTitle";
 import {
   Box,
   Button,
@@ -174,14 +175,8 @@ export default function CreateUser() {
   };
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <h1>Ajouter un utilisateur</h1>
+    <>
+      <PageTitle title="Ajouter un utilisateur">
         <BtnLink
           to="/administrator/user"
           sx={{
@@ -200,7 +195,7 @@ export default function CreateUser() {
         >
           Liste des utilisateurs
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       {Object.keys(errors).length > 0 && (
         <Box sx={{ color: "red", mt: 2, textAlign: "center" }}>
@@ -395,6 +390,6 @@ export default function CreateUser() {
           <Grid size={4}></Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   );
 }
