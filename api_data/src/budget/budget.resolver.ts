@@ -36,6 +36,7 @@ export class BudgetResolver {
       throw new Error("Impossible de récupérer le dernier budget.");
     }
   }
+
   @Query(() => BudgetOverview)
   async getBudgetOverview(): Promise<BudgetOverview> {
     try {
@@ -60,6 +61,27 @@ export class BudgetResolver {
       );
 
       return { budgets, globalBudget };
+    } catch (error) {
+      throw new Error(
+        `Erreur lors de la récupération des budgets: ${error.message}`
+      );
+    }
+  }
+
+  @Query(() => [Budget])
+  async getExerciseBudgets(@Arg("exerciseId") exerciseId: number) {
+    try {
+      const budgets = await Budget.find({
+        where: {
+          exerciseId: exerciseId,
+        },
+      });
+
+      if (!budgets.length) {
+        throw new Error("Aucun budget trouvé.");
+      }
+
+      return budgets;
     } catch (error) {
       throw new Error(
         `Erreur lors de la récupération des budgets: ${error.message}`
