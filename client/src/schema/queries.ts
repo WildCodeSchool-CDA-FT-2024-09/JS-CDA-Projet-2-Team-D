@@ -95,6 +95,15 @@ export const GET_CATEGORIES = gql`
   }
 `;
 
+export const GET_CREDIT_DEBITS = gql`
+  query GetCreditDebits {
+    getCreditDebits {
+      id
+      label
+    }
+  }
+`;
+
 export const GET_VAT_RATES = gql`
   query GetVats {
     getVats {
