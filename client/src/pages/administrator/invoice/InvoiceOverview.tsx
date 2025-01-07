@@ -36,14 +36,12 @@ const InvoiceOverview = () => {
   const [selectedExercise, setSelectedExercise] = useState<number | null>(null);
   const offset = (page - 1) * limit;
 
-  // Récupération des exercices
   const {
     data: exercisesData,
     loading: exercisesLoading,
     error: exercisesError,
   } = useGetExercisesQuery();
 
-  // Récupération des factures
   const {
     data: invoiceData,
     loading: invoiceLoading,
@@ -54,10 +52,9 @@ const InvoiceOverview = () => {
       limit,
       offset,
     },
-    skip: !selectedExercise, // Skip the query if no exercise is selected
+    skip: !selectedExercise,
   });
 
-  // Initialiser l'exercice sélectionné avec le premier exercice disponible
   useEffect(() => {
     if (
       exercisesData?.getExercises &&
@@ -80,7 +77,6 @@ const InvoiceOverview = () => {
     setPage(1);
   };
 
-  // Gestion des états de chargement et d'erreur pour les exercices
   if (exercisesLoading) return <CircularProgress />;
   if (exercisesError)
     return (
@@ -128,7 +124,6 @@ const InvoiceOverview = () => {
           Liste des Factures
         </Typography>
 
-        {/* Sélecteur d'exercice */}
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel id="exercise-select-label">Exercice</InputLabel>
           <Select
