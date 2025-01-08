@@ -47,7 +47,7 @@ export const initialValues: InvoiceState = {
   credit_debit_id: 1,
   info: "",
   paid: false,
-  vat_id: 1,
+  vat_id: 3,
   status_id: 2,
   user_id: null,
   total: 0,

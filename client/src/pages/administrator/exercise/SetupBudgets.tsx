@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useGetExerciseBudgetsQuery } from "../../../types/graphql-types";
 import BtnLink from "../../../components/BtnLink";
+import PageTitle from "../../../components/PageTitle";
+import BudgetRow from "../../../components/exercise/BudgetRow";
 import {
   Table,
   TableBody,
@@ -8,11 +10,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import Paper from "@mui/material/Paper";
-import BudgetRow from "../../../components/exercise/BudgetRow";
 
 function SetupBudgets() {
   const { exerciseId } = useParams();
@@ -28,15 +27,7 @@ function SetupBudgets() {
 
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h2" sx={{ marginBottom: "1em", fontSize: "2em" }}>
-          Mise en place des budgets {data?.getExerciseBudgets[0].exercise.label}
-        </Typography>
+      <PageTitle title="Repartition budgets : {data?.getExerciseBudgets[0].exercise.label}">
         <BtnLink
           to="/administrator/exercise"
           sx={{
@@ -55,7 +46,7 @@ function SetupBudgets() {
         >
           Retour
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       <TableContainer component={Paper} sx={{ marginTop: "1em" }}>
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des exercices">

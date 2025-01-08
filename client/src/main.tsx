@@ -12,7 +12,7 @@ import CreateUser from "./pages/administrator/user/CreateUser.tsx";
 import UpdateUser from "./pages/administrator/user/UpdateUser.tsx";
 import ManageExercise from "./pages/administrator/exercise/ManageExercise.tsx";
 import CreateExercise from "./pages/administrator/exercise/CreateExercise.tsx";
-import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
+import HomePageCommission from "./pages/commission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";

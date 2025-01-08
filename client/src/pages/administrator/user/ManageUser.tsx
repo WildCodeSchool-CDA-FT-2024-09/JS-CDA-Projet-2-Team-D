@@ -9,6 +9,7 @@ import {
 import useNotification from "../../../hooks/useNotification";
 import BtnCrud from "../../../components/BtnCrud";
 import BtnLink from "../../../components/BtnLink";
+import PageTitle from "../../../components/PageTitle";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -18,7 +19,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Pagination from "@mui/material/Pagination";
-import Box from "@mui/material/Box";
 
 export default function ManageUser() {
   const [page, setPage] = useState<number>(1);
@@ -106,15 +106,8 @@ export default function ManageUser() {
   const totalPages = Math.ceil((data?.getUsers?.totalCount || 0) / limit);
 
   return (
-    <div>
-      <h1>Gestion des utilisateurs</h1>
-
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+    <>
+      <PageTitle title="Gestion des utilisateurs">
         <BtnLink
           to="/administrator/user/add"
           sx={{
@@ -133,7 +126,7 @@ export default function ManageUser() {
         >
           Ajouter un utilisateur
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des utilisateurs">
@@ -143,7 +136,7 @@ export default function ManageUser() {
               <TableCell align="left">Nom</TableCell>
               <TableCell align="left">Prénom</TableCell>
               <TableCell align="left">Email</TableCell>
-              <TableCell align="left"></TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -159,7 +152,7 @@ export default function ManageUser() {
                   <TableCell align="left">{user.firstname}</TableCell>
                   <TableCell align="left">{user.lastname}</TableCell>
                   <TableCell align="left">{user.email}</TableCell>
-                  <TableCell align="left">
+                  <TableCell align="right">
                     <Stack spacing={2} direction="row">
                       <BtnCrud
                         disabled={false}
@@ -202,6 +195,6 @@ export default function ManageUser() {
           />
         </Stack>
       </TableContainer>
-    </div>
+    </>
   );
 }
