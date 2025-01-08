@@ -54,6 +54,7 @@ function CustomDrawer() {
             icon={<ChevronRightIcon />}
             text="Comptable"
           />
+
           <DrawerMenuItem
             to="/commission"
             icon={<ChevronRightIcon />}
@@ -111,9 +112,14 @@ function CustomDrawer() {
             </Typography>
             <List component="nav" sx={{ px: 1 }}>
               <DrawerMenuItem
-                to="/accountant/dashboard"
+                to="/accountant"
                 icon={<TableIcon />}
                 text="Partie Comptable"
+              />
+              <DrawerMenuItem
+                to="/accountant/category"
+                icon={<InboxIcon />}
+                text="Gestion des catégories"
               />
             </List>
           </>

@@ -16,8 +16,6 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   BeforeUpdate,
-  // BeforeInsert,
-  // BeforeUpdate,
 } from "typeorm";
 import { Status } from "../status/status.entity";
 import { Vat } from "../vat/vat.entity";
@@ -118,7 +116,7 @@ export class Invoice extends BaseEntity {
   user: User;
 
   @Field(() => Number)
-  @Column({ nullable: true, type: "decimal", precision: 10, scale: 2 })
+  @Column({ nullable: false, type: "decimal", precision: 10, scale: 2 })
   amount_with_vat: number;
 
   @BeforeInsert()

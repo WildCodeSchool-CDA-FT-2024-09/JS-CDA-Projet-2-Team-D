@@ -20,8 +20,8 @@ export class InvoiceInput {
   @Field()
   date: Date;
 
-  // @Field({ nullable: true })
-  // receipt?: string | null;
+  @Field({ nullable: true })
+  receipt?: string | null;
 
   @Field({ nullable: true })
   info?: string | null;
@@ -65,8 +65,8 @@ export class Invoice {
   @Field(() => Boolean)
   paid: boolean;
 
-  // @Field(() => String, { nullable: true })
-  // receipt?: string | null;
+  @Field(() => String)
+  receipt: string;
 
   @Field(() => String, { nullable: true })
   info?: string | null;
@@ -95,6 +95,6 @@ export class Invoice {
   @Field(() => Int)
   user_id: number;
 
-  @Field(() => Int, { nullable: true })
-  price_with_vat: number;
+  @Field(() => Int)
+  amount_with_vat: number;
 }

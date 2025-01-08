@@ -279,13 +279,13 @@ function DisplayCategorySubcategory() {
         <TableHead>
           <TableRow sx={{ backgroundColor: theme.palette.primary.main }}>
             <TableCell />
-            <TableCell sx={{ color: "white", fontSize: "1.5rem" }}>
+            <TableCell sx={{ color: "black", fontSize: "1.5rem" }}>
               Catégorie
             </TableCell>
             <TableCell
               align="center"
               sx={{
-                color: "white",
+                color: "black",
                 fontSize: "1.5rem",
               }}
             >
