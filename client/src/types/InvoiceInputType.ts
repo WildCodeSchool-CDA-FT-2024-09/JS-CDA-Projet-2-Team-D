@@ -13,7 +13,7 @@ export interface InvoiceState {
   vat_id: number;
   status_id: number;
   user_id: number | null;
-  total: number; // Total amount (TTC)
+  amount_with_vat: number; // Total amount (TTC)
 }
 
 // ValidInvoice doit aussi avoir l'index signature
@@ -32,7 +32,7 @@ export interface ValidInvoice {
   vat_id: number;
   status_id: number;
   user_id: number;
-  total: number;
+  amount_with_vat: number;
 }
 
 export const initialValues: InvoiceState = {
@@ -50,7 +50,7 @@ export const initialValues: InvoiceState = {
   vat_id: 3,
   status_id: 2,
   user_id: null,
-  total: 0,
+  amount_with_vat: 0,
 };
 
 export const isValidInvoice = (

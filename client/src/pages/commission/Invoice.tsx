@@ -183,7 +183,7 @@ const InvoiceForm: React.FC = () => {
       formData.append("date", invoice.date.toISOString());
       formData.append("category_id", invoice.category_id.toString());
       formData.append("invoice_id", invoice.invoice_id ?? ""); // optional field
-      formData.append("total", invoice.total.toString());
+      formData.append("amount_with_vat", invoice.amount_with_vat.toString());
       formData.append("bankAccountId", ""); // optional field
 
       const response = await axios.post("/upload", formData, {
@@ -422,7 +422,7 @@ const InvoiceForm: React.FC = () => {
                   >
                     {invoice.credit_debit_id === 2 ? "+" : "-"}
                   </span>
-                  {(invoice.total || 0).toFixed(2)} €
+                  {(invoice.amount_with_vat || 0).toFixed(2)} €
                   <span
                     style={{
                       fontWeight: "bold",

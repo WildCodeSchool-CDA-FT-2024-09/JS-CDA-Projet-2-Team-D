@@ -11,7 +11,7 @@ import {
 export interface Invoice {
   vat_id: number;
   price_without_vat: number;
-  total: number;
+  amount_with_vat: number;
 }
 
 interface FormSelectVatProps {
@@ -50,13 +50,13 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
           setInvoice((prevState) => ({
             ...prevState,
             vat_id: selectedVatId,
-            total: totalTTC,
+            amount_with_vat: totalTTC,
           }));
         } else {
           setInvoice((prevState) => ({
             ...prevState,
             vat_id: selectedVatId,
-            total: 0,
+            amount_with_vat: 0,
           }));
         }
       }
