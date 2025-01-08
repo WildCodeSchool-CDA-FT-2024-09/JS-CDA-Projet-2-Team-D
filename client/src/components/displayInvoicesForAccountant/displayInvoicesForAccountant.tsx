@@ -56,7 +56,7 @@ function DisplayInvoicesForAccountant() {
           fontWeight: "bold",
         }}
       >
-        <h1>LISTE DES FACTURES EN ATTENTE ET REFUSÉES</h1>
+        <h1>Liste des factures en attente et refusées</h1>
       </Box>
 
       {!isMobile ? (
