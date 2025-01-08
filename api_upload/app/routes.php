@@ -117,6 +117,7 @@ return function (App $app) {
             // Retrieve POST parameters from the form body
             $postData = $request->getParsedBody();
             $price_without_vat = $postData['price_without_vat'];
+            $amount_with_vat = $postData['amount_with_vat'];
             $label = $postData['label'];
             $info = $postData['info'] ?? "";
             $paid = $postData['paid'];
@@ -133,6 +134,7 @@ return function (App $app) {
                 $stmt = $db->prepare('
                     INSERT INTO invoice (
                         "price_without_vat",
+                        "amount_with_vat",
                         "label",
                         "receipt",
                         "info",
@@ -147,6 +149,7 @@ return function (App $app) {
                         "userId"
                     ) VALUES (
                         :price_without_vat,
+                        :amount_with_vat,
                         :label,
                         :receipt,
                         :info,
@@ -165,6 +168,7 @@ return function (App $app) {
                 // Execute the insert
                 $stmt->execute([
                     ':price_without_vat' => $price_without_vat,
+                    ':amount_with_vat' => $amount_with_vat,
                     ':label' => $label,
                     ':receipt' => $filename,
                     ':info' => $info,
