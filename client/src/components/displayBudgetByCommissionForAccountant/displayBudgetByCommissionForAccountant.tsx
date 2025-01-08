@@ -69,6 +69,10 @@ export default function BarAnimation() {
         series={series.slice(0, seriesNb)} // Limiter le nombre de séries affichées
         skipAnimation={skipAnimation}
         colors={colors}
+        sx={{
+          "& .MuiLegend-root": { marginTop: "16px" }, // Ajuster l'espacement global
+          "& .MuiLegend-item": { marginBottom: "8px" }, // Ajuster l'espacement entre les items
+        }}
       />
       <FormControlLabel
         checked={skipAnimation}
