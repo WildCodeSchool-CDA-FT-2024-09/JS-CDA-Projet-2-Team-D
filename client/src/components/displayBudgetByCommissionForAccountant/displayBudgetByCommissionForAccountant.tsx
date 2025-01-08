@@ -7,7 +7,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
 
-export default function BarAnimation() {
+function DisplayBudgetByCommissionForAccountant() {
   const [seriesNb, setSeriesNb] = React.useState(7);
   const [skipAnimation, setSkipAnimation] = React.useState(false);
 
@@ -70,8 +70,16 @@ export default function BarAnimation() {
         skipAnimation={skipAnimation}
         colors={colors}
         sx={{
-          "& .MuiLegend-root": { marginTop: "16px" }, // Ajuster l'espacement global
-          "& .MuiLegend-item": { marginBottom: "8px" }, // Ajuster l'espacement entre les items
+          "& .MuiLegend-root": {
+            marginTop: "16px", // Espacement au-dessus de la légende
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center", // Centrer les légendes
+            gap: "16px", // Espacement horizontal entre les légendes
+          },
+          "& .MuiLegend-item": {
+            marginBottom: "8px", // Espacement vertical entre les items
+          },
         }}
       />
       <FormControlLabel
@@ -98,3 +106,5 @@ export default function BarAnimation() {
     </Box>
   );
 }
+
+export default DisplayBudgetByCommissionForAccountant;
