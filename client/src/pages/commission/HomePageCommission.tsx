@@ -80,20 +80,6 @@ const HomePageCommission = () => {
   const totalPages = Math.ceil(totalCount / limit);
 
   const getChipStyles = (status: string) => {
-    // let backgroundColor;
-    // switch (status) {
-    //   case "Validé":
-    //     backgroundColor = theme.palette.success.main;
-    //     break;
-    //   case "En attente":
-    //     backgroundColor = theme.palette.warning.main;
-    //     break;
-    //   case "Refusé":
-    //     backgroundColor = theme.palette.error.main;
-    //     break;
-    //   default:
-    //     backgroundColor = theme.palette.primary.main;
-    // }
     const statusColors = {
       Validé: theme.palette.success.main,
       "En attente": theme.palette.warning.main,

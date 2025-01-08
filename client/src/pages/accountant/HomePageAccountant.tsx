@@ -4,7 +4,7 @@ function HomePageAccountant() {
   return (
     <>
       {/* <DisplayBudgetByCommissionForAccountant /> */}
-      <DisplayInvoicesForAccountant />;
+      <DisplayInvoicesForAccountant />
     </>
   );
 }
