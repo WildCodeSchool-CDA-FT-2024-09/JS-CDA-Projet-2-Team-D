@@ -41,20 +41,18 @@ export default function BarAnimation() {
     setSeriesNb(newValue);
   };
 
-  const colorMapping = {
-    Animation: "#018571",
-    Formation: "#DFC27D",
-    Opérationnel: "#80CDC1",
-    Événementiel: "#EA452F",
-    Équipement: "#7570B3",
-    Jeunesse: "#A6611A",
-    Communication: "#0F2080",
-  };
+  const predefinedColors = [
+    "#018571",
+    "#DFC27D",
+    "#80CDC1",
+    "#EA452F",
+    "#7570B3",
+    "#A6611A",
+    "#0F2080",
+  ];
 
   const colors = budgets.map(
-    (budget) =>
-      colorMapping[budget.commissions.name as keyof typeof colorMapping] ||
-      "#CCCCCC",
+    (_, index) => predefinedColors[index % predefinedColors.length],
   );
 
   return (
@@ -90,7 +88,7 @@ export default function BarAnimation() {
         onChange={handleSeriesNbChange}
         valueLabelDisplay="auto"
         min={1}
-        max={series.length} // Basé sur le nombre de séries provenant des données
+        max={series.length}
         aria-labelledby="input-series-number"
       />
     </Box>
