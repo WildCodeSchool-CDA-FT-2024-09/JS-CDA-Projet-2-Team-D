@@ -236,8 +236,6 @@ export default class UserResolver {
               {
                 id: user.id,
                 email: user.email,
-                firstname: user.firstname,
-                lastname: user.lastname,
                 roles: user.roles.map((role) => ({ id: role.id })),
               },
               AUTH_SECRET_KEY as string,
@@ -253,7 +251,7 @@ export default class UserResolver {
             );
 
             return {
-              token: token,
+              //tokenInMemory different from the cookie
               id: user.id,
               email: user.email,
               firstname: user.firstname,
