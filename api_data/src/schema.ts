@@ -31,9 +31,19 @@ const getSchema = async () => {
       ExerciseResolver,
     ],
     validate: true,
-    authChecker: ({ context }): boolean => {
-      if (context.loggedInUser) return true;
-      return false;
+    authChecker: ({ context }, rolesId: number[]): boolean => {
+      /** context.loggedInUser
+       * {
+            id: user.id,
+            email: user.email,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            roles: [1,2,3] // [admin: 1, compta: 2, commission: 3]
+          },
+       */
+      return context.loggedInUser.roles.some((role: number) =>
+        rolesId.includes(role)
+      );
     },
   });
 };

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Arg, Int, Ctx } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Arg,
+  Int,
+  Ctx,
+  Authorized,
+} from "type-graphql";
 import { validate } from "class-validator";
 import { AppDataSource } from "../db/data-source";
 import {
@@ -39,6 +47,7 @@ interface UserContext {
 
 @Resolver(User)
 export default class UserResolver {
+  @Authorized([1])
   @Query(() => PaginatedUsers)
   async getUsers(
     @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
