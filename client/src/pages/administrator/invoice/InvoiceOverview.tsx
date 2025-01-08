@@ -26,6 +26,7 @@ import {
   useGetInvoicesByExerciseQuery,
 } from "../../../types/graphql-types";
 import { formatDate } from "../../../utils/dateUtils";
+import PageTitle from "../../../components/PageTitle";
 
 const InvoiceOverview = () => {
   const theme = useTheme();
@@ -116,13 +117,7 @@ const InvoiceOverview = () => {
   return (
     <Box sx={{ padding: 2 }}>
       <Stack spacing={3}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ fontSize: isMobile ? "18px" : "24px", fontWeight: "bold" }}
-        >
-          Liste des Factures
-        </Typography>
+        <PageTitle title="Liste des Factures" />
 
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel id="exercise-select-label">Exercice</InputLabel>

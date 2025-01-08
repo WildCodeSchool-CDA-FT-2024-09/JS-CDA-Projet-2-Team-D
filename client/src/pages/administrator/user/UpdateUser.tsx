@@ -11,6 +11,7 @@ import {
   useUpdateUserMutation,
 } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
+import PageTitle from "../../../components/PageTitle";
 import BtnLink from "../../../components/BtnLink";
 import GeneratePassword from "../../../components/user/GeneratePassword";
 import PasswordField from "../../../components/user/PasswordField";
@@ -195,14 +196,8 @@ export default function UpdateUser() {
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <h1>Editer un utilisateur</h1>
+    <>
+      <PageTitle title="Editer un utilisateur">
         <BtnLink
           to="/administrator/user"
           sx={{
@@ -221,7 +216,7 @@ export default function UpdateUser() {
         >
           Liste des utilisateurs
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       {Object.keys(errors).length > 0 && (
         <Box sx={{ color: "red", mt: 2, textAlign: "center" }}>
@@ -416,6 +411,6 @@ export default function UpdateUser() {
           <Grid size={4}></Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   );
 }
