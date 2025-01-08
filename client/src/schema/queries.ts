@@ -311,7 +311,7 @@ export const GET_EXERCISE_BUDGETS = gql`
       commissions {
         id
         name
-        }
+      }
     }
   }
 `;
