@@ -149,14 +149,14 @@ const HomePageCommission = () => {
             ) : (
               invoices.map((row) => {
                 const montantHT =
-                  row.creditDebit?.label?.toLowerCase() === "débit"
-                    ? -row.price_without_vat
-                    : row.price_without_vat;
+                  row.creditDebit?.id === 2 //crédit
+                    ? row.price_without_vat
+                    : -row.price_without_vat;
 
                 const montantTTC =
-                  row.creditDebit?.label?.toLowerCase() === "débit"
-                    ? -row.amount_with_vat
-                    : row.amount_with_vat;
+                  row.creditDebit?.id === 2 //crédit
+                    ? row.amount_with_vat
+                    : -row.amount_with_vat;
 
                 return (
                   <TableRow key={row.id}>
