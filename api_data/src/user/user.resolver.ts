@@ -244,7 +244,7 @@ export default class UserResolver {
             );
 
             return {
-              token: token,
+              //SECU: tokenInMemory different from the cookie
               id: user.id,
               email: user.email,
               firstname: user.firstname,
