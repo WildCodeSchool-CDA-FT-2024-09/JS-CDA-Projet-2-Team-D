@@ -1,5 +1,6 @@
 import { Gauge } from "@mui/x-charts";
-import { useTheme } from "@mui/material";
+import { useTheme, Box, Typography, Paper, useMediaQuery } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 interface BudgetGaugeProps {
   globalBudget: number;
@@ -11,41 +12,100 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
   currentBudget,
 }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const pourcentage =
-    globalBudget > 0 ? Math.floor((-currentBudget / globalBudget) * 100) : 0;
+  const calculatePercentage = (current: number, total: number): number => {
+    if (total <= 0) return 0;
+    const percentage = Math.floor((current / total) * 100);
+    return Math.min(Math.max(percentage, 0), 100);
+  };
+
+  const percentage = calculatePercentage(currentBudget, globalBudget);
+
+  const remainingBudget = globalBudget - currentBudget;
+
   const getColor = (value: number) => {
-    if (value <= 50) return theme.palette.success.main;
-    if (value <= 75) return theme.palette.secondary.main;
+    if (value <= 60) return theme.palette.success.main;
+    if (value <= 80) return theme.palette.secondary.main;
     return theme.palette.error.main;
   };
 
   return (
-    <article style={{ textAlign: "center" }}>
-      <h2>Budget global : {globalBudget.toLocaleString()} €</h2>
-      <h3>Total des dépenses : {currentBudget.toLocaleString()} €</h3>
-      <Gauge
-        startAngle={-120}
-        endAngle={120}
-        value={pourcentage}
-        valueMax={100}
-        valueMin={0}
-        innerRadius="80%"
-        outerRadius="100%"
+    <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+      <Typography
+        variant="h4"
         sx={{
-          height: 200,
-          "& .MuiGauge-valueText": {
-            fontSize: 40,
-          },
-          "& .MuiGauge-valueArc": {
-            fill: getColor(pourcentage),
-          },
-          "& .MuiGauge-referenceArc": {
-            fill: "#DADBBD",
-          },
+          fontWeight: "bold",
+          color: theme.palette.primary.main,
+          textAlign: "center",
         }}
-      />
-    </article>
+      >
+        Budget global : {globalBudget.toLocaleString()} €
+      </Typography>
+
+      <Grid container spacing={1} alignItems="center">
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box sx={{ height: 250 }}>
+            <Gauge
+              startAngle={-120}
+              endAngle={120}
+              value={percentage}
+              valueMax={100}
+              valueMin={0}
+              innerRadius={80}
+              outerRadius={100}
+              sx={{
+                width: "100%",
+                height: "100%",
+                "& .MuiGauge-valueText": {
+                  fontSize: 40,
+                  fontWeight: "bold",
+                },
+                "& .MuiGauge-valueArc": {
+                  fill: getColor(percentage),
+                },
+                "& .MuiGauge-referenceArc": {
+                  fill: theme.palette.grey[300],
+                },
+              }}
+              text={({ value }) => `${value} %`}
+            />
+          </Box>
+        </Grid>
+
+        {/* Informations à droite */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              height: "100%",
+              justifyContent: "center",
+              textAlign: isMobile ? "center" : "left",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              Budget restant : {remainingBudget.toLocaleString()} €
+            </Typography>
+
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              Total des dépenses : {currentBudget.toLocaleString()} €
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 };
 
