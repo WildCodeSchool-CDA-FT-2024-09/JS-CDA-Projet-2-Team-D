@@ -9,7 +9,7 @@
     "lint": "eslint '*/**/*.{js,jsx,ts,tsx}'",
     "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'",
     "preview": "vite preview",
-    "test": "vitest",
+    "unit-test": "vitest",
     "codegen": "graphql-codegen --config codegen-config.ts"
   },
   "dependencies": {
