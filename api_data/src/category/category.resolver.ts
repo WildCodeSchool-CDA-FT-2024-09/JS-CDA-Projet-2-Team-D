@@ -19,7 +19,7 @@ export default class CategoryResolver {
   }
 
   // add a new category
-  @Authorized(["1", "2", "3"])
+  @Authorized(["2"])
   @Mutation(() => Category)
   async addCategory(
     @Arg("label") label: string,
@@ -60,7 +60,7 @@ export default class CategoryResolver {
   }
 
   // update a category
-  @Authorized([1, 2, 3])
+  @Authorized(["2"])
   @Mutation(() => Category)
   async updateCategory(
     @Arg("id") id: number,

@@ -11,7 +11,7 @@ export default class SubcategoryResolver {
     return Subcategory.find();
   }
 
-  @Authorized(["1", "2", "3"])
+  @Authorized(["2"])
   @Mutation(() => Subcategory)
   async addSubcategory(
     @Arg("label") label: string,
@@ -39,7 +39,7 @@ export default class SubcategoryResolver {
     return subcategory;
   }
 
-  @Authorized(["1", "2", "3"])
+  @Authorized(["2"])
   @Mutation(() => Subcategory)
   async updateSubcategory(
     @Arg("id") id: number,
