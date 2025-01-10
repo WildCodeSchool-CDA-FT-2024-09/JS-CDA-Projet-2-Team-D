@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../../../utils/userValidation";
@@ -7,11 +7,11 @@ import {
   useGetCommissionsQuery,
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
-import { generatePassword } from "../../../utils/generatePassword";
+// import { generatePassword } from "../../../utils/generatePassword";
 import useNotification from "../../../hooks/useNotification";
 import BtnLink from "../../../components/BtnLink";
-import GeneratePassword from "../../../components/user/GeneratePassword";
-import PasswordField from "../../../components/user/PasswordField";
+// import GeneratePassword from "../../../components/user/GeneratePassword";
+// import PasswordField from "../../../components/user/PasswordField";
 import PageTitle from "../../../components/PageTitle";
 import {
   Box,
@@ -47,13 +47,13 @@ export default function CreateUser() {
   const { data: commissionsData } = useGetCommissionsQuery();
   const [createNewUser] = useCreateNewUserMutation();
 
-  const handleGeneratePassword = () => {
-    const pwd = generatePassword(12);
-    setValue("password", pwd, { shouldValidate: true });
-    setValue("passwordConfirm", pwd, { shouldValidate: true });
+  // const handleGeneratePassword = () => {
+  //   const pwd = generatePassword(12);
+  //   setValue("password", pwd, { shouldValidate: true });
+  //   setValue("passwordConfirm", pwd, { shouldValidate: true });
 
-    trigger(["password", "passwordConfirm"]);
-  };
+  //   trigger(["password", "passwordConfirm"]);
+  // };
 
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
@@ -64,7 +64,7 @@ export default function CreateUser() {
     handleSubmit,
     setValue,
     trigger, // Manual validation trigger
-    watch,
+    // watch,
     formState: {
       errors, // Contains validation errors
     },
@@ -75,23 +75,23 @@ export default function CreateUser() {
       firstname: "",
       lastname: "",
       email: "",
-      password: "",
-      passwordConfirm: "",
+      // password: "",
+      // passwordConfirm: "",
       roles: [],
       commissions: [],
     },
   });
 
   // Watch form values for dynamic validation
-  const watchPassword = watch("password");
-  const watchPasswordConfirm = watch("passwordConfirm");
+  // const watchPassword = watch("password");
+  // const watchPasswordConfirm = watch("passwordConfirm");
 
   // Trigger validation for password confirmation when password changes
-  useEffect(() => {
-    if (watchPassword || watchPasswordConfirm) {
-      trigger("passwordConfirm");
-    }
-  }, [watchPassword, watchPasswordConfirm, trigger]);
+  // useEffect(() => {
+  //   if (watchPassword || watchPasswordConfirm) {
+  //     trigger("passwordConfirm");
+  //   }
+  // }, [watchPassword, watchPasswordConfirm, trigger]);
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -119,7 +119,7 @@ export default function CreateUser() {
     firstname: string;
     lastname: string;
     email: string;
-    password: string;
+    // password: string;
     roles: string[];
     commissions?: string[];
   }) => {
@@ -149,7 +149,7 @@ export default function CreateUser() {
             firstname: formData.firstname,
             lastname: formData.lastname,
             email: formData.email,
-            password: formData.password,
+            // password: formData.password,
             roles: selectedRoleObjects,
             commissions: selectedCommissionsObjects,
           },
@@ -162,10 +162,10 @@ export default function CreateUser() {
       if (formData.firstname) setValue("firstname", "");
       if (formData.lastname) setValue("lastname", "");
       if (formData.email) setValue("email", "");
-      if (formData.password) {
-        setValue("password", "");
-        setValue("passwordConfirm", "");
-      }
+      // if (formData.password) {
+      //   setValue("password", "");
+      //   setValue("passwordConfirm", "");
+      // }
       setRoles([]);
       setCommissions([]);
     } catch (error) {
@@ -303,7 +303,7 @@ export default function CreateUser() {
               )}
             </FormControl>
           </Grid>
-          <Grid size={6}>
+          {/* <Grid size={6}>
             <PasswordField
               label="Mot de passe"
               error={
@@ -345,7 +345,7 @@ export default function CreateUser() {
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs
             commissions.
-          </Grid>
+          </Grid> */}
           <Grid size={12}>
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="commission-select-label">Commissions</InputLabel>
