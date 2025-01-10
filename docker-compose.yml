@@ -33,6 +33,10 @@ services:
       db:
         condition: service_healthy
 
+  redis:
+    image: redis
+    container_name: api_data
+
   # api_email:
   #   build: ./api_email
   #   command: npm run dev
@@ -79,3 +83,5 @@ services:
       - api_data
       # - api_email
       - api_upload
+
+    
