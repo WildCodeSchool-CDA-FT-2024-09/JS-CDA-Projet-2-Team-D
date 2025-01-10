@@ -9,6 +9,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
+import { sendPasswordByEmail } from "../utilities/emailUtils";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
@@ -101,6 +102,17 @@ export default class UserResolver {
       );
 
       const newUser = await user.save();
+
+      const emailSuccess = await sendPasswordByEmail(
+        user.email,
+        data.password,
+        user.firstname,
+        user.lastname
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
 
       return newUser;
     } catch (error) {
