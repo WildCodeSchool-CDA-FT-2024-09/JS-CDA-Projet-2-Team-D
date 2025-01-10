@@ -1,10 +1,11 @@
 import { Category } from "./category.entity";
 import { CreditDebit } from "../creditDebit/creditDebit.entity";
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { validate } from "class-validator";
 
 @Resolver(Category)
 export default class CategoryResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Category])
   async getCategories() {
     return Category.find({
@@ -18,6 +19,7 @@ export default class CategoryResolver {
   }
 
   // add a new category
+  @Authorized(["1", "2", "3"])
   @Mutation(() => Category)
   async addCategory(
     @Arg("label") label: string,
@@ -58,6 +60,7 @@ export default class CategoryResolver {
   }
 
   // update a category
+  @Authorized([1, 2, 3])
   @Mutation(() => Category)
   async updateCategory(
     @Arg("id") id: number,

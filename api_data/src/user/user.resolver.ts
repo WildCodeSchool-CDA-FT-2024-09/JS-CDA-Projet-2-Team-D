@@ -47,7 +47,7 @@ interface UserContext {
 
 @Resolver(User)
 export default class UserResolver {
-  @Authorized([1])
+  @Authorized(["1"])
   @Query(() => PaginatedUsers)
   async getUsers(
     @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
@@ -67,7 +67,7 @@ export default class UserResolver {
     return { users, totalCount };
   }
 
-  @Authorized([1, 2, 3])
+  @Authorized(["1", "2", "3"])
   @Query(() => User)
   async getUserById(@Arg("userId") userId: number) {
     const user = await User.findOneOrFail({
@@ -82,7 +82,7 @@ export default class UserResolver {
     return user;
   }
 
-  @Authorized([1])
+  @Authorized(["1"])
   @Mutation(() => User)
   async createNewUser(@Arg("data") data: UserInput) {
     try {
@@ -120,7 +120,7 @@ export default class UserResolver {
     }
   }
 
-  @Authorized([1])
+  @Authorized(["1"])
   @Mutation(() => User)
   async updateUser(
     @Arg("userId") userId: number,
@@ -169,7 +169,7 @@ export default class UserResolver {
     }
   }
 
-  @Authorized([1])
+  @Authorized(["1"])
   @Mutation(() => DeleteResponseStatus)
   async softDeleteUser(@Arg("data") data: UserIdInput) {
     try {
@@ -190,7 +190,7 @@ export default class UserResolver {
     }
   }
 
-  @Authorized([1])
+  @Authorized(["1"])
   @Mutation(() => RestoreResponseStatus)
   async restoreUser(@Arg("data") data: UserIdInput) {
     try {
