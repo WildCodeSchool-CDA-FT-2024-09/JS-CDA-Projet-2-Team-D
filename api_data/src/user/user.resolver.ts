@@ -9,6 +9,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
+import { generatePassword } from "../utilities/generatePassword";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
@@ -75,11 +76,13 @@ export default class UserResolver {
   @Mutation(() => User)
   async createNewUser(@Arg("data") data: UserInput) {
     try {
+      const pwd = generatePassword(12);
+
       const user = new User();
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-      user.password = await argon2.hash(data.password);
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
@@ -120,14 +123,12 @@ export default class UserResolver {
         relations: ["roles", "commissions"],
       });
 
+      const pwd = generatePassword(12);
+
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-
-      // Update password only if it is not empty in the request
-      if (data.password) {
-        user.password = await argon2.hash(data.password);
-      }
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
