@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query, Arg, Mutation } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
@@ -232,6 +232,48 @@ export default class InvoiceResolver {
     } catch (error) {
       console.error("Error fetching invoices by exercise:", error);
       throw new Error("Unable to fetch invoices for the given exercise.");
+    }
+  }
+
+  @Mutation(() => Invoice)
+  async updateInvoiceStatus(
+    @Arg("invoiceId") invoiceId: number,
+    @Arg("statusId") statusId: number
+  ): Promise<Invoice> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+
+      if (!invoice) {
+        throw new Error("Invoice not found.");
+      }
+
+      const status = await Status.findOne({
+        where: { id: statusId },
+      });
+
+      if (!status) {
+        throw new Error("Status not found.");
+      }
+
+      invoice.status = status;
+
+      await invoice.save();
+
+      return invoice;
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+      throw new Error("Unable to update invoice status.");
     }
   }
 }
