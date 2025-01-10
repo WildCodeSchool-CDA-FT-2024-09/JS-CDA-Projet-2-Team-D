@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:7100/email/send-email
+  url: http://localhost:7100/email/send-email-password
   body: json
   auth: none
 }
@@ -13,8 +13,8 @@ post {
 body:json {
   {
     "recipient": "f@feub.net",
-    "subject": "Sending from Express",
-    "fullname": "Fabien Amann",
-    "invoiceNumber": "2025-000007"
+    "subject": "Votre mot de passe",
+    "email": "f@feub.net",
+    "password": "thrshrshjrjrj07"
   }
 }
