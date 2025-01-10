@@ -3,7 +3,7 @@ import { BankAccount } from "./bank_account.entity";
 
 @Resolver(BankAccount)
 export default class BankAccountResolver {
-  @Authorized(["1", "2", "3"])
+  @Authorized(["1", "2"])
   @Query(() => [BankAccount])
   async getBankAccounts() {
     const bankAccounts = await BankAccount.find({});
