@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query, Arg, Authorized } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
@@ -14,6 +14,7 @@ import { Exercise } from "../exercise/exercise.entity";
 
 @Resolver(Invoice)
 export default class InvoiceResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Invoice])
   async getInvoices(): Promise<Invoice[]> {
     try {
@@ -113,6 +114,7 @@ export default class InvoiceResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
   @Query(() => [Invoice])
   async getInvoicesToValidateOrRefused(): Promise<Invoice[]> {
     try {
@@ -195,6 +197,7 @@ export default class InvoiceResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
   @Query(() => PaginatedInvoices)
   async getInvoicesByExercise(
     @Arg("exerciseId") exerciseId: number,
