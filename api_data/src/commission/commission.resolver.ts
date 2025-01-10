@@ -2,15 +2,18 @@ import { Between } from "typeorm";
 import { Exercise } from "../exercise/exercise.entity";
 import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "./commission.entity";
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query, Arg, Authorized } from "type-graphql";
 import { PaginatedInvoices } from "../invoice/paginatedInvoice.type";
 
 @Resolver(Commission)
 export default class CommissionResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Commission])
   async getCommissions() {
     return Commission.find();
   }
+
+  @Authorized(["1", "2", "3"])
   @Query(() => PaginatedInvoices)
   async getInvoicesByCommissionId(
     @Arg("commissionId") commissionId: number,

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Arg, Int, Ctx } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Arg,
+  Int,
+  Ctx,
+  Authorized,
+} from "type-graphql";
 import { validate } from "class-validator";
 import { AppDataSource } from "../db/data-source";
 import {
@@ -10,6 +18,7 @@ import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
 import { generatePassword } from "../utilities/generatePassword";
+import { sendPasswordByEmail } from "../utilities/emailUtils";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
@@ -40,6 +49,7 @@ interface UserContext {
 
 @Resolver(User)
 export default class UserResolver {
+  @Authorized(["1"])
   @Query(() => PaginatedUsers)
   async getUsers(
     @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
@@ -59,6 +69,7 @@ export default class UserResolver {
     return { users, totalCount };
   }
 
+  @Authorized(["1", "2", "3"])
   @Query(() => User)
   async getUserById(@Arg("userId") userId: number) {
     const user = await User.findOneOrFail({
@@ -73,6 +84,7 @@ export default class UserResolver {
     return user;
   }
 
+  @Authorized(["1"])
   @Mutation(() => User)
   async createNewUser(@Arg("data") data: UserInput) {
     try {
@@ -105,6 +117,17 @@ export default class UserResolver {
 
       const newUser = await user.save();
 
+      const emailSuccess = await sendPasswordByEmail(
+        user.email,
+        pwd,
+        user.firstname,
+        user.lastname
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
+
       return newUser;
     } catch (error) {
       console.error(error);
@@ -112,6 +135,7 @@ export default class UserResolver {
     }
   }
 
+  @Authorized(["1"])
   @Mutation(() => User)
   async updateUser(
     @Arg("userId") userId: number,
@@ -158,6 +182,7 @@ export default class UserResolver {
     }
   }
 
+  @Authorized(["1"])
   @Mutation(() => DeleteResponseStatus)
   async softDeleteUser(@Arg("data") data: UserIdInput) {
     try {
@@ -178,6 +203,7 @@ export default class UserResolver {
     }
   }
 
+  @Authorized(["1"])
   @Mutation(() => RestoreResponseStatus)
   async restoreUser(@Arg("data") data: UserIdInput) {
     try {
@@ -245,6 +271,7 @@ export default class UserResolver {
             );
 
             return {
+              //SECU: tokenInMemory different from the cookie
               token: token,
               id: user.id,
               email: user.email,

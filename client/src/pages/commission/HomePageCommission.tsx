@@ -105,7 +105,7 @@ const HomePageCommission = () => {
         gutterBottom
         sx={{ fontSize: isMobile ? "18px" : "24px", fontWeight: "bold" }}
       >
-        Récapitulatif des Factures de Commission
+        Récapitulatif des factures de la commission :
       </Typography>
 
       <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
