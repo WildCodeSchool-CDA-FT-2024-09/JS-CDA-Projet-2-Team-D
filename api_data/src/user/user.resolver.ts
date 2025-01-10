@@ -67,7 +67,7 @@ export default class UserResolver {
     return { users, totalCount };
   }
 
-  @Authorized([1])
+  @Authorized([1, 2, 3])
   @Query(() => User)
   async getUserById(@Arg("userId") userId: number) {
     const user = await User.findOneOrFail({
