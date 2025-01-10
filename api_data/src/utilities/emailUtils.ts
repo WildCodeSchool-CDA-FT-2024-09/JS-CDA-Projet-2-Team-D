@@ -17,7 +17,7 @@ export async function sendPasswordByEmail(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recipient: email,
-          subject: "Un compte a été créé pour vous",
+          subject: "ClubCompta - Votre compte est actif",
           fullname: `${firstname} ${lastname}`,
           email: email,
           password: password,
