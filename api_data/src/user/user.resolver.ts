@@ -175,10 +175,21 @@ export default class UserResolver {
 
       const newUser = await user.save();
 
+      const emailSuccess = await sendPasswordByEmail(
+        user.email,
+        pwd,
+        user.firstname,
+        user.lastname
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
+
       return newUser;
     } catch (error) {
       console.error(error);
-      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+      throw new Error("Problème avec la mise à jour de l'utilisateur.");
     }
   }
 
