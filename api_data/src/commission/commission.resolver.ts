@@ -2,15 +2,18 @@ import { Between } from "typeorm";
 import { Exercise } from "../exercise/exercise.entity";
 import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "./commission.entity";
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query, Arg, Authorized } from "type-graphql";
 import { PaginatedInvoices } from "../invoice/paginatedInvoice.type";
 
 @Resolver(Commission)
 export default class CommissionResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Commission])
   async getCommissions() {
     return Commission.find();
   }
+
+  @Authorized(["1", "2", "3"])
   @Query(() => PaginatedInvoices)
   async getInvoicesByCommissionId(
     @Arg("commissionId") commissionId: number,
@@ -45,14 +48,17 @@ export default class CommissionResolver {
           commission: { id: commissionId },
           date: Between(lastExercise.start_date, lastExercise.end_date),
         },
-        relations: ["vat", "creditDebit"],
+        relations: ["creditDebit"],
       });
 
-      const totalAmount = allInvoices.reduce((sum, invoice) => {
-        const vatRate = invoice.vat?.rate || 0;
-        const ttc = invoice.price_without_vat * (1 + vatRate / 100);
-        return sum + (invoice.creditDebit.id === 2 ? -ttc : ttc);
-      }, 0);
+      const totalAmount = Number(
+        allInvoices
+          .reduce((sum, invoice) => {
+            const amount = Number(invoice.amount_with_vat);
+            return sum + (invoice.creditDebit.id === 2 ? -amount : amount);
+          }, 0)
+          .toFixed(2)
+      );
 
       return { invoices, totalCount, totalAmount };
     } catch (error) {

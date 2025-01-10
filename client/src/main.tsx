@@ -18,7 +18,7 @@ import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
 import Administrator from "./pages/administrator/Administrator.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
-import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
+import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";

@@ -682,6 +682,7 @@ export type GetInvoicesByCommissionIdQuery = {
       invoiceNumber: string;
       label: string;
       price_without_vat: number;
+      amount_with_vat: number;
       status: { __typename?: "Status"; label: string; id: number };
       vat: { __typename?: "Vat"; rate: number; label: string; id: number };
       creditDebit: { __typename?: "CreditDebit"; label: string; id: number };
@@ -2149,6 +2150,7 @@ export const GetInvoicesByCommissionIdDocument = gql`
         invoiceNumber
         label
         price_without_vat
+        amount_with_vat
         status {
           label
           id

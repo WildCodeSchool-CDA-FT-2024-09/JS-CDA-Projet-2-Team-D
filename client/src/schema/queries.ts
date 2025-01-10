@@ -144,6 +144,7 @@ export const GET_INVOICE_BY_COMMISSION = gql`
         invoiceNumber
         label
         price_without_vat
+        amount_with_vat
         status {
           label
           id

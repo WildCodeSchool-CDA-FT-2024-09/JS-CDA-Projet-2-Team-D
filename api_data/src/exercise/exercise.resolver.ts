@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { validate } from "class-validator";
 import { Exercise } from "./exercise.entity";
 import { Budget } from "../budget/budget.entity";
@@ -7,6 +7,7 @@ import { ExerciseInput } from "./exercise.type";
 
 @Resolver(Exercise)
 export default class ExerciseResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Exercise])
   async getExercises() {
     const exercises = await Exercise.find({
@@ -19,6 +20,7 @@ export default class ExerciseResolver {
     return exercises;
   }
 
+  @Authorized(["1", "2", "3"])
   @Mutation(() => Exercise)
   async createNewExercise(@Arg("data") data: ExerciseInput) {
     try {
