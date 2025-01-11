@@ -351,9 +351,10 @@ export default class UserResolver {
       // Return true even if user doesn't exist for security
       return true;
     } else {
-      // Generate reset token
+      // Generate reset token (encoded to be passed as a querystring)
       const resetToken = crypto.randomBytes(32).toString("base64");
-      const resetTokenExpiry = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+      const encodedResetToken = encodeURIComponent(resetToken); // Encoded to be passed as a query string
+      const resetTokenExpiry = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
 
       // Save to the token + expiry to the database
       user.resetPasswordToken = resetToken;
@@ -364,7 +365,7 @@ export default class UserResolver {
       // Send email with link
       const emailSuccess = await sendResetPasswordEmail(
         user.email,
-        `http://localhost:7100/reset-password?token=${resetToken}`
+        `http://localhost:7100/reset-password?token=${encodedResetToken}`
       );
 
       if (!emailSuccess) {
@@ -381,9 +382,12 @@ export default class UserResolver {
     @Arg("newPassword") newPassword: string
   ) {
     try {
+      // Decode the token to handle special characters like '+'
+      const decodedToken = decodeURIComponent(token);
+
       const user = await User.findOne({
         where: {
-          resetPasswordToken: token,
+          resetPasswordToken: decodedToken,
           resetPasswordExpiry: MoreThan(new Date()),
         },
       });
