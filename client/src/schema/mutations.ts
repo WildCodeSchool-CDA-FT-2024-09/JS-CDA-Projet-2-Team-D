@@ -164,3 +164,14 @@ export const SET_COMMISSION_BUDGET_AMOUNT = gql`
     }
   }
 `;
+
+export const UPDATE_STATUS_INVOICE = gql`
+  mutation UpdateStatusInvoice($invoiceId: Float!, $statusId: Float!) {
+    updateInvoiceStatus(invoiceId: $invoiceId, statusId: $statusId) {
+      id
+      status {
+        id
+      }
+    }
+  }
+`;

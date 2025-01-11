@@ -238,6 +238,45 @@ export default class InvoiceResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
+  @Query(() => Invoice)
+  async getInvoiceById(@Arg("invoiceId") invoiceId: number): Promise<Invoice> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+
+      if (!invoice) {
+        throw new Error("Invoice not found.");
+      }
+
+      // if (!invoice.bankAccount) {
+      //   console.warn(
+      //     `Facture ID ${invoice.id} n'a pas de compte bancaire, valeur par défaut utilisée`
+      //   );
+      //   invoice.bankAccount = {
+      //     id: 0,
+      //     bankName: "Non défini",
+      //   } as unknown as BankAccount;
+      // }
+
+      return invoice;
+    } catch (error) {
+      console.error("Error fetching invoice by ID:", error);
+      throw new Error("Unable to fetch invoice for the given ID.");
+    }
+  }
+
+  @Authorized(["2"])
   @Mutation(() => Invoice)
   async updateInvoiceStatus(
     @Arg("invoiceId") invoiceId: number,

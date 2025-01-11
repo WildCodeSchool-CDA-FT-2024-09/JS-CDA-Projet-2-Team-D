@@ -77,6 +77,50 @@ export const GET_INVOICES = gql`
   }
 `;
 
+export const GET_INVOICE_BY_ID = gql`
+  query GetInvoiceById($invoiceId: Float!) {
+    getInvoiceById(invoiceId: $invoiceId) {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        label
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORIES = gql`
   query GetCategories {
     getCategories {
