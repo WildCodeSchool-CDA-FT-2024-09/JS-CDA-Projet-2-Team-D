@@ -164,3 +164,15 @@ export const SET_COMMISSION_BUDGET_AMOUNT = gql`
     }
   }
 `;
+
+export const REQUEST_RESET_PASSWORD = gql`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($newPassword: String!, $token: String!) {
+    resetPassword(newPassword: $newPassword, token: $token)
+  }
+`;

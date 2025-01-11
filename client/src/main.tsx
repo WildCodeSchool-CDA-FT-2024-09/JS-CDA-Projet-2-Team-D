@@ -22,6 +22,7 @@ import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
+import ResetPassword from "./pages/administrator/user/ResetPassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Login />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
       },
       {
         path: "administrator",
