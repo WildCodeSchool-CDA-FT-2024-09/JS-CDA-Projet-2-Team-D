@@ -7,6 +7,7 @@ import {
   Ctx,
   Authorized,
 } from "type-graphql";
+import { MoreThan } from "typeorm";
 import { validate } from "class-validator";
 import { AppDataSource } from "../db/data-source";
 import {
@@ -15,6 +16,7 @@ import {
 } from "../utilities/responseStatus";
 import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
+import crypto from "crypto";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
 import { sendPasswordByEmail } from "../utilities/emailUtils";
@@ -172,9 +174,9 @@ export default class UserResolver {
         data.commissions.some((el) => el.id === commission.id)
       );
 
-      const newUser = await user.save();
+      const updatedUser = await user.save();
 
-      return newUser;
+      return updatedUser;
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la création d'un nouvel utilisateur.");
@@ -334,5 +336,62 @@ export default class UserResolver {
         "Utilisateur non authentifié (token manquant ou non valide)"
       );
     }
+  }
+
+  @Mutation(() => Boolean)
+  async requestPasswordReset(@Arg("email") email: string) {
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (!user) {
+      // Return true even if user doesn't exist for security
+      return true;
+    } else {
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString("base64");
+      const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+
+      // Save to the token + expiry to the database
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpiry = resetTokenExpiry;
+
+      await user.save();
+
+      //TODO send email
+    }
+
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async resetPassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string
+  ) {
+    try {
+      const user = await User.findOne({
+        where: {
+          resetPasswordToken: token,
+          resetPasswordExpiry: MoreThan(new Date()),
+        },
+      });
+
+      if (!user) {
+        throw new Error("Le jeton a expiré ou n'est plus valide.");
+      }
+
+      // Regenerate the new password hash with argon2
+      user.password = await argon2.hash(newPassword);
+      (user.resetPasswordToken as string | null) = null;
+      (user.resetPasswordExpiry as Date | null) = null;
+
+      await user.save();
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
+    }
+
+    return true;
   }
 }
