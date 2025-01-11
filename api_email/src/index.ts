@@ -88,6 +88,40 @@ app.post("/send-email-password", async (req: Request, res: Response) => {
   );
 });
 
+app.post("/send-reset-password", async (req: Request, res: Response) => {
+  const { recipient, subject, resetUrl } = req.body;
+
+  // Data for the template
+  const templateData = { resetUrl };
+
+  // Render the email template
+  const emailHtml = await ejs.renderFile(
+    path.join(__dirname, "views", "email-template-reset-password.ejs"),
+    templateData
+  );
+
+  transporter.sendMail(
+    {
+      from: EMAIL_FROM,
+      to: recipient,
+      subject: subject,
+      html: emailHtml,
+    },
+    (err, info) => {
+      if (err) {
+        console.error("Error sending email");
+        res
+          .status(400)
+          .json({ success: false, message: "Error sending email" });
+      } else {
+        res
+          .status(200)
+          .json({ success: true, message: `Message ${info.messageId} sent` });
+      }
+    }
+  );
+});
+
 app.listen(PORT, () => {
   console.info(`🚀 API email server ready at http://localhost:${PORT}`);
 });
