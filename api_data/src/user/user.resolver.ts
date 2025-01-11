@@ -353,7 +353,7 @@ export default class UserResolver {
     } else {
       // Generate reset token
       const resetToken = crypto.randomBytes(32).toString("base64");
-      const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+      const resetTokenExpiry = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
 
       // Save to the token + expiry to the database
       user.resetPasswordToken = resetToken;
@@ -364,7 +364,7 @@ export default class UserResolver {
       // Send email with link
       const emailSuccess = await sendResetPasswordEmail(
         user.email,
-        `http://localhost/reset-password?token=${resetToken}`
+        `http://localhost:7100/reset-password?token=${resetToken}`
       );
 
       if (!emailSuccess) {
