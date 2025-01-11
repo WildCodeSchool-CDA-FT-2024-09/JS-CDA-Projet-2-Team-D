@@ -19,7 +19,10 @@ import * as jwt from "jsonwebtoken";
 import crypto from "crypto";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
-import { sendPasswordByEmail } from "../utilities/emailUtils";
+import {
+  sendPasswordByEmail,
+  sendResetPasswordEmail,
+} from "../utilities/emailUtils";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
@@ -358,7 +361,15 @@ export default class UserResolver {
 
       await user.save();
 
-      //TODO send email
+      // Send email with link
+      const emailSuccess = await sendResetPasswordEmail(
+        user.email,
+        `http://localhost/reset-password?token=${resetToken}`
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
     }
 
     return true;
