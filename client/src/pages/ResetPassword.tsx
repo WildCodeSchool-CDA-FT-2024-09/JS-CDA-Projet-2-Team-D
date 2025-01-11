@@ -2,20 +2,22 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { resetPasswordSchema } from "../../../utils/resetPasswordValidation";
-import { useResetPasswordMutation } from "../../../types/graphql-types";
-import { generatePassword } from "../../../utils/generatePassword";
-import useNotification from "../../../hooks/useNotification";
-import PageTitle from "../../../components/PageTitle";
-import PasswordField from "../../../components/user/PasswordField";
-import GeneratePassword from "../../../components/user/GeneratePassword";
+import { resetPasswordSchema } from "../utils/resetPasswordValidation";
+import { useResetPasswordMutation } from "../types/graphql-types";
+import { generatePassword } from "../utils/generatePassword";
+import useNotification from "../hooks/useNotification";
+import PageTitle from "../components/PageTitle";
+import PasswordField from "../components/user/PasswordField";
+import GeneratePassword from "../components/user/GeneratePassword";
+import BtnLink from "../components/BtnLink";
 import { Box, Grid } from "@mui/system";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+  const encodedToken = searchParams.get("token");
+  const token = decodeURIComponent(encodedToken || "");
 
   const [resetPasswordMutation] = useResetPasswordMutation();
 
@@ -79,12 +81,17 @@ function ResetPassword() {
 
   return (
     <>
-      <PageTitle title="Nouveau mot de passe" />
-
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          maxWidth: { xs: "100%", md: "40%" },
+          margin: "0 auto",
           border: "1px solid #f3f3f3",
           padding: "1em",
           borderRadius: ".5em",
@@ -92,8 +99,9 @@ function ResetPassword() {
         noValidate
         autoComplete="off"
       >
+        <PageTitle title="Nouveau mot de passe" />
         <Grid container spacing={2}>
-          <Grid size={6}>
+          <Grid size={12}>
             <PasswordField
               label="Mot de passe"
               error={
@@ -111,7 +119,7 @@ function ResetPassword() {
               }}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={12}>
             <PasswordField
               label="Confirmer le mot de passe"
               error={
@@ -145,6 +153,15 @@ function ResetPassword() {
             </Button>
           </Grid>
           <Grid size={4}></Grid>
+          <Grid size={12} sx={{ textAlign: "center" }}>
+            <BtnLink
+              aria-label="Retour à la page de connexion"
+              to="/"
+              sx={{ fontSize: ".8em" }}
+            >
+              Retour à la page de connexion
+            </BtnLink>
+          </Grid>
         </Grid>
       </Box>
     </>
