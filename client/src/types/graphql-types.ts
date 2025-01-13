@@ -359,7 +359,6 @@ export type UserInput = {
   email: Scalars["String"]["input"];
   firstname: Scalars["String"]["input"];
   lastname: Scalars["String"]["input"];
-  password: Scalars["String"]["input"];
   roles: Array<RolesInput>;
 };
 
