@@ -64,6 +64,8 @@ function DetailInvoice() {
   const totalPrice =
     invoice.price_without_vat * (1 + (invoice.vat?.rate ?? 0) / 100);
 
+  // console.log(invoice);
+
   return (
     <Paper
       elevation={3}
@@ -159,7 +161,11 @@ function DetailInvoice() {
           </Grid>
 
           <Grid size={6}>
-            <TextField label="Catégories" fullWidth value="category" />
+            <TextField
+              label="Catégories"
+              fullWidth
+              value={invoice.subcategory.category.label}
+            />
           </Grid>
           <Grid size={6}>
             <TextField
@@ -191,7 +197,7 @@ function DetailInvoice() {
             <Typography>Justificatif</Typography>
             <a
               href={`http://localhost:7100/upload/get-file/${invoice.receipt}`}
-              download
+              download={invoice.receipt}
             >
               <UploadFileTwoToneIcon />
               Télécharger le justificatif

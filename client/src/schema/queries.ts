@@ -102,8 +102,14 @@ export const GET_INVOICE_BY_ID = gql`
       }
       subcategory {
         id
+        code
         label
+        category {
+          id
+          label
+        }
       }
+
       commission {
         id
         name

@@ -10,7 +10,13 @@ import {
   DeleteDateColumn,
 } from "typeorm";
 import { Field, ObjectType, Int } from "type-graphql";
-import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from "class-validator";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
 import { Invoice } from "../invoice/invoice.entity";
@@ -46,6 +52,16 @@ export class User extends BaseEntity {
   @IsNotEmpty()
   @Column({ nullable: false, type: "varchar" })
   password: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  @Column({ nullable: true, type: "varchar", default: null })
+  resetPasswordToken: string | null;
+
+  @Field(() => Date, { nullable: true })
+  @Column({ nullable: true, type: "timestamp", default: null })
+  resetPasswordExpiry: Date | null;
 
   @Field(() => [Role])
   @ManyToMany(() => Role, (role: Role) => role.users)
