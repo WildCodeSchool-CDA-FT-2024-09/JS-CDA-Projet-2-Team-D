@@ -19,6 +19,7 @@ import * as jwt from "jsonwebtoken";
 import crypto from "crypto";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
+import { generatePassword } from "../utilities/generatePassword";
 import {
   sendPasswordByEmail,
   sendResetPasswordEmail,
