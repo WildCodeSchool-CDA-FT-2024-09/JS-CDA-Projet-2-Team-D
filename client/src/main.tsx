@@ -135,6 +135,16 @@ const router = createBrowserRouter([
               },
             ],
           },
+          {
+            path: "invoiceOverview",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <InvoiceOverview />,
+              },
+            ],
+          },
         ],
       },
       {

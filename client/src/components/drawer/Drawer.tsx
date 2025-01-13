@@ -5,7 +5,6 @@ import { Divider, Drawer, List, Toolbar, Typography } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import TableIcon from "@mui/icons-material/TableChart";
 import PieChartSharpIcon from "@mui/icons-material/PieChartSharp";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CardTravelIcon from "@mui/icons-material/CardTravel";
 import InboxIcon from "@mui/icons-material/Inbox";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
@@ -43,28 +42,9 @@ function CustomDrawer() {
         anchor="left"
       >
         <Toolbar />
-        <List component="nav" sx={{ px: 1 }}>
-          <DrawerMenuItem
-            to="/administrator"
-            icon={<ChevronRightIcon />}
-            text="Administrateur"
-          />
-          <DrawerMenuItem
-            to="/accountant"
-            icon={<ChevronRightIcon />}
-            text="Comptable"
-          />
-
-          <DrawerMenuItem
-            to="/commission"
-            icon={<ChevronRightIcon />}
-            text="Commission"
-          />
-        </List>
         {/* Menu Administrateur */}
         {user?.roles.includes("1") && (
           <>
-            <Divider sx={{ my: 1 }} />
             <Typography
               variant="overline"
               sx={{ px: 3, color: "text.secondary", fontSize: "0.75rem" }}
@@ -120,6 +100,11 @@ function CustomDrawer() {
                 to="/accountant/category"
                 icon={<InboxIcon />}
                 text="Gestion des catégories"
+              />
+              <DrawerMenuItem
+                to="/accountant/invoiceOverview"
+                icon={<ReceiptLongSharpIcon />}
+                text="Factures par exercice"
               />
             </List>
           </>
