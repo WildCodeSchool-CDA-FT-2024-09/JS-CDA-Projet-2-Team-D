@@ -159,7 +159,7 @@ function DetailInvoice() {
           </Grid>
 
           <Grid size={6}>
-            <TextField label="Catégories" fullWidth value="Categorie" />
+            <TextField label="Catégories" fullWidth value="category" />
           </Grid>
           <Grid size={6}>
             <TextField
@@ -189,7 +189,10 @@ function DetailInvoice() {
           </Grid>
           <Grid size={12}>
             <Typography>Justificatif</Typography>
-            <a href={`http://localhost:8081/${invoice.receipt}`} download>
+            <a
+              href={`http://localhost:7100/upload/get-file/${invoice.receipt}`}
+              download
+            >
               <UploadFileTwoToneIcon />
               Télécharger le justificatif
             </a>
