@@ -1,11 +1,11 @@
-import { Resolver, Query, Mutation, Arg, Int } from "type-graphql";
-// import { validate } from "class-validator";
+import { Resolver, Query, Mutation, Arg, Int, Authorized } from "type-graphql";
 import { Budget } from "./budget.entity";
 import { Exercise } from "../exercise/exercise.entity";
 import { BudgetOverview } from "./budget.type";
 
 @Resolver(Budget)
 export class BudgetResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => Budget, { nullable: true })
   async getCurrentBudgetByCommissionID(
     @Arg("commissionId", () => Int) commissionId: number
@@ -37,6 +37,7 @@ export class BudgetResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
   @Query(() => BudgetOverview)
   async getBudgetOverview(): Promise<BudgetOverview> {
     try {
@@ -68,6 +69,7 @@ export class BudgetResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
   @Query(() => [Budget])
   async getExerciseBudgets(@Arg("exerciseId") exerciseId: number) {
     try {
@@ -89,6 +91,7 @@ export class BudgetResolver {
     }
   }
 
+  @Authorized(["1", "2", "3"])
   @Mutation(() => Budget)
   async setCommissionBudgetAmount(
     @Arg("exerciseId") exerciseId: number,

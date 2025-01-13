@@ -29,35 +29,31 @@ return function (App $app) {
     });
 
     /**
-     * GET Invoice endpoint
+     * GET file endpoint
      */
-    // $app->get('/upload/invoice/{invoiceId}', function (Request $request, Response $response, array $args) {
-    //     $invoiceId = $args['invoiceId'];
+    $app->get('/upload/get-file/{receipt}', function (Request $request, Response $response, array $args) {
+        $receipt = $args['receipt'];
+        $uploadDir = __DIR__ . $_ENV['UPL_DIR'];
+        $filePath = $uploadDir . DIRECTORY_SEPARATOR . $receipt;
 
-    //     // Get database connection
-    //     $db = getDbConnection();
+        // Check if the file exists
+        if (!file_exists($filePath)) {
+            $response->getBody()->write(json_encode(['success' => false, 'error' => 'File not found']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
 
-    //     // Prepare the SQL statement
-    //     $stmt = $db->prepare("SELECT * FROM invoice WHERE id = :invoiceId");
+        // Get the file's MIME type
+        $mimeType = mime_content_type($filePath);
 
-    //     // // Execute the query
-    //     $stmt->execute([':invoiceId' => $invoiceId]);
+        // Return the file as a stream response
+        $stream = fopen($filePath, 'rb');
+        $response = $response
+            ->withHeader('Content-Type', $mimeType)
+            ->withHeader('Content-Disposition', 'attachment; filename="' . basename($filePath) . '"')
+            ->withBody(new \Slim\Psr7\Stream($stream));
 
-    //     // Fetch the invoice
-    //     $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    //     if ($invoice === false) {
-    //         // If no invoice found, return a 404 error
-    //         $response->getBody()->write(json_encode(['success' => false, 'error' => 'Invoice not found']));
-    //         return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
-    //     }
-
-    //     $response->getBody()->write('Invoice: '.$invoice['receipt']);
-
-    //     return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-
-    //     return $response;
-    // });
+        return $response;
+    });
 
     /**
      * POST Upload endpoint

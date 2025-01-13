@@ -33,17 +33,18 @@ services:
       db:
         condition: service_healthy
 
+  api_email:
+    build: ./api_email
+    command: npm run dev
+    restart: always
+    env_file: .env
+    volumes:
+      - ./api_email:/app/
+    ports:
+      - 3100:3000 # to be removed
   redis:
     image: redis
     container_name: api_data
-
-  # api_email:
-  #   build: ./api_email
-  #   command: npm run dev
-  #   restart: always
-  #   env_file: .env
-  #   volumes:
-  #     - ./api_email:/app/
 
   api_upload:
     build: ./api_upload
@@ -81,7 +82,7 @@ services:
     depends_on:
       - client
       - api_data
-      # - api_email
+      - api_email
       - api_upload
 
     

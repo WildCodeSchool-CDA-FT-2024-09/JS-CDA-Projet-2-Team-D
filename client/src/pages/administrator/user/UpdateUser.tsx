@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../../../utils/userValidation";
-import { generatePassword } from "../../../utils/generatePassword";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
@@ -13,8 +12,6 @@ import {
 import useNotification from "../../../hooks/useNotification";
 import PageTitle from "../../../components/PageTitle";
 import BtnLink from "../../../components/BtnLink";
-import GeneratePassword from "../../../components/user/GeneratePassword";
-import PasswordField from "../../../components/user/PasswordField";
 import {
   Box,
   Button,
@@ -54,14 +51,6 @@ export default function UpdateUser() {
   });
   const [updateUserMutation] = useUpdateUserMutation();
 
-  const handleGeneratePassword = () => {
-    const pwd = generatePassword(12);
-    setValue("password", pwd, { shouldValidate: true });
-    setValue("passwordConfirm", pwd, { shouldValidate: true });
-
-    trigger(["password", "passwordConfirm"]);
-  };
-
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
 
@@ -71,7 +60,6 @@ export default function UpdateUser() {
     handleSubmit,
     setValue,
     trigger, // Manual validation trigger
-    watch,
     formState: {
       errors, // Contains validation errors
     },
@@ -82,23 +70,10 @@ export default function UpdateUser() {
       firstname: "",
       lastname: "",
       email: "",
-      password: "",
-      passwordConfirm: "",
       roles: [],
       commissions: [],
     },
   });
-
-  // Watch form values for dynamic validation
-  const watchPassword = watch("password");
-  const watchPasswordConfirm = watch("passwordConfirm");
-
-  // Trigger validation for password confirmation when password changes
-  useEffect(() => {
-    if (watchPassword || watchPasswordConfirm) {
-      trigger("passwordConfirm");
-    }
-  }, [watchPassword, watchPasswordConfirm, trigger]);
 
   // Populate form with existing values
   useEffect(() => {
@@ -144,7 +119,6 @@ export default function UpdateUser() {
     firstname: string;
     lastname: string;
     email: string;
-    password: string;
     roles: string[];
     commissions?: string[];
   }) => {
@@ -177,7 +151,6 @@ export default function UpdateUser() {
             firstname: formData.firstname,
             lastname: formData.lastname,
             email: formData.email,
-            password: formData.password,
             roles: selectedRoleObjects,
             commissions: selectedCommissionsObjects,
           },
@@ -323,45 +296,6 @@ export default function UpdateUser() {
                 </p>
               )}
             </FormControl>
-          </Grid>
-          <Grid size={6}>
-            <PasswordField
-              label="Mot de passe"
-              error={
-                errors.password?.message
-                  ? { message: errors.password.message }
-                  : undefined
-              }
-              {...register("password")}
-              value={watch("password")} // Explicitly set value using watch
-              onChange={async (e) => {
-                setValue("password", e.target.value, {
-                  shouldValidate: true,
-                });
-                await trigger(["password", "passwordConfirm"]);
-              }}
-            />
-          </Grid>
-          <Grid size={6}>
-            <PasswordField
-              label="Confirmer le mot de passe"
-              error={
-                errors.passwordConfirm?.message
-                  ? { message: errors.passwordConfirm.message }
-                  : undefined
-              }
-              {...register("passwordConfirm")}
-              value={watch("passwordConfirm")} // Explicitly set value using watch
-              onChange={async (e) => {
-                setValue("passwordConfirm", e.target.value, {
-                  shouldValidate: true,
-                });
-                await trigger(["password", "passwordConfirm"]);
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <GeneratePassword handleGeneratePassword={handleGeneratePassword} />
           </Grid>
           <Grid size={12}>
             Il est possible d'associer un utilisateur à une ou plusieurs

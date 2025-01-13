@@ -1,14 +1,17 @@
+import { Resolver, Mutation, Query, Arg, Authorized } from "type-graphql";
+import { validate } from "class-validator";
 import { Subcategory } from "./subcategory.entity";
 import { Category } from "../category/category.entity";
-import { Resolver, Mutation, Query, Arg } from "type-graphql";
-import { validate } from "class-validator";
 
 @Resolver(Subcategory)
 export default class SubcategoryResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Subcategory])
   async getSubcategories() {
     return Subcategory.find();
   }
+
+  @Authorized(["2"])
   @Mutation(() => Subcategory)
   async addSubcategory(
     @Arg("label") label: string,
@@ -36,6 +39,7 @@ export default class SubcategoryResolver {
     return subcategory;
   }
 
+  @Authorized(["2"])
   @Mutation(() => Subcategory)
   async updateSubcategory(
     @Arg("id") id: number,
