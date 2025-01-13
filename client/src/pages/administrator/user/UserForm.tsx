@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../../../utils/userValidation";
 import {
   useGetRolesQuery,
   useGetCommissionsQuery,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
   useCreateNewUserMutation,
 } from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
-import BtnLink from "../../../components/BtnLink";
 import PageTitle from "../../../components/PageTitle";
+import BtnLink from "../../../components/BtnLink";
 import {
   Box,
   Button,
@@ -23,8 +26,9 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import Grid from "@mui/material/Grid2";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -37,12 +41,23 @@ const MenuProps = {
   },
 };
 
-export default function CreateUser() {
+type UserFormProps = {
+  mode: "create" | "update";
+};
+export default function UserForm({ mode }: UserFormProps) {
+  const { userId } = useParams();
+  const isUpdateMode = mode === "update";
+
   const [roles, setRoles] = useState<string[]>([]);
   const [commissions, setCommissions] = useState<string[]>([]);
   const { data: rolesData } = useGetRolesQuery();
   const { data: commissionsData } = useGetCommissionsQuery();
-  const [createNewUser] = useCreateNewUserMutation();
+  const { data, loading, error } = useGetUserByIdQuery({
+    variables: { userId: parseInt(userId as string) },
+    skip: !isUpdateMode || !userId,
+  });
+  const [updateUserMutation] = useUpdateUserMutation();
+  const [createUserMutation] = useCreateNewUserMutation();
 
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
@@ -67,6 +82,24 @@ export default function CreateUser() {
       commissions: [],
     },
   });
+
+  // Populate form with existing values
+  useEffect(() => {
+    if (isUpdateMode && data?.getUserById) {
+      const userData = data.getUserById;
+      setValue("firstname", userData.firstname || "");
+      setValue("lastname", userData.lastname || "");
+      setValue("email", userData.email || "");
+
+      // Set roles and commissions
+      const userRoles = userData.roles?.map((role) => role.label) || [];
+      const userCommissions =
+        userData.commissions?.map((comm) => comm.name) || [];
+
+      setRoles(userRoles);
+      setCommissions(userCommissions);
+    }
+  }, [data, setValue, isUpdateMode]);
 
   const handleChangeRoles = (event: SelectChangeEvent<typeof roles>) => {
     const {
@@ -98,55 +131,69 @@ export default function CreateUser() {
     commissions?: string[];
   }) => {
     try {
-      const selectedRoleObjects: { id: number }[] = roles
+      const selectedRoleObjects: { id: number }[] = formData.roles
         .map((roleLabel: string) =>
           rolesData?.getRoles.find((role) => role.label === roleLabel),
         )
-        .filter((role) => role !== undefined) // Ensure no `undefined` values in case of mismatch
+        .filter((role) => role !== undefined)
         .map((role) => ({ id: role.id }));
 
-      // Default role is set to commission
-      if (selectedRoleObjects.length === 0) selectedRoleObjects.push({ id: 3 });
+      // Default role is set to commission if no roles selected
+      if (selectedRoleObjects.length === 0) {
+        selectedRoleObjects.push({ id: 3 });
+      }
 
-      const selectedCommissionsObjects: { id: number }[] = commissions
-        .map((commissionLabel: string) =>
-          commissionsData?.getCommissions.find(
-            (commission) => commission.name === commissionLabel,
-          ),
-        )
-        .filter((commission) => commission !== undefined) // Ensure no `undefined` values in case of mismatch
-        .map((commission) => ({ id: commission.id }));
+      const selectedCommissionsObjects: { id: number }[] =
+        formData.commissions
+          ?.map((commissionLabel: string) =>
+            commissionsData?.getCommissions.find(
+              (commission) => commission.name === commissionLabel,
+            ),
+          )
+          .filter((commission) => commission !== undefined)
+          .map((commission) => ({ id: commission.id as number })) || [];
 
-      await createNewUser({
-        variables: {
-          data: {
-            firstname: formData.firstname,
-            lastname: formData.lastname,
-            email: formData.email,
-            // password: formData.password,
-            roles: selectedRoleObjects,
-            commissions: selectedCommissionsObjects,
+      const userData = {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        email: formData.email,
+        roles: selectedRoleObjects,
+        commissions: selectedCommissionsObjects,
+      };
+
+      if (isUpdateMode) {
+        await updateUserMutation({
+          variables: {
+            data: userData,
+            userId: parseInt(userId as string),
           },
-        },
-      });
+        });
 
-      notifySuccess("Utilisateur ajouté avec succès");
+        notifySuccess("Utilisateur mis à jour avec succès");
+      } else {
+        await createUserMutation({
+          variables: {
+            data: userData,
+          },
+        });
 
-      // Reset the form
-      if (formData.firstname) setValue("firstname", "");
-      if (formData.lastname) setValue("lastname", "");
-      if (formData.email) setValue("email", "");
-      setRoles([]);
-      setCommissions([]);
+        notifySuccess("Utilisateur créé avec succès");
+      }
     } catch (error) {
-      notifyError("Erreur lors de l'ajout de l'utilisateur");
-      console.error("Erreur lors de l'ajout d'un utilisateur", error);
+      const action = isUpdateMode ? "mise à jour" : "création";
+      notifyError(`Erreur lors de la ${action} de l'utilisateur`);
+      console.error(`Erreur lors de la ${action} de l'utilisateur`, error);
     }
   };
 
+  if (loading) return <p>🥁 Chargement...</p>;
+  if (error) return <p>☠️ Erreur: {error.message}</p>;
+
   return (
     <>
-      <PageTitle title="Ajouter un utilisateur">
+      <PageTitle
+        title={isUpdateMode ? "Editer un utilisateur" : "Créer un utilisateur"}
+      >
         <BtnLink
           to="/administrator/user"
           sx={{
@@ -274,15 +321,19 @@ export default function CreateUser() {
             </FormControl>
           </Grid>
           <Grid size={12}>
+            Il est possible d'associer un utilisateur à une ou plusieurs
+            commissions.
+          </Grid>
+          <Grid size={12}>
             <FormControl sx={{ width: "100%" }}>
               <InputLabel id="commission-select-label">Commissions</InputLabel>
               <Select
                 {...register("commissions")}
                 fullWidth
                 labelId="commission-select-label"
-                aria-label="Commissions"
                 id="commissions"
                 name="commissions"
+                aria-label="Commissions"
                 multiple
                 value={commissions}
                 onChange={handleChangeCommissions}
@@ -308,10 +359,14 @@ export default function CreateUser() {
               disabled={Object.keys(errors).length > 0}
               type="submit"
               variant="contained"
-              startIcon={<AddIcon />}
-              aria-label="Ajouter l'utilisateur"
+              startIcon={isUpdateMode ? <EditIcon /> : <AddIcon />}
+              aria-label={
+                isUpdateMode
+                  ? "Mettre à jour l'utilisateur"
+                  : "Ajouter l'utilisateur"
+              }
             >
-              Ajouter
+              {isUpdateMode ? "Mettre à jour" : "Ajouter"}
             </Button>
           </Grid>
           <Grid size={4}></Grid>
