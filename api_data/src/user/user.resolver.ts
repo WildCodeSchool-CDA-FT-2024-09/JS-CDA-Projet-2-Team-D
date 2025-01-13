@@ -190,7 +190,7 @@ export default class UserResolver {
         throw new Error("Problème avec l'envoi de l'email");
       }
 
-      return newUser;
+      return updatedUser;
     } catch (error) {
       console.error(error);
       throw new Error("Problème avec la mise à jour de l'utilisateur.");
