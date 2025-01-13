@@ -17,6 +17,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
+import { generatePassword } from "../utilities/generatePassword";
 import { sendPasswordByEmail } from "../utilities/emailUtils";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
@@ -87,11 +88,13 @@ export default class UserResolver {
   @Mutation(() => User)
   async createNewUser(@Arg("data") data: UserInput) {
     try {
+      const pwd = generatePassword(12);
+
       const user = new User();
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-      user.password = await argon2.hash(data.password);
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
@@ -116,7 +119,7 @@ export default class UserResolver {
 
       const emailSuccess = await sendPasswordByEmail(
         user.email,
-        data.password,
+        pwd,
         user.firstname,
         user.lastname
       );
@@ -144,14 +147,12 @@ export default class UserResolver {
         relations: ["roles", "commissions"],
       });
 
+      const pwd = generatePassword(12);
+
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-
-      // Update password only if it is not empty in the request
-      if (data.password) {
-        user.password = await argon2.hash(data.password);
-      }
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
@@ -174,10 +175,21 @@ export default class UserResolver {
 
       const newUser = await user.save();
 
+      const emailSuccess = await sendPasswordByEmail(
+        user.email,
+        pwd,
+        user.firstname,
+        user.lastname
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
+
       return newUser;
     } catch (error) {
       console.error(error);
-      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+      throw new Error("Problème avec la mise à jour de l'utilisateur.");
     }
   }
 
