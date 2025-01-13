@@ -3,10 +3,12 @@ import NotificationProvider from "./context/NotificationContext";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Drawer from "./components/drawer/Drawer";
-import Home from "./pages/Login";
+import Login from "./pages/Login";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
+import ILostMyPassword from "./pages/ILostMyPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const theme = createTheme({
   typography: {
@@ -75,7 +77,11 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          {currentPage !== "/" ? (
+          {/* {currentPage === "/" ? (
+            <Login />
+          ) : currentPage === "/lost-password" ? (
+            <ILostMyPassword />
+          ) : (
             <Box sx={{ display: "flex" }}>
               <CssBaseline />
               <Header
@@ -89,9 +95,38 @@ function App() {
                 <Footer />
               </Box>
             </Box>
-          ) : (
-            <Home />
-          )}
+          )} */}
+          {(() => {
+            switch (currentPage) {
+              case "/":
+                return <Login />;
+              case "/lost-password":
+                return <ILostMyPassword />;
+              case "/reset-password":
+                return <ResetPassword />;
+              default:
+                return (
+                  <>
+                    <Box sx={{ display: "flex" }}>
+                      <CssBaseline />
+                      <Header
+                        title="ClubCompta"
+                        subtitle="Budget 2024/2025"
+                        logoUrl="/Logo.svg"
+                      />
+                      <Drawer />
+                      <Box
+                        component="main"
+                        sx={{ flexGrow: 1, p: 3, mt: "4rem" }}
+                      >
+                        <Outlet />
+                        <Footer />
+                      </Box>
+                    </Box>
+                  </>
+                );
+            }
+          })()}
         </NotificationProvider>
       </ThemeProvider>
     </>

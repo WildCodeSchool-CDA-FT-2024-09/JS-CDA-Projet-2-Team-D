@@ -40,11 +40,6 @@ export class UserInput {
   @Length(5, 150)
   email: string;
 
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
   @IsString()
   @IsNotEmpty()
   passwordConfirm: string;

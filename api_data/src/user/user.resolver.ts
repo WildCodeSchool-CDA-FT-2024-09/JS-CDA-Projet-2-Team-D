@@ -7,6 +7,7 @@ import {
   Ctx,
   Authorized,
 } from "type-graphql";
+import { MoreThan } from "typeorm";
 import { validate } from "class-validator";
 import { AppDataSource } from "../db/data-source";
 import {
@@ -15,9 +16,14 @@ import {
 } from "../utilities/responseStatus";
 import { IncomingMessage, ServerResponse } from "http";
 import * as jwt from "jsonwebtoken";
+import crypto from "crypto";
 import * as dotenv from "dotenv";
 import argon2 from "argon2";
-import { sendPasswordByEmail } from "../utilities/emailUtils";
+import { generatePassword } from "../utilities/generatePassword";
+import {
+  sendPasswordByEmail,
+  sendResetPasswordEmail,
+} from "../utilities/emailUtils";
 import { User } from "./user.entity";
 import { Role } from "../role/role.entity";
 import { Commission } from "../commission/commission.entity";
@@ -87,11 +93,13 @@ export default class UserResolver {
   @Mutation(() => User)
   async createNewUser(@Arg("data") data: UserInput) {
     try {
+      const pwd = generatePassword(12);
+
       const user = new User();
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-      user.password = await argon2.hash(data.password);
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
@@ -116,7 +124,7 @@ export default class UserResolver {
 
       const emailSuccess = await sendPasswordByEmail(
         user.email,
-        data.password,
+        pwd,
         user.firstname,
         user.lastname
       );
@@ -144,14 +152,12 @@ export default class UserResolver {
         relations: ["roles", "commissions"],
       });
 
+      const pwd = generatePassword(12);
+
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-
-      // Update password only if it is not empty in the request
-      if (data.password) {
-        user.password = await argon2.hash(data.password);
-      }
+      user.password = await argon2.hash(pwd);
 
       const error = await validate(user);
 
@@ -172,12 +178,23 @@ export default class UserResolver {
         data.commissions.some((el) => el.id === commission.id)
       );
 
-      const newUser = await user.save();
+      const updatedUser = await user.save();
 
-      return newUser;
+      const emailSuccess = await sendPasswordByEmail(
+        user.email,
+        pwd,
+        user.firstname,
+        user.lastname
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
+
+      return updatedUser;
     } catch (error) {
       console.error(error);
-      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+      throw new Error("Problème avec la mise à jour de l'utilisateur.");
     }
   }
 
@@ -334,5 +351,74 @@ export default class UserResolver {
         "Utilisateur non authentifié (token manquant ou non valide)"
       );
     }
+  }
+
+  @Mutation(() => Boolean)
+  async requestPasswordReset(@Arg("email") email: string) {
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (!user) {
+      // Return true even if user doesn't exist for security
+      return true;
+    } else {
+      // Generate reset token (encoded to be passed as a querystring)
+      const resetToken = crypto.randomBytes(32).toString("base64");
+      const encodedResetToken = encodeURIComponent(resetToken); // Encoded to be passed as a query string
+      const resetTokenExpiry = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
+
+      // Save to the token + expiry to the database
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpiry = resetTokenExpiry;
+
+      await user.save();
+
+      // Send email with link
+      const emailSuccess = await sendResetPasswordEmail(
+        user.email,
+        `http://localhost:7100/reset-password?token=${encodedResetToken}`
+      );
+
+      if (!emailSuccess) {
+        throw new Error("Problème avec l'envoi de l'email");
+      }
+    }
+
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async resetPassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string
+  ) {
+    try {
+      // Decode the token to handle special characters like '+'
+      const decodedToken = decodeURIComponent(token);
+
+      const user = await User.findOne({
+        where: {
+          resetPasswordToken: decodedToken,
+          resetPasswordExpiry: MoreThan(new Date()),
+        },
+      });
+
+      if (!user) {
+        throw new Error("Le jeton a expiré ou n'est plus valide.");
+      }
+
+      // Regenerate the new password hash with argon2
+      user.password = await argon2.hash(newPassword);
+      (user.resetPasswordToken as string | null) = null;
+      (user.resetPasswordExpiry as Date | null) = null;
+
+      await user.save();
+    } catch (error) {
+      console.error(error);
+      return new RestoreResponseStatus("error", "server error");
+    }
+
+    return true;
   }
 }

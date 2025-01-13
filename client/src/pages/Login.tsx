@@ -17,6 +17,7 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "/Logo_seul.svg";
+import BtnLink from "../components/BtnLink";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -91,6 +92,8 @@ export default function Login() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          maxWidth: { xs: "100%", md: "40%" },
+          margin: "0 auto",
         }}
       >
         <img src={logo} alt="ClubCompta" style={{ marginBottom: "20px" }} />
@@ -150,6 +153,13 @@ export default function Login() {
             >
               Se connecter
             </Button>
+            <BtnLink
+              aria-label="J'ai perdu mon mot de passe"
+              to="/lost-password"
+              sx={{ fontSize: ".8em" }}
+            >
+              J'ai perdu mon mot de passe
+            </BtnLink>
           </Box>
         </form>
 
