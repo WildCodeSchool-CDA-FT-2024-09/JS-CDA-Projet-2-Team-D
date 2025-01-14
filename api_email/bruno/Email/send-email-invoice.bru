@@ -1,0 +1,24 @@
+meta {
+  name: send-email-invoice
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:7100/email/send-email-invoice
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsImVtYWlsIjoic3VwZXJAYWRtaW4ubmV0IiwiZmlyc3RuYW1lIjoiU3VwZXIiLCJsYXN0bmFtZSI6IkFkbWluIiwicm9sZXMiOlt7ImlkIjoxfSx7ImlkIjoyfSx7ImlkIjozfV0sImlhdCI6MTczNjc4MDkzMSwiZXhwIjoxNzM2OTUzNzMxfQ.0vwVkwjE_wLiJV3jGFlggZgNenmqFzciT-u6XTKSIec
+}
+
+body:json {
+  {
+    "recipient": "f@feub.net",
+    "subject": "ClubCompta - Nous avons besoin de plus d'informations",
+    "fullname": "fabien",
+    "invoiceNumber": "thrshrshjrjrj07"
+  }
+}
