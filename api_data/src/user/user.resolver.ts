@@ -367,10 +367,7 @@ export default class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async requestPasswordReset(
-    @Arg("email") email: string,
-    @Ctx() context: UserContext
-  ) {
+  async requestPasswordReset(@Arg("email") email: string) {
     const user = await User.findOne({
       where: { email: email },
     });
@@ -390,11 +387,8 @@ export default class UserResolver {
 
       await user.save();
 
-      const token = context.token;
-
       // Send email with link
       const emailSuccess = await sendResetPasswordEmail(
-        token,
         user.email,
         `http://localhost:7100/reset-password?token=${encodedResetToken}`
       );

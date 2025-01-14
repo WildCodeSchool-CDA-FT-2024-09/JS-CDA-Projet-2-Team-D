@@ -38,7 +38,6 @@ export async function sendPasswordByEmail(
 }
 
 export async function sendResetPasswordEmail(
-  token: string,
   email: string,
   resetUrl: string
 ): Promise<boolean> {
@@ -49,7 +48,6 @@ export async function sendResetPasswordEmail(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           recipient: email,
