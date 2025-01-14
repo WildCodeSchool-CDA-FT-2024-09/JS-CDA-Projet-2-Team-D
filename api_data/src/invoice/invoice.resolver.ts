@@ -11,13 +11,25 @@ import { Equal } from "typeorm";
 import { PaginatedInvoices } from "./paginatedInvoice.type";
 import { Between } from "typeorm";
 import { Exercise } from "../exercise/exercise.entity";
+import redisClient from "../../redis.config";
 
 @Resolver(Invoice)
 export default class InvoiceResolver {
   @Authorized(["1", "2", "3"])
   @Query(() => [Invoice])
-  async getInvoices(): Promise<Invoice[]> {
+  async getInvoices(
+    @Arg("keyword", { nullable: true }) keyword: string
+  ): Promise<Invoice[]> {
     try {
+      // Definition of cache key
+      const cacheKey = keyword ? `invoices:keyword:${keyword}` : "invoices:all";
+
+      // Redis cache check
+      const cachedInvoices = await redisClient.get(cacheKey);
+      if (cachedInvoices) {
+        return JSON.parse(cachedInvoices);
+      }
+
       const invoices = await Invoice.find({
         relations: [
           "bankAccount",
@@ -29,84 +41,70 @@ export default class InvoiceResolver {
           "user",
         ],
       });
-      console.info("Raw invoices from database:", invoices);
 
-      // Déclarer validInvoices comme un tableau d'Invoice
+      // Processing invoices with default values
       const validInvoices: Invoice[] = invoices.map((invoice) => {
-        // Vérification pour Subcategory
-        if (!invoice.subcategory) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de sous-catégorie, valeur par défaut utilisée`
-          );
-          invoice.subcategory = {
+        const processedInvoice = { ...invoice };
+
+        // Check for Subcategory
+        if (!processedInvoice.subcategory) {
+          processedInvoice.subcategory = {
             id: 0,
             label: "Sous-catégorie non définie",
           } as Subcategory;
         }
 
-        // Vérification pour Status
-        if (!invoice.status) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de statut, valeur par défaut utilisée`
-          );
-          invoice.status = { id: 1, label: "Non défini" } as Status;
+        // Check for Status
+        if (!processedInvoice.status) {
+          processedInvoice.status = { id: 1, label: "Non défini" } as Status;
         }
 
-        // Vérification pour Vat
-        if (!invoice.vat) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de TVA, valeur par défaut utilisée`
-          );
-          invoice.vat = { id: 0, rate: 0, label: "Pas de TVA" } as Vat;
+        // Check for Vat
+        if (!processedInvoice.vat) {
+          processedInvoice.vat = { id: 0, rate: 0, label: "Pas de TVA" } as Vat;
         }
 
-        // Vérification pour CreditDebit
-        if (!invoice.creditDebit) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de CreditDebit, valeur par défaut utilisée`
-          );
-          invoice.creditDebit = {
+        // Check for CreditDebit
+        if (!processedInvoice.creditDebit) {
+          processedInvoice.creditDebit = {
             id: 0,
             label: "Non défini",
           } as CreditDebit;
         }
 
-        // Vérification pour Commission
-        if (!invoice.commission) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de Commission, valeur par défaut utilisée`
-          );
-          invoice.commission = { id: 0, name: "Non défini" } as Commission;
+        // Check for Commission
+        if (!processedInvoice.commission) {
+          processedInvoice.commission = {
+            id: 0,
+            name: "Non défini",
+          } as Commission;
         }
 
-        // Vérification pour BankAccount
-        if (!invoice.bankAccount) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de compte bancaire, valeur par défaut utilisée`
-          );
-          invoice.bankAccount = {
+        // Check for BankAccount
+        if (!processedInvoice.bankAccount) {
+          processedInvoice.bankAccount = {
             id: 0,
             bankName: "Non défini",
           } as unknown as BankAccount;
         }
 
-        // Vérification pour User
-        if (!invoice.user) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas d'utilisateur, valeur par défaut utilisée`
-          );
-          invoice.user = {
+        // Check for User
+        if (!processedInvoice.user) {
+          processedInvoice.user = {
             id: 0,
             firstname: "Non défini",
             lastname: "Non défini",
           } as User;
         }
-
-        // Retourner chaque facture modifiée
-        return invoice;
+        return processedInvoice as Invoice;
       });
 
-      // Retourner la liste complète des factures valides
+      // Storage of the result in Redis
+      await redisClient.set(cacheKey, JSON.stringify(validInvoices), {
+        EX: 60, // Expiration after 1 min
+      });
+
+      // Return the full list of valid invoices
       return validInvoices;
     } catch (error) {
       console.error("Erreur lors de la récupération des factures:", error);

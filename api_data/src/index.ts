@@ -37,7 +37,7 @@ function parseCookies(cookieHeader: string | undefined) {
   });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: Number(PORT) },
+    listen: { port: Number(PORT), host: "0.0.0.0" },
     context: async ({ req, res }) => {
       if (!req.headers.cookie) return { res };
 

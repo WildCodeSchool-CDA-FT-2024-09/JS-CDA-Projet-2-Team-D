@@ -33,6 +33,12 @@ services:
       db:
         condition: service_healthy
 
+  redis:
+    image: redis
+    container_name: redis_cache
+    ports: 
+      - 6379:6379
+
   api_email:
     build: ./api_email
     command: npm run dev
@@ -42,9 +48,6 @@ services:
       - ./api_email:/app/
     ports:
       - 3100:3000 # to be removed
-  redis:
-    image: redis
-    container_name: api_data
 
   api_upload:
     build: ./api_upload
@@ -67,7 +70,7 @@ services:
     command: npm run dev -- --host
     restart: always
     environment:
-      - VITE_API_URL=http://localhost:7100/graph
+      - VITE_API_URL=http://reverse_proxy/graph
     volumes:
       - ./client/src:/app/src
       - /app/node_modules
@@ -84,5 +87,8 @@ services:
       - api_data
       - api_email
       - api_upload
+
+
+
 
     

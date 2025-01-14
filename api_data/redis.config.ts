@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 
 const redisClient = createClient({
-  url: "redis://api_data:6379",
+  url: "redis://redis:6379",
 }); // * 1
 
 redisClient.on("error", (err) => {
