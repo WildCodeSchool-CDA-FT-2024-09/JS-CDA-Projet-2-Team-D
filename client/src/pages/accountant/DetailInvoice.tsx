@@ -1,5 +1,8 @@
 import { useParams } from "react-router-dom";
-import { useGetInvoiceByIdQuery } from "../../types/graphql-types";
+import {
+  useGetInvoiceByIdQuery,
+  useUpdateStatusInvoiceMutation,
+} from "../../types/graphql-types";
 import {
   TextField,
   Button,
@@ -19,15 +22,21 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import fr from "date-fns/locale/fr";
-// import { useState } from "react";
 import UploadFileTwoToneIcon from "@mui/icons-material/UploadFileTwoTone";
+import AddBankAccount from "../../components/addBankAccount/AddBankAccount";
+import useNotification from "../../hooks/useNotification";
 
 function DetailInvoice() {
+  const { notifySuccess, notifyError } = useNotification();
+
   const { invoiceId } = useParams<{ invoiceId: string }>();
 
   // Conversion sécurisée de l'ID en nombre
   const invoiceIdAsNumber = invoiceId ? parseInt(invoiceId, 10) : NaN;
   const isInvalidId = isNaN(invoiceIdAsNumber);
+
+  const [updateStatusInvoiceMutation, { error: updateError }] =
+    useUpdateStatusInvoiceMutation();
 
   // Appeler le hook avec l'option `skip`
   const { loading, error, data } = useGetInvoiceByIdQuery({
@@ -66,6 +75,33 @@ function DetailInvoice() {
 
   // console.log(invoice);
 
+  if (updateError) {
+    console.error("GraphQL error:", updateError);
+
+    return (
+      <div>
+        <p>Error :(</p>
+        <p>{updateError.message}</p>
+        <pre>{JSON.stringify(updateError, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  const handleUpdateStatusInvoice = async () => {
+    try {
+      await updateStatusInvoiceMutation({
+        variables: {
+          invoiceId: invoice.id,
+          statusId: 1,
+        },
+      });
+      notifySuccess("Facture validée avec succès");
+    } catch (error) {
+      console.error("Error on update status invoice", error);
+      notifyError("Erreur lors de la validation de la facture");
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -78,6 +114,7 @@ function DetailInvoice() {
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Facture n°{invoice.id}
       </Typography>
+      <AddBankAccount />
       <Snackbar open={false} autoHideDuration={8000}>
         <Alert
           severity="error"
@@ -209,12 +246,34 @@ function DetailInvoice() {
               multiline
               rows={4}
               fullWidth
+              value={invoice.info}
             />
           </Grid>
           <Grid size={12}>
-            <Button type="submit" variant="contained" color="primary">
-              Enregistrer la facture
-            </Button>
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                color="success"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+                onClick={() => handleUpdateStatusInvoice()}
+              >
+                Valider la facture
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="error"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Refuser la facture
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
       </form>
