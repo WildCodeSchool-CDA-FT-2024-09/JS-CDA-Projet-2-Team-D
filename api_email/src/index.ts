@@ -36,7 +36,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Authentication middleware
-const authenticateJWT = (
+const authenticatedRoute = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
@@ -73,7 +73,7 @@ app.get("/", (_, res: Response) => {
 
 app.post(
   "/send-email-invoice",
-  authenticateJWT,
+  authenticatedRoute,
   async (req: AuthenticatedRequest, res: Response) => {
     const { recipient, subject, fullname, invoiceNumber } = req.body;
 
@@ -109,73 +109,81 @@ app.post(
   }
 );
 
-app.post("/send-email-password", async (req: Request, res: Response) => {
-  const { recipient, subject, fullname, email, password } = req.body;
+app.post(
+  "/send-email-password",
+  authenticatedRoute,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { recipient, subject, fullname, email, password } = req.body;
 
-  // Data for the template
-  const templateData = { fullname, email, password };
+    // Data for the template
+    const templateData = { fullname, email, password };
 
-  // Render the email template
-  const emailHtml = await ejs.renderFile(
-    path.join(__dirname, "views", "email-template-password.ejs"),
-    templateData
-  );
+    // Render the email template
+    const emailHtml = await ejs.renderFile(
+      path.join(__dirname, "views", "email-template-password.ejs"),
+      templateData
+    );
 
-  transporter.sendMail(
-    {
-      from: EMAIL_FROM,
-      to: recipient,
-      subject: subject,
-      html: emailHtml,
-    },
-    (err, info) => {
-      if (err) {
-        console.error("Error sending email");
-        res
-          .status(400)
-          .json({ success: false, message: "Error sending email" });
-      } else {
-        res
-          .status(200)
-          .json({ success: true, message: `Message ${info.messageId} sent` });
+    transporter.sendMail(
+      {
+        from: EMAIL_FROM,
+        to: recipient,
+        subject: subject,
+        html: emailHtml,
+      },
+      (err, info) => {
+        if (err) {
+          console.error("Error sending email");
+          res
+            .status(400)
+            .json({ success: false, message: "Error sending email" });
+        } else {
+          res
+            .status(200)
+            .json({ success: true, message: `Message ${info.messageId} sent` });
+        }
       }
-    }
-  );
-});
+    );
+  }
+);
 
-app.post("/send-reset-password", async (req: Request, res: Response) => {
-  const { recipient, subject, resetUrl } = req.body;
+app.post(
+  "/send-reset-password",
+  authenticatedRoute,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { recipient, subject, resetUrl } = req.body;
 
-  // Data for the template
-  const templateData = { resetUrl };
+    // Data for the template
+    const templateData = { resetUrl };
 
-  // Render the email template
-  const emailHtml = await ejs.renderFile(
-    path.join(__dirname, "views", "email-template-reset-password.ejs"),
-    templateData
-  );
+    // Render the email template
+    const emailHtml = await ejs.renderFile(
+      path.join(__dirname, "views", "email-template-reset-password.ejs"),
+      templateData
+    );
 
-  transporter.sendMail(
-    {
-      from: EMAIL_FROM,
-      to: recipient,
-      subject: subject,
-      html: emailHtml,
-    },
-    (err, info) => {
-      if (err) {
-        console.error("Error sending email");
-        res
-          .status(400)
-          .json({ success: false, message: "Error sending email" });
-      } else {
-        res
-          .status(200)
-          .json({ success: true, message: `Message ${info.messageId} sent` });
+    transporter.sendMail(
+      {
+        from: EMAIL_FROM,
+        to: recipient,
+        subject: subject,
+        html: emailHtml,
+      },
+      (err, info) => {
+        if (err) {
+          console.error("Error sending email");
+          res
+            .status(400)
+            .json({ success: false, message: "Error sending email" });
+        } else {
+          res
+            .status(200)
+            .json({ success: true, message: `Message ${info.messageId} sent` });
+        }
       }
-    }
-  );
-});
+    );
+  }
+);
 
 app.listen(PORT, () => {
   console.info(`🚀 API email server ready at http://localhost:${PORT}`);
