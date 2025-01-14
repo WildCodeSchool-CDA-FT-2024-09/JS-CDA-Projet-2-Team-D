@@ -70,7 +70,7 @@ services:
     command: npm run dev -- --host
     restart: always
     environment:
-      - VITE_API_URL=http://reverse_proxy/graph
+      - VITE_API_URL=http://localhost:7100/graph
     volumes:
       - ./client/src:/app/src
       - /app/node_modules
