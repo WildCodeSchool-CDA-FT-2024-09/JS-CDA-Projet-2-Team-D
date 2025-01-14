@@ -280,6 +280,10 @@ export type QueryGetExerciseBudgetsArgs = {
   exerciseId: Scalars["Float"]["input"];
 };
 
+export type QueryGetInvoicesArgs = {
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type QueryGetInvoicesByCommissionIdArgs = {
   commissionId: Scalars["Float"]["input"];
   limit?: Scalars["Float"]["input"];
