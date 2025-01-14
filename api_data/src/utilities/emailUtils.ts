@@ -4,6 +4,7 @@ dotenv.config();
 const { MAILER_HOST, MAILER_PORT } = process.env;
 
 export async function sendPasswordByEmail(
+  token: string,
   email: string,
   password: string,
   firstname: string,
@@ -14,7 +15,10 @@ export async function sendPasswordByEmail(
       `http://${MAILER_HOST}:${MAILER_PORT}/send-email-password`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           recipient: email,
           subject: "ClubCompta - Votre compte est actif",
@@ -28,13 +32,13 @@ export async function sendPasswordByEmail(
       throw new Error(`Failed to send email: ${response.statusText}`);
     }
     return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
+  } catch {
     return false;
   }
 }
 
 export async function sendResetPasswordEmail(
+  token: string,
   email: string,
   resetUrl: string
 ): Promise<boolean> {
@@ -43,7 +47,10 @@ export async function sendResetPasswordEmail(
       `http://${MAILER_HOST}:${MAILER_PORT}/send-reset-password`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           recipient: email,
           subject: "ClubCompta - Réinitialisation de votre mot de passe",
@@ -55,8 +62,7 @@ export async function sendResetPasswordEmail(
       throw new Error(`Failed to send email: ${response.statusText}`);
     }
     return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
+  } catch {
     return false;
   }
 }

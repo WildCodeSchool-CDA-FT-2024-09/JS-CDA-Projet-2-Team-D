@@ -41,7 +41,7 @@ function parseCookies(cookieHeader: string | undefined) {
 
       try {
         const payload = jwt.verify(clubcompta_token, AUTH_SECRET_KEY as string);
-        return { res, loggedInUser: payload };
+        return { res, loggedInUser: payload, token: clubcompta_token };
       } catch {
         return { res };
       }

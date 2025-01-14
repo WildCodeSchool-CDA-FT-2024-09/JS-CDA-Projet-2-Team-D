@@ -50,6 +50,7 @@ interface UserContext {
     iat: number;
     exp: number;
   };
+  token: string;
 }
 
 @Resolver(User)
@@ -91,7 +92,10 @@ export default class UserResolver {
 
   @Authorized(["1"])
   @Mutation(() => User)
-  async createNewUser(@Arg("data") data: UserInput) {
+  async createNewUser(
+    @Arg("data") data: UserInput,
+    @Ctx() context: UserContext
+  ) {
     try {
       const pwd = generatePassword(12);
 
@@ -122,7 +126,10 @@ export default class UserResolver {
 
       const newUser = await user.save();
 
+      const token = context.token;
+
       const emailSuccess = await sendPasswordByEmail(
+        token,
         user.email,
         pwd,
         user.firstname,
@@ -135,8 +142,9 @@ export default class UserResolver {
 
       return newUser;
     } catch (error) {
-      console.error(error);
-      throw new Error("Problème avec la création d'un nouvel utilisateur.");
+      throw new Error(
+        `Problème avec la création d'un nouvel utilisateur : ${error}`
+      );
     }
   }
 
@@ -144,7 +152,8 @@ export default class UserResolver {
   @Mutation(() => User)
   async updateUser(
     @Arg("userId") userId: number,
-    @Arg("data") data: UserInput
+    @Arg("data") data: UserInput,
+    @Ctx() context: UserContext
   ) {
     try {
       const user = await User.findOneOrFail({
@@ -180,7 +189,10 @@ export default class UserResolver {
 
       const updatedUser = await user.save();
 
+      const token = context.token;
+
       const emailSuccess = await sendPasswordByEmail(
+        token,
         user.email,
         pwd,
         user.firstname,
@@ -193,8 +205,9 @@ export default class UserResolver {
 
       return updatedUser;
     } catch (error) {
-      console.error(error);
-      throw new Error("Problème avec la mise à jour de l'utilisateur.");
+      throw new Error(
+        `Problème avec la mise à jour de l'utilisateur : ${error}`
+      );
     }
   }
 
@@ -354,7 +367,10 @@ export default class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async requestPasswordReset(@Arg("email") email: string) {
+  async requestPasswordReset(
+    @Arg("email") email: string,
+    @Ctx() context: UserContext
+  ) {
     const user = await User.findOne({
       where: { email: email },
     });
@@ -374,8 +390,11 @@ export default class UserResolver {
 
       await user.save();
 
+      const token = context.token;
+
       // Send email with link
       const emailSuccess = await sendResetPasswordEmail(
+        token,
         user.email,
         `http://localhost:7100/reset-password?token=${encodedResetToken}`
       );
