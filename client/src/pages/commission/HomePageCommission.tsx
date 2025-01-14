@@ -22,6 +22,10 @@ import { formatDate } from "../../utils/dateUtils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
+const formatAmount = (amount: number): number => {
+  return Number(amount.toFixed(2));
+};
+
 const HomePageCommission = () => {
   const { commissionId } = useParams<{ commissionId: string }>();
   const commissionIdNumber = parseInt(commissionId || "0", 10);
@@ -72,9 +76,12 @@ const HomePageCommission = () => {
       </Typography>
     );
 
-  const globalBudget = budgetData?.getCurrentBudgetByCommissionID?.amount || 0;
-  const currentBudget =
-    invoiceData?.getInvoicesByCommissionId?.totalAmount || 0;
+  const globalBudget = formatAmount(
+    budgetData?.getCurrentBudgetByCommissionID?.amount || 0,
+  );
+  const currentBudget = formatAmount(
+    invoiceData?.getInvoicesByCommissionId?.totalAmount || 0,
+  );
   const invoices = invoiceData?.getInvoicesByCommissionId.invoices || [];
   const totalCount = invoiceData?.getInvoicesByCommissionId?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / limit);
@@ -116,7 +123,7 @@ const HomePageCommission = () => {
             <TableRow>
               <TableCell>
                 {isMobile ? "N° de fact." : "Numéro de facture"}
-              </TableCell>{" "}
+              </TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Libellé</TableCell>
               {!isMobile && <TableCell>Montant HT</TableCell>}

@@ -104,6 +104,11 @@ function CustomDrawer() {
               icon={<InboxIcon />}
               text="Gestion des catégories"
             />
+            <DrawerMenuItem
+              to="/accountant/invoiceOverview"
+              icon={<ReceiptLongSharpIcon />}
+              text="Factures par exercice"
+            />
           </List>
         </>
       )}
