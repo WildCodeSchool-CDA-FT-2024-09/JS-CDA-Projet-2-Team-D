@@ -27,7 +27,9 @@ function SetupBudgets() {
 
   return (
     <>
-      <PageTitle title="Repartition budgets : {data?.getExerciseBudgets[0].exercise.label}">
+      <PageTitle
+        title={`Repartition budgets : ${data?.getExerciseBudgets[0]?.exercise.label}`}
+      >
         <BtnLink
           to="/administrator/exercise"
           sx={{
