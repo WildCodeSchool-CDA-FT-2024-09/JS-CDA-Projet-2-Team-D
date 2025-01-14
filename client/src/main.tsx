@@ -15,7 +15,6 @@ import HomePageCommission from "./pages/commission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
-import Administrator from "./pages/administrator/Administrator.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
 import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
@@ -50,10 +49,6 @@ const router = createBrowserRouter([
           </RoleProtectedRoute>
         ),
         children: [
-          {
-            index: true,
-            element: <Administrator />,
-          },
           {
             path: "overview",
             element: <Outlet />,
