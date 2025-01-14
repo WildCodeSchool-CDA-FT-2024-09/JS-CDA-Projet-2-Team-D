@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Avatar from "../components/avatar/Avatar";
+import Avatar from "./Avatar";
 
 describe("Avatar Integration Test", () => {
   it("should render avatar with correct properties", () => {
@@ -11,13 +11,11 @@ describe("Avatar Integration Test", () => {
     const svg = container.querySelector("svg") as SVGSVGElement;
     const path = container.querySelector("path");
 
-    // Vérification de la structure
     expect(svg).toBeInTheDocument();
     expect(svg).toHaveAttribute("xmlns", "http://www.w3.org/2000/svg");
     expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
     expect(path).toBeInTheDocument();
 
-    // Vérification du style
     expect(svg).toHaveStyle({ width: "100%", height: "100%", color });
   });
 
