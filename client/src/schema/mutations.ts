@@ -204,3 +204,12 @@ export const RESET_PASSWORD = gql`
     resetPassword(newPassword: $newPassword, token: $token)
   }
 `;
+
+export const UPDATE_BALANCE = gql`
+  mutation UpdateBalance($bankAccountId: Float!, $amount: Float!) {
+    updateBalance(bankAccountId: $bankAccountId, amount: $amount) {
+      id
+      balance
+    }
+  }
+`;

@@ -154,7 +154,6 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: "Mutation";
-  addBank: Bank;
   addCategory: Category;
   addSubcategory: Subcategory;
   associateBankAccountToInvoice: Invoice;
@@ -167,6 +166,7 @@ export type Mutation = {
   restoreUser: RestoreResponseStatus;
   setCommissionBudgetAmount: Budget;
   softDeleteUser: DeleteResponseStatus;
+  updateBalance: BankAccount;
   updateCategory: Category;
   updateInvoiceStatus: Invoice;
   updateSubcategory: Subcategory;
@@ -223,6 +223,11 @@ export type MutationSetCommissionBudgetAmountArgs = {
 
 export type MutationSoftDeleteUserArgs = {
   data: UserIdInput;
+};
+
+export type MutationUpdateBalanceArgs = {
+  amount: Scalars["Float"]["input"];
+  bankAccountId: Scalars["Float"]["input"];
 };
 
 export type MutationUpdateCategoryArgs = {
@@ -621,6 +626,16 @@ export type ResetPasswordMutationVariables = Exact<{
 export type ResetPasswordMutation = {
   __typename?: "Mutation";
   resetPassword: boolean;
+};
+
+export type UpdateBalanceMutationVariables = Exact<{
+  bankAccountId: Scalars["Float"]["input"];
+  amount: Scalars["Float"]["input"];
+}>;
+
+export type UpdateBalanceMutation = {
+  __typename?: "Mutation";
+  updateBalance: { __typename?: "BankAccount"; id: number; balance: number };
 };
 
 export type GetUsersQueryVariables = Exact<{
@@ -1881,6 +1896,58 @@ export type ResetPasswordMutationResult =
 export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<
   ResetPasswordMutation,
   ResetPasswordMutationVariables
+>;
+export const UpdateBalanceDocument = gql`
+  mutation UpdateBalance($bankAccountId: Float!, $amount: Float!) {
+    updateBalance(bankAccountId: $bankAccountId, amount: $amount) {
+      id
+      balance
+    }
+  }
+`;
+export type UpdateBalanceMutationFn = Apollo.MutationFunction<
+  UpdateBalanceMutation,
+  UpdateBalanceMutationVariables
+>;
+
+/**
+ * __useUpdateBalanceMutation__
+ *
+ * To run a mutation, you first call `useUpdateBalanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBalanceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBalanceMutation, { data, loading, error }] = useUpdateBalanceMutation({
+ *   variables: {
+ *      bankAccountId: // value for 'bankAccountId'
+ *      amount: // value for 'amount'
+ *   },
+ * });
+ */
+export function useUpdateBalanceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateBalanceMutation,
+    UpdateBalanceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateBalanceMutation,
+    UpdateBalanceMutationVariables
+  >(UpdateBalanceDocument, options);
+}
+export type UpdateBalanceMutationHookResult = ReturnType<
+  typeof useUpdateBalanceMutation
+>;
+export type UpdateBalanceMutationResult =
+  Apollo.MutationResult<UpdateBalanceMutation>;
+export type UpdateBalanceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateBalanceMutation,
+  UpdateBalanceMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
@@ -3565,5 +3632,6 @@ export const namedOperations = {
     AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",
+    UpdateBalance: "UpdateBalance",
   },
 };

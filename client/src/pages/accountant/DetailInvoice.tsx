@@ -1,7 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetInvoiceByIdQuery,
   useUpdateStatusInvoiceMutation,
+  useAssociateBankAccountToInvoiceMutation,
+  useGetBanksQuery,
+  Bank,
+  useUpdateBalanceMutation,
 } from "../../types/graphql-types";
 import {
   TextField,
@@ -27,29 +32,73 @@ import AddBankAccount from "../../components/addBankAccount/AddBankAccount";
 import useNotification from "../../hooks/useNotification";
 
 function DetailInvoice() {
+  const navigate = useNavigate();
   const { notifySuccess, notifyError } = useNotification();
-
   const { invoiceId } = useParams<{ invoiceId: string }>();
 
-  // Conversion sécurisée de l'ID en nombre
   const invoiceIdAsNumber = invoiceId ? parseInt(invoiceId, 10) : NaN;
   const isInvalidId = isNaN(invoiceIdAsNumber);
+
+  const { loading, error, data } = useGetInvoiceByIdQuery({
+    variables: { invoiceId: invoiceIdAsNumber },
+  });
+
+  const [selectedBank, setSelectedBank] = useState<string | "">("");
+  const [banks, setBanks] = useState<Bank[]>([]);
+
+  const [
+    associateBankAccountToInvoice,
+    { loading: loadingAssociate, error: errorAssociate },
+  ] = useAssociateBankAccountToInvoiceMutation();
 
   const [updateStatusInvoiceMutation, { error: updateError }] =
     useUpdateStatusInvoiceMutation();
 
-  // Appeler le hook avec l'option `skip`
-  const { loading, error, data } = useGetInvoiceByIdQuery({
-    variables: { invoiceId: invoiceIdAsNumber }, // Passez l'ID converti en nombre
-    // skip: isInvalidId, // Ignorez la requête si l'ID est invalide
-  });
+  const [updateBalanceMutation, { error: updateBalanceError }] =
+    useUpdateBalanceMutation();
 
-  // Gérer les cas où l'ID est invalide
+  const { data: bankData } = useGetBanksQuery();
+  useEffect(() => {
+    if (bankData?.getBanks) {
+      setBanks(bankData.getBanks);
+    }
+  }, [bankData]);
+
+  if (loadingAssociate) {
+    return <p>Loading...</p>;
+  }
+
+  if (errorAssociate) {
+    console.error("GraphQL error: ", errorAssociate);
+    return (
+      <div>
+        <p>Error :(</p>
+        <pre>{JSON.stringify(errorAssociate, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  if (updateError) {
+    console.error("GraphQL error: ", updateError);
+    return (
+      <div>
+        <p>Error :(</p>
+        <pre>{JSON.stringify(updateError, null, 2)}</pre>
+      </div>
+    );
+  }
+  if (updateBalanceError) {
+    return (
+      <div>
+        <p>Error :(</p>
+        <pre>{JSON.stringify(updateBalanceError, null, 2)}</pre>
+      </div>
+    );
+  }
   if (isInvalidId) {
     return <p>Invalid Invoice ID</p>;
   }
 
-  // Gestion des différents états
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -69,38 +118,71 @@ function DetailInvoice() {
     return <p>No data</p>;
   }
 
-  const invoice = data.getInvoiceById;
-  const totalPrice =
-    invoice.price_without_vat * (1 + (invoice.vat?.rate ?? 0) / 100);
-
-  // console.log(invoice);
-
-  if (updateError) {
-    console.error("GraphQL error:", updateError);
-
+  if (updateBalanceError) {
     return (
       <div>
         <p>Error :(</p>
-        <p>{updateError.message}</p>
-        <pre>{JSON.stringify(updateError, null, 2)}</pre>
+        <pre>{JSON.stringify(updateBalanceError, null, 2)}</pre>
       </div>
     );
   }
 
-  const handleUpdateStatusInvoice = async () => {
+  const invoice = data.getInvoiceById;
+
+  const handleValidateInvoice = async () => {
+    const selectedBankAccount = banks?.find(
+      (bank) => String(bank.id) === selectedBank,
+    )?.bankAccounts?.[0];
+
+    const bankAccountId = selectedBankAccount?.id
+      ? Number(selectedBankAccount.id)
+      : null;
+
+    if (!bankAccountId) {
+      notifyError("Veuillez sélectionner un compte bancaire valide");
+      return;
+    }
+
     try {
+      await associateBankAccountToInvoice({
+        variables: {
+          invoiceId: invoice.id,
+          bankAccountId,
+        },
+      });
+
       await updateStatusInvoiceMutation({
         variables: {
           invoiceId: invoice.id,
           statusId: 1,
         },
       });
-      notifySuccess("Facture validée avec succès");
-    } catch (error) {
-      console.error("Error on update status invoice", error);
+
+      await updateBalanceMutation({
+        variables: {
+          bankAccountId,
+          amount: totalPrice,
+        },
+      });
+
+      notifySuccess(
+        "Facture validée avec succès, compte bancaire associé et balance mise à jour",
+      );
+      navigate("/accountant");
+    } catch {
       notifyError("Erreur lors de la validation de la facture");
     }
   };
+
+  let totalPrice = 0;
+
+  if (invoice.creditDebit?.id === 1) {
+    totalPrice = -invoice.price_without_vat * (1 + invoice.vat.rate / 100);
+  } else if (invoice.creditDebit?.id === 2) {
+    totalPrice = invoice.price_without_vat * (1 + invoice.vat.rate / 100);
+  } else {
+    totalPrice = 0;
+  }
 
   return (
     <Paper
@@ -114,7 +196,12 @@ function DetailInvoice() {
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Facture n°{invoice.id}
       </Typography>
-      <AddBankAccount invoiceId={invoice.id} />
+      <AddBankAccount
+        invoiceId={invoice.id}
+        selectedBank={selectedBank}
+        setSelectedBank={setSelectedBank}
+        banks={banks}
+      />
       <Snackbar open={false} autoHideDuration={8000}>
         <Alert
           severity="error"
@@ -140,10 +227,10 @@ function DetailInvoice() {
             <TextField
               label="Commissions"
               fullWidth
-              value={invoice.commission?.name || ""} // Affiche le nom de la commission ou une chaîne vide
+              value={invoice.commission?.name || ""}
               slotProps={{
                 input: {
-                  readOnly: true, // Rend le champ non modifiable
+                  readOnly: true,
                 },
               }}
             />
@@ -222,13 +309,55 @@ function DetailInvoice() {
               value={invoice.price_without_vat}
             />
           </Grid>
-          <Grid size={6}>
-            <TextField label="Taux de TVA" fullWidth value={invoice.vat.rate} />
+          <Grid
+            size={6}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              marginTop: "2rem",
+            }}
+          >
+            <Grid container>
+              <TextField
+                label="Taux de TVA"
+                fullWidth
+                value={invoice.vat.rate}
+              />
+            </Grid>
           </Grid>
-          <Grid size={12}>
-            <Typography variant="h6">
-              Total TTC : <strong>{totalPrice}</strong>
-            </Typography>
+
+          <Grid
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              marginTop: "1rem",
+            }}
+          >
+            <Grid
+              container
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mt: 2,
+                border: "1px solid black",
+                padding: "1rem",
+                justifyContent: "center",
+                width: "50%",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Total TTC : <strong>{totalPrice}</strong>
+              </Typography>
+            </Grid>
           </Grid>
           <Grid size={12}>
             <Typography>Justificatif</Typography>
@@ -257,16 +386,16 @@ function DetailInvoice() {
               alignItems="center"
             >
               <Button
-                type="submit"
+                type="button"
                 variant="contained"
                 color="success"
                 sx={{ fontWeight: "bold", fontSize: "1rem" }}
-                onClick={() => handleUpdateStatusInvoice()}
+                onClick={() => handleValidateInvoice()}
               >
                 Valider la facture
               </Button>
               <Button
-                type="submit"
+                type="button"
                 variant="contained"
                 color="error"
                 sx={{ fontWeight: "bold", fontSize: "1rem" }}
