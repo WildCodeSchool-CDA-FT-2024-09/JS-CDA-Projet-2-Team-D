@@ -87,4 +87,18 @@ export default class ExerciseResolver {
       throw new Error("Problème avec la mise à jour de l'exercice.");
     }
   }
+
+  @Authorized(["1", "2", "3"])
+  @Query(() => Exercise)
+  async getExerciseById(@Arg("exerciseId") exerciseId: number) {
+    const exercise = await Exercise.findOneOrFail({
+      where: { id: exerciseId },
+    });
+
+    if (!exercise) {
+      throw new Error("L'exercise n'existe pas");
+    }
+
+    return exercise;
+  }
 }
