@@ -51,14 +51,8 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "overview",
-            element: <Outlet />,
-            children: [
-              {
-                index: true,
-                element: <BudgetOverview />,
-              },
-            ],
+            index: true,
+            element: <BudgetOverview />,
           },
           {
             path: "invoiceOverview",

@@ -75,25 +75,6 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          {/* {currentPage === "/" ? (
-            <Login />
-          ) : currentPage === "/lost-password" ? (
-            <ILostMyPassword />
-          ) : (
-            <Box sx={{ display: "flex" }}>
-              <CssBaseline />
-              <Header
-                title="ClubCompta"
-                subtitle="Budget 2024/2025"
-                logoUrl="/Logo.svg"
-              />
-              <Drawer />
-              <Box component="main" sx={{ flexGrow: 1, p: 3, mt: "4rem" }}>
-                <Outlet />
-                <Footer />
-              </Box>
-            </Box>
-          )} */}
           {(() => {
             switch (currentPage) {
               case "/":

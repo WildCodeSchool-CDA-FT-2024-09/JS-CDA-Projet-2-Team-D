@@ -56,7 +56,7 @@ function CustomDrawer() {
           </Typography>
           <List component="nav" sx={{ px: 1 }}>
             <DrawerMenuItem
-              to="/administrator/overview"
+              to="/administrator"
               icon={<PieChartSharpIcon />}
               text="Vue globale du budget"
             />
