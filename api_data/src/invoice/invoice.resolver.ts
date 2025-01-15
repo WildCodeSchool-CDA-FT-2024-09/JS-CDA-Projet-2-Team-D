@@ -27,10 +27,8 @@ export default class InvoiceResolver {
       // Redis cache check
       const cachedInvoices = await redisClient.get(cacheKey);
       if (cachedInvoices) {
-        console.info("Returning cached invoices");
         return JSON.parse(cachedInvoices);
       }
-      console.info("cache not found, fetching from database...");
 
       const invoices = await Invoice.find({
         relations: [
