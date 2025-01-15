@@ -151,7 +151,11 @@ export default function ManageUser() {
                   </TableCell>
                   <TableCell align="left">{user.firstname}</TableCell>
                   <TableCell align="left">{user.lastname}</TableCell>
-                  <TableCell align="left">{user.email}</TableCell>
+                  <TableCell align="left">
+                    {user.email}
+                    <br />
+                    {user.roles.map((role) => role.label)}
+                  </TableCell>
                   <TableCell align="right">
                     <Stack spacing={2} direction="row">
                       <BtnCrud
