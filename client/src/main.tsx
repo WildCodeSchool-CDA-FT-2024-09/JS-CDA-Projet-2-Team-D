@@ -15,12 +15,12 @@ import HomePageCommission from "./pages/commission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
-import Administrator from "./pages/administrator/Administrator.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
 import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
+import DetailInvoice from "./pages/accountant/DetailInvoice.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import ILostMyPassword from "./pages/ILostMyPassword.tsx";
 
@@ -50,10 +50,6 @@ const router = createBrowserRouter([
           </RoleProtectedRoute>
         ),
         children: [
-          {
-            index: true,
-            element: <Administrator />,
-          },
           {
             path: "overview",
             element: <Outlet />,
@@ -145,6 +141,10 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: "invoice/:invoiceId",
+            element: <DetailInvoice />,
+          },
+          {
             path: "invoiceOverview",
             element: <Outlet />,
             children: [
@@ -156,6 +156,7 @@ const router = createBrowserRouter([
           },
         ],
       },
+
       {
         path: "commission",
         element: (

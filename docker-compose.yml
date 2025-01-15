@@ -33,6 +33,12 @@ services:
       db:
         condition: service_healthy
 
+  redis:
+    image: redis
+    container_name: redis_cache
+    ports:
+      - 6379:6379
+
   api_email:
     build: ./api_email
     command: npm run dev
@@ -40,8 +46,6 @@ services:
     env_file: .env
     volumes:
       - ./api_email:/app/
-    ports:
-      - 3100:3000 # to be removed
 
   api_upload:
     build: ./api_upload

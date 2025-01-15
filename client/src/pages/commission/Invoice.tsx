@@ -135,7 +135,6 @@ const InvoiceForm: React.FC = () => {
     if (userId) {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
-    console.info("Données de la facture :", invoice);
 
     // Checks of mandatory fields
     const missingFields: string[] = [];

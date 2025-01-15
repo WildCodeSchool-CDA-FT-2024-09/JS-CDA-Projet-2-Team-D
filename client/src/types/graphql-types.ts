@@ -51,7 +51,7 @@ export type BankAccount = {
   __typename?: "BankAccount";
   account_number: Scalars["String"]["output"];
   balance: Scalars["Float"]["output"];
-  bank: Bank;
+  bank?: Maybe<Bank>;
   id: Scalars["Int"]["output"];
   invoices?: Maybe<Array<Invoice>>;
   name: Scalars["String"]["output"];
@@ -95,7 +95,7 @@ export type CommissionsInput = {
 
 export type CreditDebit = {
   __typename?: "CreditDebit";
-  categories: Category;
+  categories: Array<Category>;
   id: Scalars["Float"]["output"];
   invoices: Array<Invoice>;
   label: Scalars["String"]["output"];
@@ -154,8 +154,10 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: "Mutation";
+  addBank: Bank;
   addCategory: Category;
   addSubcategory: Subcategory;
+  associateBankAccountToInvoice: Invoice;
   createNewExercise: Exercise;
   createNewUser: User;
   login: LoginResponse;
@@ -166,6 +168,7 @@ export type Mutation = {
   setCommissionBudgetAmount: Budget;
   softDeleteUser: DeleteResponseStatus;
   updateCategory: Category;
+  updateInvoiceStatus: Invoice;
   updateSubcategory: Subcategory;
   updateUser: User;
 };
@@ -179,6 +182,11 @@ export type MutationAddSubcategoryArgs = {
   categoryId: Scalars["Float"]["input"];
   code: Scalars["String"]["input"];
   label: Scalars["String"]["input"];
+};
+
+export type MutationAssociateBankAccountToInvoiceArgs = {
+  bankAccountId?: InputMaybe<Scalars["Float"]["input"]>;
+  invoiceId: Scalars["Float"]["input"];
 };
 
 export type MutationCreateNewExerciseArgs = {
@@ -223,6 +231,11 @@ export type MutationUpdateCategoryArgs = {
   label: Scalars["String"]["input"];
 };
 
+export type MutationUpdateInvoiceStatusArgs = {
+  invoiceId: Scalars["Float"]["input"];
+  statusId: Scalars["Float"]["input"];
+};
+
 export type MutationUpdateSubcategoryArgs = {
   categoryId: Scalars["Float"]["input"];
   code: Scalars["String"]["input"];
@@ -260,6 +273,7 @@ export type Query = {
   getCurrentBudgetByCommissionID?: Maybe<Budget>;
   getExerciseBudgets: Array<Budget>;
   getExercises: Array<Exercise>;
+  getInvoiceById: Invoice;
   getInvoices: Array<Invoice>;
   getInvoicesByCommissionId: PaginatedInvoices;
   getInvoicesByExercise: PaginatedInvoices;
@@ -278,6 +292,14 @@ export type QueryGetCurrentBudgetByCommissionIdArgs = {
 
 export type QueryGetExerciseBudgetsArgs = {
   exerciseId: Scalars["Float"]["input"];
+};
+
+export type QueryGetInvoiceByIdArgs = {
+  invoiceId: Scalars["Float"]["input"];
+};
+
+export type QueryGetInvoicesArgs = {
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QueryGetInvoicesByCommissionIdArgs = {
@@ -554,6 +576,34 @@ export type SetCommissionBudgetAmountMutation = {
   };
 };
 
+export type UpdateStatusInvoiceMutationVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+  statusId: Scalars["Float"]["input"];
+}>;
+
+export type UpdateStatusInvoiceMutation = {
+  __typename?: "Mutation";
+  updateInvoiceStatus: {
+    __typename?: "Invoice";
+    id: number;
+    status: { __typename?: "Status"; id: number };
+  };
+};
+
+export type AssociateBankAccountToInvoiceMutationVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+  bankAccountId?: InputMaybe<Scalars["Float"]["input"]>;
+}>;
+
+export type AssociateBankAccountToInvoiceMutation = {
+  __typename?: "Mutation";
+  associateBankAccountToInvoice: {
+    __typename?: "Invoice";
+    id: number;
+    bankAccount?: { __typename?: "BankAccount"; id: number } | null;
+  };
+};
+
 export type RequestPasswordResetMutationVariables = Exact<{
   email: Scalars["String"]["input"];
 }>;
@@ -639,6 +689,47 @@ export type GetInvoicesQuery = {
       lastname: string;
     };
   }>;
+};
+
+export type GetInvoiceByIdQueryVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+}>;
+
+export type GetInvoiceByIdQuery = {
+  __typename?: "Query";
+  getInvoiceById: {
+    __typename?: "Invoice";
+    id: number;
+    price_without_vat: number;
+    label: string;
+    receipt: string;
+    info: string;
+    paid: boolean;
+    date: string;
+    invoiceNumber: string;
+    status: { __typename?: "Status"; id: number; label: string };
+    vat: { __typename?: "Vat"; id: number; rate: number };
+    creditDebit: { __typename?: "CreditDebit"; id: number; label: string };
+    subcategory: {
+      __typename?: "Subcategory";
+      id: number;
+      code: string;
+      label: string;
+      category: { __typename?: "Category"; id: number; label: string };
+    };
+    commission: { __typename?: "Commission"; id: number; name: string };
+    bankAccount?: {
+      __typename?: "BankAccount";
+      id: number;
+      name: string;
+    } | null;
+    user: {
+      __typename?: "User";
+      id: number;
+      firstname: string;
+      lastname: string;
+    };
+  };
 };
 
 export type GetCategoriesQueryVariables = Exact<{ [key: string]: never }>;
@@ -1579,6 +1670,121 @@ export type SetCommissionBudgetAmountMutationOptions =
     SetCommissionBudgetAmountMutation,
     SetCommissionBudgetAmountMutationVariables
   >;
+export const UpdateStatusInvoiceDocument = gql`
+  mutation UpdateStatusInvoice($invoiceId: Float!, $statusId: Float!) {
+    updateInvoiceStatus(invoiceId: $invoiceId, statusId: $statusId) {
+      id
+      status {
+        id
+      }
+    }
+  }
+`;
+export type UpdateStatusInvoiceMutationFn = Apollo.MutationFunction<
+  UpdateStatusInvoiceMutation,
+  UpdateStatusInvoiceMutationVariables
+>;
+
+/**
+ * __useUpdateStatusInvoiceMutation__
+ *
+ * To run a mutation, you first call `useUpdateStatusInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateStatusInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateStatusInvoiceMutation, { data, loading, error }] = useUpdateStatusInvoiceMutation({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *      statusId: // value for 'statusId'
+ *   },
+ * });
+ */
+export function useUpdateStatusInvoiceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateStatusInvoiceMutation,
+    UpdateStatusInvoiceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateStatusInvoiceMutation,
+    UpdateStatusInvoiceMutationVariables
+  >(UpdateStatusInvoiceDocument, options);
+}
+export type UpdateStatusInvoiceMutationHookResult = ReturnType<
+  typeof useUpdateStatusInvoiceMutation
+>;
+export type UpdateStatusInvoiceMutationResult =
+  Apollo.MutationResult<UpdateStatusInvoiceMutation>;
+export type UpdateStatusInvoiceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateStatusInvoiceMutation,
+  UpdateStatusInvoiceMutationVariables
+>;
+export const AssociateBankAccountToInvoiceDocument = gql`
+  mutation AssociateBankAccountToInvoice(
+    $invoiceId: Float!
+    $bankAccountId: Float
+  ) {
+    associateBankAccountToInvoice(
+      invoiceId: $invoiceId
+      bankAccountId: $bankAccountId
+    ) {
+      id
+      bankAccount {
+        id
+      }
+    }
+  }
+`;
+export type AssociateBankAccountToInvoiceMutationFn = Apollo.MutationFunction<
+  AssociateBankAccountToInvoiceMutation,
+  AssociateBankAccountToInvoiceMutationVariables
+>;
+
+/**
+ * __useAssociateBankAccountToInvoiceMutation__
+ *
+ * To run a mutation, you first call `useAssociateBankAccountToInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssociateBankAccountToInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [associateBankAccountToInvoiceMutation, { data, loading, error }] = useAssociateBankAccountToInvoiceMutation({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *      bankAccountId: // value for 'bankAccountId'
+ *   },
+ * });
+ */
+export function useAssociateBankAccountToInvoiceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >(AssociateBankAccountToInvoiceDocument, options);
+}
+export type AssociateBankAccountToInvoiceMutationHookResult = ReturnType<
+  typeof useAssociateBankAccountToInvoiceMutation
+>;
+export type AssociateBankAccountToInvoiceMutationResult =
+  Apollo.MutationResult<AssociateBankAccountToInvoiceMutation>;
+export type AssociateBankAccountToInvoiceMutationOptions =
+  Apollo.BaseMutationOptions<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >;
 export const RequestPasswordResetDocument = gql`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email)
@@ -1944,6 +2150,129 @@ export type GetInvoicesSuspenseQueryHookResult = ReturnType<
 export type GetInvoicesQueryResult = Apollo.QueryResult<
   GetInvoicesQuery,
   GetInvoicesQueryVariables
+>;
+export const GetInvoiceByIdDocument = gql`
+  query GetInvoiceById($invoiceId: Float!) {
+    getInvoiceById(invoiceId: $invoiceId) {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        code
+        label
+        category {
+          id
+          label
+        }
+      }
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetInvoiceByIdQuery__
+ *
+ * To run a query within a React component, call `useGetInvoiceByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoiceByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoiceByIdQuery({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *   },
+ * });
+ */
+export function useGetInvoiceByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetInvoiceByIdQuery,
+    GetInvoiceByIdQueryVariables
+  > &
+    (
+      | { variables: GetInvoiceByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetInvoiceByIdQuery, GetInvoiceByIdQueryVariables>(
+    GetInvoiceByIdDocument,
+    options,
+  );
+}
+export function useGetInvoiceByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetInvoiceByIdQuery,
+    GetInvoiceByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetInvoiceByIdQuery, GetInvoiceByIdQueryVariables>(
+    GetInvoiceByIdDocument,
+    options,
+  );
+}
+export function useGetInvoiceByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetInvoiceByIdQuery,
+        GetInvoiceByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetInvoiceByIdQuery,
+    GetInvoiceByIdQueryVariables
+  >(GetInvoiceByIdDocument, options);
+}
+export type GetInvoiceByIdQueryHookResult = ReturnType<
+  typeof useGetInvoiceByIdQuery
+>;
+export type GetInvoiceByIdLazyQueryHookResult = ReturnType<
+  typeof useGetInvoiceByIdLazyQuery
+>;
+export type GetInvoiceByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetInvoiceByIdSuspenseQuery
+>;
+export type GetInvoiceByIdQueryResult = Apollo.QueryResult<
+  GetInvoiceByIdQuery,
+  GetInvoiceByIdQueryVariables
 >;
 export const GetCategoriesDocument = gql`
   query GetCategories {
@@ -3203,6 +3532,7 @@ export const namedOperations = {
     GetUsers: "GetUsers",
     GetRoles: "GetRoles",
     GetInvoices: "GetInvoices",
+    GetInvoiceById: "GetInvoiceById",
     GetCategories: "GetCategories",
     GetCreditDebits: "GetCreditDebits",
     GetVats: "GetVats",
@@ -3231,6 +3561,8 @@ export const namedOperations = {
     Logout: "Logout",
     CreateNewExercise: "CreateNewExercise",
     SetCommissionBudgetAmount: "SetCommissionBudgetAmount",
+    UpdateStatusInvoice: "UpdateStatusInvoice",
+    AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",
   },
