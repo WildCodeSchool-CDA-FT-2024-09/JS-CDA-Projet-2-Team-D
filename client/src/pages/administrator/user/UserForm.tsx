@@ -78,8 +78,8 @@ export default function UserForm({ mode }: UserFormProps) {
       firstname: "",
       lastname: "",
       email: "",
-      roles: [],
-      commissions: [],
+      roles: [] as string[],
+      commissions: [] as string[],
     },
   });
 
@@ -110,7 +110,7 @@ export default function UserForm({ mode }: UserFormProps) {
     setRoles(selectedRoles);
   };
 
-  const handleChangeCommissions = (
+  const handleChangeCommissions = async (
     event: SelectChangeEvent<typeof commissions>,
   ) => {
     const {
@@ -119,6 +119,12 @@ export default function UserForm({ mode }: UserFormProps) {
     // On autofill we get a stringified value
     const selectedCommissions =
       typeof value === "string" ? value.split(",") : value;
+
+    // Update the form field value and trigger validation immediately
+    setValue("commissions", selectedCommissions);
+
+    // Trigger validation
+    await trigger("commissions");
     setCommissions(selectedCommissions);
   };
 
@@ -128,7 +134,7 @@ export default function UserForm({ mode }: UserFormProps) {
     lastname: string;
     email: string;
     roles: string[];
-    commissions?: string[];
+    commissions: string[];
   }) => {
     try {
       const selectedRoleObjects: { id: number }[] = formData.roles
@@ -349,6 +355,11 @@ export default function UserForm({ mode }: UserFormProps) {
                     </MenuItem>
                   ))}
               </Select>
+              {errors.commissions && (
+                <p style={{ color: "red", margin: "4px 14px 0" }}>
+                  {errors.commissions.message}
+                </p>
+              )}
             </FormControl>
           </Grid>
           <Grid size={6}></Grid>
