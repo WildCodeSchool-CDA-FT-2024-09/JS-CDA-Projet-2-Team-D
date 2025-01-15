@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import BtnLink from "../BtnLink";
 import Table from "@mui/material/Table";
@@ -32,6 +32,16 @@ type Exercise = {
 
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState<boolean>(false);
+  const [enableManageBtn, setEnableManageBtn] = useState<boolean>(false);
+
+  // If the exercise.end_date is bigger than the current date, we can manage that exercise
+  useEffect(() => {
+    if (new Date(exercise.end_date) >= new Date()) {
+      setEnableManageBtn(true);
+    } else {
+      setEnableManageBtn(false);
+    }
+  }, []);
 
   return (
     <>
@@ -55,25 +65,27 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         <TableCell align="left">{formatDate(exercise.start_date)}</TableCell>
         <TableCell align="left">{formatDate(exercise.end_date)}</TableCell>
         <TableCell align="right">
-          <BtnLink
-            to={`/administrator/exercise/${exercise.id}/budgets`}
-            sx={{
-              display: "inline-block",
-              marginLeft: "auto",
-              backgroundColor: "primary.main",
-              padding: "8px 16px",
-              color: "primary.contrastText",
-              textTransform: "uppercase",
-              borderRadius: "4px",
-              textDecoration: "none",
-              textAlign: "center",
-              "&:hover": {
-                backgroundColor: "primary.dark",
-              },
-            }}
-          >
-            Gérer
-          </BtnLink>
+          {enableManageBtn && (
+            <BtnLink
+              to={`/administrator/exercise/${exercise.id}/budgets`}
+              sx={{
+                display: "inline-block",
+                marginLeft: "auto",
+                backgroundColor: "primary.main",
+                padding: "8px 16px",
+                color: "primary.contrastText",
+                textTransform: "uppercase",
+                borderRadius: "4px",
+                textDecoration: "none",
+                textAlign: "center",
+                "&:hover": {
+                  backgroundColor: "primary.dark",
+                },
+              }}
+            >
+              Gérer
+            </BtnLink>
+          )}
         </TableCell>
       </TableRow>
       <TableRow>
