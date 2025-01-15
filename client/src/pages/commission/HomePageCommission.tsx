@@ -24,8 +24,10 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import PageTitle from "../../components/PageTitle";
+import SearchBar from "../../components/SearchBar";
 
 const HomePageCommission = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { commissionId } = useParams<{ commissionId: string }>();
   const commissionIdNumber = parseInt(commissionId || "0", 10);
 
@@ -104,6 +106,11 @@ const HomePageCommission = () => {
   const totalCount = invoiceData?.getInvoicesByCommissionId?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / limit);
 
+  const filteredInvoices = invoices.filter(
+    (invoice) =>
+      invoice.invoiceNumber.toString().includes(searchQuery) ||
+      invoice.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
   const getChipStyles = (status: string) => {
     const statusColors = {
       Validé: theme.palette.success.main,
@@ -131,6 +138,15 @@ const HomePageCommission = () => {
 
       <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
 
+      <Box sx={{ marginBottom: 2 }}>
+        <SearchBar
+          placeholder="Rechercher une facture"
+          value={searchQuery}
+          onSearch={setSearchQuery}
+          onClear={() => setSearchQuery("")}
+        />
+      </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ tableLayout: "auto" }}>
           <TableHead>
@@ -147,14 +163,14 @@ const HomePageCommission = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.length === 0 ? (
+            {filteredInvoices.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={isMobile ? 5 : 7} align="center">
                   Aucune facture disponible
                 </TableCell>
               </TableRow>
             ) : (
-              invoices.map((row) => {
+              filteredInvoices.map((row) => {
                 const montantHT =
                   row.creditDebit?.id === 2 //crédit
                     ? row.price_without_vat
