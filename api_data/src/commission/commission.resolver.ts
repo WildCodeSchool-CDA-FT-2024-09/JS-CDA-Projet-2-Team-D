@@ -4,6 +4,7 @@ import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "./commission.entity";
 import { Resolver, Query, Arg, Authorized } from "type-graphql";
 import { PaginatedInvoices } from "../invoice/paginatedInvoice.type";
+import redisClient from "../../redis.config";
 
 @Resolver(Commission)
 export default class CommissionResolver {
@@ -21,6 +22,15 @@ export default class CommissionResolver {
     @Arg("limit", { defaultValue: 5 }) limit: number
   ): Promise<PaginatedInvoices> {
     try {
+      const cacheKey = commissionId
+        ? `invoicesByCommissionId:keyword:${commissionId}`
+        : "invoicesByCommissionId:all";
+
+      const cachedInvoicesByCommissionId = await redisClient.get(cacheKey);
+      if (cachedInvoicesByCommissionId) {
+        return JSON.parse(cachedInvoicesByCommissionId);
+      }
+
       const [lastExercise] = await Exercise.find({
         order: { end_date: "DESC" },
         take: 1,
@@ -60,7 +70,13 @@ export default class CommissionResolver {
           .toFixed(2)
       );
 
-      return { invoices, totalCount, totalAmount };
+      const result = { invoices, totalCount, totalAmount };
+
+      await redisClient.set(cacheKey, JSON.stringify(result), {
+        EX: 60,
+      });
+
+      return result;
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
       throw new Error("Unable to fetch invoices for the given commission ID.");
