@@ -1,8 +1,13 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { validateExerciseSchema } from "../../../utils/exerciseValidation";
-import { useCreateNewExerciseMutation } from "../../../types/graphql-types";
+import {
+  useCreateNewExerciseMutation,
+  useUpdateExerciseMutation,
+  useGetExerciseByIdQuery,
+} from "../../../types/graphql-types";
 import useNotification from "../../../hooks/useNotification";
 import PageTitle from "../../../components/PageTitle";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -13,6 +18,7 @@ import BtnLink from "../../../components/BtnLink";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 
 const today = new Date();
 const nextYear = new Date(
@@ -27,9 +33,21 @@ type FormValues = {
   end_date: Date;
 };
 
-export default function CreateExercise() {
+type ExerciseFormProps = {
+  mode: "create" | "update";
+};
+
+export default function ExerciseForm({ mode }: ExerciseFormProps) {
+  const { exerciseId } = useParams();
+  const isUpdateMode = mode === "update";
   const navigate = useNavigate();
 
+  const { data, loading, error } = useGetExerciseByIdQuery({
+    variables: { exerciseId: parseInt(exerciseId as string) },
+    skip: !isUpdateMode || !exerciseId,
+  });
+
+  const [updateExerciseMutation] = useUpdateExerciseMutation();
   const [createNewExercise] = useCreateNewExerciseMutation();
 
   const handleStartDateChange = async (date: Date | null) => {
@@ -73,33 +91,76 @@ export default function CreateExercise() {
     },
   });
 
+  // Populate form with existing values
+  useEffect(() => {
+    if (isUpdateMode && data?.getExerciseById) {
+      const exerciseData = data.getExerciseById;
+      setValue("label", exerciseData.label || "");
+      setValue(
+        "start_date",
+        exerciseData.start_date ? new Date(exerciseData.start_date) : today,
+      );
+      setValue(
+        "end_date",
+        exerciseData.end_date ? new Date(exerciseData.end_date) : nextYear,
+      );
+    }
+  }, [data, setValue, isUpdateMode]);
+
   // Form submission handler
   const onSubmit = async (formData: FormValues) => {
     try {
-      await createNewExercise({
-        variables: {
-          data: {
-            label: formData.label,
-            start_date: formData.start_date.toISOString(),
-            end_date: formData.end_date.toISOString(),
-          },
-        },
-      });
+      const exerciseData = {
+        label: formData.label,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+      };
 
-      notifySuccess("Exercice ajouté avec succès");
+      if (isUpdateMode) {
+        await updateExerciseMutation({
+          variables: {
+            data: {
+              ...exerciseData,
+              start_date: exerciseData.start_date.toISOString(),
+              end_date: exerciseData.end_date.toISOString(),
+            },
+            exerciseId: parseInt(exerciseId as string),
+          },
+        });
+
+        notifySuccess("Exercice mis à jour avec succès");
+      } else {
+        await createNewExercise({
+          variables: {
+            data: {
+              label: formData.label,
+              start_date: formData.start_date.toISOString(),
+              end_date: formData.end_date.toISOString(),
+            },
+          },
+        });
+
+        notifySuccess("Exercice ajouté avec succès");
+      }
 
       navigate("/administrator/exercise");
     } catch (error) {
+      const action = isUpdateMode ? "mise à jour" : "création";
       notifyError(
-        "Erreur lors de l'ajout de l'exercice. Le libellé existe-t-il déjà ?",
+        `Erreur lors de la ${action} de l'exercice. Le libellé existe-t-il déjà ?`,
       );
-      console.error("Erreur lors de l'ajout de l'exercice", error);
+      console.error(`Erreur lors de la ${action} de l'exercice`, error);
     }
   };
 
+  if (loading) return <p>🥁 Chargement...</p>;
+  if (error) return <p>☠️ Erreur: {error.message}</p>;
+
   return (
     <>
-      <PageTitle title="Ajouter un exercice">
+      <PageTitle
+        title={isUpdateMode ? "Editer un exercise" : "Créer un exercise"}
+      >
         <BtnLink
           to="/administrator/exercise"
           sx={{
@@ -194,9 +255,12 @@ export default function CreateExercise() {
               disabled={Object.keys(errors).length > 0}
               type="submit"
               variant="contained"
-              startIcon={<AddIcon />}
+              startIcon={isUpdateMode ? <EditIcon /> : <AddIcon />}
+              aria-label={
+                isUpdateMode ? "Mettre à jour l'exercise" : "Ajouter l'exercise"
+              }
             >
-              Ajouter
+              {isUpdateMode ? "Mettre à jour" : "Ajouter"}
             </Button>
           </Grid>
           <Grid size={4}></Grid>
