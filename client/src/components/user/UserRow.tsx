@@ -6,7 +6,7 @@ import {
 } from "../../types/graphql-types";
 import useNotification from "../../hooks/useNotification";
 import BtnCrud from "../BtnCrud";
-import { TableCell, TableRow } from "@mui/material";
+import { Chip, TableCell, TableRow, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 
 type UserType = {
@@ -102,7 +102,20 @@ function UserRow({ user, offset, limit }: UserRowType) {
         <TableCell align="left">
           {user.email}
           <br />
-          {user.roles.map((role) => role.label)}
+          <Typography
+            component="div"
+            sx={{ fontSize: ".8rem", marginTop: ".5em" }}
+          >
+            {user.roles.map((role) => (
+              <Chip
+                key={role.id}
+                label={role.label}
+                size="small"
+                variant="outlined"
+                sx={{ marginRight: ".5em" }}
+              />
+            ))}
+          </Typography>
         </TableCell>
         <TableCell align="right">
           <Stack spacing={2} direction="row">
