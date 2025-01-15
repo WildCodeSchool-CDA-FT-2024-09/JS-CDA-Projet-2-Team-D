@@ -28,7 +28,7 @@ export class CreditDebit extends BaseEntity {
   @OneToMany(() => Invoice, (invoice) => invoice.id)
   invoices: Invoice[];
 
-  @Field(() => Category)
+  @Field(() => [Category])
   @OneToMany(() => Category, (category) => category.creditDebit)
   categories: Category[];
 }

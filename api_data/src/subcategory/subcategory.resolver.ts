@@ -8,7 +8,7 @@ export default class SubcategoryResolver {
   @Authorized(["1", "2", "3"])
   @Query(() => [Subcategory])
   async getSubcategories() {
-    return Subcategory.find();
+    return Subcategory.find({ relations: ["category"] });
   }
 
   @Authorized(["2"])

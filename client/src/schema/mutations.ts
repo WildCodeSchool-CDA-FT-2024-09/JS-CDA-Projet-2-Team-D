@@ -165,6 +165,34 @@ export const SET_COMMISSION_BUDGET_AMOUNT = gql`
   }
 `;
 
+export const UPDATE_STATUS_INVOICE = gql`
+  mutation UpdateStatusInvoice($invoiceId: Float!, $statusId: Float!) {
+    updateInvoiceStatus(invoiceId: $invoiceId, statusId: $statusId) {
+      id
+      status {
+        id
+      }
+    }
+  }
+`;
+
+export const ASSOCIATED_BANK_ACCOUNT_TO_INVOICE = gql`
+  mutation AssociateBankAccountToInvoice(
+    $invoiceId: Float!
+    $bankAccountId: Float
+  ) {
+    associateBankAccountToInvoice(
+      invoiceId: $invoiceId
+      bankAccountId: $bankAccountId
+    ) {
+      id
+      bankAccount {
+        id
+      }
+    }
+  }
+`;
+
 export const REQUEST_RESET_PASSWORD = gql`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email)

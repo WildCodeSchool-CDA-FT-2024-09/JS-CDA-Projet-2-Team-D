@@ -14,6 +14,8 @@ import {
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { Box } from "@mui/system";
 
+import { Link } from "react-router-dom";
+
 import { useGetInvoicesToValidateOrRefusedQuery } from "../../types/graphql-types";
 
 function DisplayInvoicesForAccountant() {
@@ -37,7 +39,7 @@ function DisplayInvoicesForAccountant() {
   }
 
   const rows = data.getInvoicesToValidateOrRefused.map((invoice) => ({
-    invoiceNumber: invoice.id,
+    invoiceId: invoice.id,
     date: invoice.date,
     commission: invoice.commission?.name,
     amountHT: invoice.price_without_vat,
@@ -88,8 +90,8 @@ function DisplayInvoicesForAccountant() {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.invoiceNumber}>
-                  <TableCell>{row.invoiceNumber}</TableCell>
+                <TableRow key={row.invoiceId}>
+                  <TableCell>{row.invoiceId}</TableCell>
                   <TableCell align="right">
                     {new Date(row.date).toLocaleDateString("fr-FR")}
                   </TableCell>
@@ -109,7 +111,9 @@ function DisplayInvoicesForAccountant() {
                   </TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">
-                    <RemoveRedEyeOutlinedIcon />
+                    <Link to={`/accountant/invoice/${row.invoiceId}`}>
+                      <RemoveRedEyeOutlinedIcon />
+                    </Link>
                   </TableCell>
                   <TableCell align="right">
                     <Button
@@ -139,7 +143,7 @@ function DisplayInvoicesForAccountant() {
         <Box>
           {rows.map((row) => (
             <Paper
-              key={row.invoiceNumber}
+              key={row.invoiceId}
               sx={{
                 marginBottom: "1rem",
                 padding: "1rem",
@@ -150,7 +154,7 @@ function DisplayInvoicesForAccountant() {
               }}
             >
               <Box>
-                <strong>Numéro :</strong> {row.invoiceNumber}
+                <strong>Numéro :</strong> {row.invoiceId}
               </Box>
               <Box>
                 <strong>Date :</strong>{" "}
@@ -178,9 +182,14 @@ function DisplayInvoicesForAccountant() {
                 }}
               >
                 <strong>Détail :</strong>
-                <RemoveRedEyeOutlinedIcon
-                  sx={{ mt: "auto" }}
-                ></RemoveRedEyeOutlinedIcon>
+                <Link
+                  key={row.invoiceId}
+                  to={`/accountant/invoice/${row.invoiceId}`}
+                >
+                  <RemoveRedEyeOutlinedIcon
+                    sx={{ mt: "auto" }}
+                  ></RemoveRedEyeOutlinedIcon>
+                </Link>
               </Box>
               <Box>
                 <strong>Status :</strong> {row.status}

@@ -21,6 +21,7 @@ import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
+import DetailInvoice from "./pages/accountant/DetailInvoice.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import ILostMyPassword from "./pages/ILostMyPassword.tsx";
 
@@ -145,6 +146,10 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: "invoice/:invoiceId",
+            element: <DetailInvoice />,
+          },
+          {
             path: "invoiceOverview",
             element: <Outlet />,
             children: [
@@ -156,6 +161,7 @@ const router = createBrowserRouter([
           },
         ],
       },
+
       {
         path: "commission",
         element: (

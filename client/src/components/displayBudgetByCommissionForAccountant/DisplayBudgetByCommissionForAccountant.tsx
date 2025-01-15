@@ -25,13 +25,11 @@ function DisplayBudgetByCommissionForAccountant() {
     );
   }
 
-  // Extraire les budgets depuis l'API
   const budgets = data?.getBudgetOverview?.budgets || [];
 
-  // Préparer les séries pour le graphique
   const series = budgets.map((budget) => ({
-    label: budget.commissions.name, // Exemple : Utilisation de "category" comme label
-    data: [budget.amount], // Exemple : Utilisation de "amount" comme valeur
+    label: budget.commissions.name,
+    data: [budget.amount],
   }));
 
   const handleSeriesNbChange = (_: Event, newValue: number | number[]) => {
@@ -66,19 +64,19 @@ function DisplayBudgetByCommissionForAccountant() {
       </Typography>
       <BarChart
         height={600}
-        series={series.slice(0, seriesNb)} // Limiter le nombre de séries affichées
+        series={series.slice(0, seriesNb)}
         skipAnimation={skipAnimation}
         colors={colors}
         sx={{
           "& .MuiLegend-root": {
-            marginTop: "16px", // Espacement au-dessus de la légende
+            marginTop: "16px",
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: "center", // Centrer les légendes
-            gap: "16px", // Espacement horizontal entre les légendes
+            justifyContent: "center",
+            gap: "50px",
           },
           "& .MuiLegend-item": {
-            marginBottom: "8px", // Espacement vertical entre les items
+            marginBottom: "8px",
           },
         }}
       />
