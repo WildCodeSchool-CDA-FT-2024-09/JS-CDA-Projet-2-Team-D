@@ -117,7 +117,11 @@ function App() {
                       <Drawer />
                       <Box
                         component="main"
-                        sx={{ flexGrow: 1, p: 3, mt: "4rem" }}
+                        sx={{
+                          flexGrow: 1,
+                          p: 3,
+                          mt: "4rem",
+                        }}
                       >
                         <Outlet />
                         <Footer />

@@ -26,7 +26,7 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
 
   const getColor = (value: number) => {
     if (value <= 60) return theme.palette.success.main;
-    if (value <= 80) return theme.palette.secondary.main;
+    if (value <= 80) return theme.palette.warning.main;
     return theme.palette.error.main;
   };
 
