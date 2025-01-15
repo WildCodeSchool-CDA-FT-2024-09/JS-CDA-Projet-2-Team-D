@@ -56,4 +56,35 @@ export default class ExerciseResolver {
       throw new Error("Problème avec la création d'un nouvel exercice.");
     }
   }
+
+  @Authorized(["1", "2", "3"])
+  @Mutation(() => Exercise)
+  async updateExercise(
+    @Arg("exerciseId") exerciseId: number,
+    @Arg("data") data: ExerciseInput
+  ) {
+    try {
+      const exercise = await Exercise.findOneOrFail({
+        where: { id: exerciseId },
+      });
+
+      exercise.label = data.label;
+      exercise.start_date = data.start_date;
+      exercise.end_date = data.end_date;
+
+      const error = await validate(exercise);
+
+      if (error.length > 0)
+        throw new Error(
+          `Erreur dans la validation des données de l'exercice : ${error}`
+        );
+
+      const newExercise = await exercise.save();
+
+      return newExercise;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Problème avec la mise à jour de l'exercice.");
+    }
+  }
 }
