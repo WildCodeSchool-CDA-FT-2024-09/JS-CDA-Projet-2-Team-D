@@ -10,7 +10,7 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
 import UserForm from "./pages/administrator/user/UserForm.tsx";
 import ManageExercise from "./pages/administrator/exercise/ManageExercise.tsx";
-import CreateExercise from "./pages/administrator/exercise/CreateExercise.tsx";
+import ExerciseForm from "./pages/administrator/exercise/ExerciseForm.tsx";
 import HomePageCommission from "./pages/commission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
@@ -102,7 +102,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "add",
-                element: <CreateExercise />,
+                element: <ExerciseForm mode="create" />,
+              },
+              {
+                path: "edit/:exerciseId",
+                element: <ExerciseForm mode="update" />,
               },
               {
                 path: ":exerciseId/budgets",

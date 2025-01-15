@@ -204,3 +204,14 @@ export const RESET_PASSWORD = gql`
     resetPassword(newPassword: $newPassword, token: $token)
   }
 `;
+
+export const UPDATE_EXERCISE = gql`
+  mutation UpdateExercise($data: ExerciseInput!, $exerciseId: Float!) {
+    updateExercise(data: $data, exerciseId: $exerciseId) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;
