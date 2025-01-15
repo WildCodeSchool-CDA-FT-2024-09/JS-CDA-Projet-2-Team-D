@@ -17,14 +17,13 @@ import BudgetGauge from "../../components/budgetGaugeChart/BudgetGaugeChart";
 import {
   useGetInvoicesByCommissionIdQuery,
   useGetCurrentBudgetByCommissionIdQuery,
+  useGetUserByIdQuery,
 } from "../../types/graphql-types";
 import { formatDate } from "../../utils/dateUtils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-
-const formatAmount = (amount: number): number => {
-  return Number(amount.toFixed(2));
-};
+import { useUser } from "../../hooks/useUser";
+import PageTitle from "../../components/PageTitle";
 
 const HomePageCommission = () => {
   const { commissionId } = useParams<{ commissionId: string }>();
@@ -43,6 +42,20 @@ const HomePageCommission = () => {
   ) => {
     setPage(value);
   };
+
+  const { user } = useUser();
+  const {
+    data: userData,
+    loading: userLoading,
+    error: userError,
+  } = useGetUserByIdQuery({
+    variables: { userId: user?.id ?? 0 },
+  });
+  const commissions = userData?.getUserById.commissions || [];
+
+  const currentCommission = commissions.find(
+    (commission) => commission.id === commissionIdNumber,
+  );
 
   const {
     data: budgetData,
@@ -66,15 +79,20 @@ const HomePageCommission = () => {
     skip: !commissionIdNumber,
   });
 
-  if (budgetLoading || invoiceLoading)
+  if (budgetLoading || invoiceLoading || userLoading)
     return <Typography>Chargement des données...</Typography>;
 
-  if (budgetError || invoiceError)
+  if (budgetError || invoiceError || userError)
     return (
       <Typography>
-        Erreur : {budgetError?.message || invoiceError?.message}
+        Erreur :{" "}
+        {budgetError?.message || invoiceError?.message || userError?.message}
       </Typography>
     );
+
+  const formatAmount = (amount: number): number => {
+    return Number(amount.toFixed(2));
+  };
 
   const globalBudget = formatAmount(
     budgetData?.getCurrentBudgetByCommissionID?.amount || 0,
@@ -107,13 +125,9 @@ const HomePageCommission = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ fontSize: isMobile ? "18px" : "24px", fontWeight: "bold" }}
-      >
-        Récapitulatif des factures de la commission :
-      </Typography>
+      <PageTitle
+        title={`Récapitulatif des factures de la commission ${currentCommission?.name}`}
+      />
 
       <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
 

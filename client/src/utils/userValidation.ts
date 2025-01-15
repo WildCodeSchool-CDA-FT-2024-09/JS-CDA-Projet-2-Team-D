@@ -21,5 +21,7 @@ export const updateUserSchema = z.object({
 
   roles: z.array(z.string()).optional(),
 
-  commissions: z.array(z.string()).optional(),
+  commissions: z
+    .array(z.string())
+    .min(1, { message: "Au moins une commission est requise" }),
 });

@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Arg, Authorized, Mutation } from "type-graphql";
 import { Invoice } from "./invoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
@@ -233,6 +233,127 @@ export default class InvoiceResolver {
     } catch (error) {
       console.error("Error fetching invoices by exercise:", error);
       throw new Error("Unable to fetch invoices for the given exercise.");
+    }
+  }
+
+  @Authorized(["1", "2", "3"])
+  @Query(() => Invoice)
+  async getInvoiceById(@Arg("invoiceId") invoiceId: number): Promise<Invoice> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "subcategory.category",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+
+      if (!invoice) {
+        throw new Error("Invoice not found.");
+      }
+
+      return invoice;
+    } catch (error) {
+      console.error("Error fetching invoice by ID:", error);
+      throw new Error("Unable to fetch invoice for the given ID.");
+    }
+  }
+
+  @Authorized(["2"])
+  @Mutation(() => Invoice)
+  async updateInvoiceStatus(
+    @Arg("invoiceId") invoiceId: number,
+    @Arg("statusId") statusId: number
+  ): Promise<Invoice> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+
+      if (!invoice) {
+        throw new Error("Invoice not found.");
+      }
+
+      const status = await Status.findOne({
+        where: { id: statusId },
+      });
+
+      if (!status) {
+        throw new Error("Status not found.");
+      }
+
+      invoice.status = status;
+
+      await invoice.save();
+
+      return invoice;
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+      throw new Error("Unable to update invoice status.");
+    }
+  }
+
+  @Authorized(["2"])
+  @Mutation(() => Invoice)
+  async associateBankAccountToInvoice(
+    @Arg("invoiceId") invoiceId: number,
+    @Arg("bankAccountId", { nullable: true }) bankAccountId?: number
+  ): Promise<Invoice> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: [
+          "bankAccount",
+          "subcategory",
+          "creditDebit",
+          "commission",
+          "status",
+          "vat",
+          "user",
+        ],
+      });
+
+      if (!invoice) {
+        throw new Error("Invoice not found.");
+      }
+
+      if (bankAccountId) {
+        const bankAccount = await BankAccount.findOne({
+          where: { id: bankAccountId },
+        });
+
+        if (!bankAccount) {
+          throw new Error("Bank account not found.");
+        }
+
+        // Associer le compte bancaire
+        invoice.bankAccount = bankAccount;
+      } else {
+        // Dissocier le compte bancaire
+        invoice.bankAccount = null;
+      }
+
+      await invoice.save();
+
+      return invoice;
+    } catch (error) {
+      console.error("Error associating bank account to invoice:", error);
+      throw new Error("Unable to associate bank account to invoice.");
     }
   }
 }
