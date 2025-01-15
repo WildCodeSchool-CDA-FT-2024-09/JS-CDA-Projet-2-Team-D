@@ -52,7 +52,17 @@ describe("User resolver", () => {
     schema = await getSchema();
   });
 
-  it("get the 10 first users", async () => {
+  it("Should get the 10 first users", async () => {
+    // Mock authenticated user context
+    const context = {
+      loggedInUser: {
+        id: 21,
+        email: "super@admin.com",
+        firstname: "Super",
+        lastname: "Admin",
+        roles: [{ id: 1 }],
+      },
+    };
     const offset = 0;
     const limit = 10;
 
@@ -60,23 +70,46 @@ describe("User resolver", () => {
       schema: schema,
       source: print(GET_PAGINATED_USERS),
       variableValues: { limit: limit, offset: offset },
+      contextValue: context,
     })) as { data: { getUsers: Array<unknown> } };
 
-    expect(result.data.getUsers).toEqual(expect.any(Array));
+    expect(result.data.getUsers).toEqual(expect.any(Object));
   });
 
-  it("get the user with ID 7", async () => {
+  it("Should get the user with ID 7", async () => {
     const id = 7;
+    // Mock authenticated user context
+    const context = {
+      loggedInUser: {
+        id: 21,
+        email: "super@admin.com",
+        firstname: "Super",
+        lastname: "Admin",
+        roles: [{ id: 1 }],
+      },
+    };
     const expectedResult = {
+      commissions: [
+        { id: 1, name: "Équipement" },
+        { id: 2, name: "Animation" },
+        { id: 3, name: "Opérationnel" },
+        { id: 4, name: "Jeunesse" },
+        { id: 5, name: "Communication" },
+        { id: 6, name: "Événementiel" },
+        { id: 7, name: "Formation" },
+      ],
       email: "julie.michel@association.com",
       firstname: "Julie",
+      id: 7,
       lastname: "Michel",
+      roles: [{ id: 3, label: "Responsable Commission" }],
     };
 
     const result = (await graphql({
       schema: schema,
       source: print(GET_USER_BY_ID),
       variableValues: { userId: id },
+      contextValue: context,
     })) as {
       data: {
         getUserById: Array<{
@@ -87,7 +120,7 @@ describe("User resolver", () => {
       };
     };
 
-    expect(result.data.getUserById).toContain(
+    expect(result.data.getUserById).toEqual(
       expect.objectContaining(expectedResult)
     );
   });
