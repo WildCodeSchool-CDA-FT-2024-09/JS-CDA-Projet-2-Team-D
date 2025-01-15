@@ -18,7 +18,6 @@ export default class CategoryResolver {
     });
   }
 
-  // add a new category
   @Authorized(["2"])
   @Mutation(() => Category)
   async addCategory(
@@ -59,7 +58,6 @@ export default class CategoryResolver {
     return category;
   }
 
-  // update a category
   @Authorized(["2"])
   @Mutation(() => Category)
   async updateCategory(
@@ -78,7 +76,6 @@ export default class CategoryResolver {
 
     const currentCreditDebitId = category.creditDebit.id;
 
-    // Vérifiez si aucun changement n'a été apporté
     if (
       label.trim() === category.label.trim() &&
       creditDebitId === currentCreditDebitId
@@ -86,13 +83,11 @@ export default class CategoryResolver {
       throw new Error("Aucune modification n'a été apportée !");
     }
 
-    // Récupérer le nouveau crédit/débit
     const creditDebit = await CreditDebit.findOneBy({ id: creditDebitId });
     if (!creditDebit) {
       throw new Error("Veuillez sélectionner un type de crédit/débit valide !");
     }
 
-    // Mise à jour uniquement des champs modifiés
     if (label.trim() !== category.label.trim()) {
       if (label.trim() === "") {
         throw new Error("Veuillez entrer un libellé de catégorie !");
@@ -104,7 +99,6 @@ export default class CategoryResolver {
       category.creditDebit = creditDebit;
     }
 
-    // Validations des données
     const errors = await validate(category);
     if (errors.length > 0) {
       throw new Error(
@@ -112,7 +106,6 @@ export default class CategoryResolver {
       );
     }
 
-    // Sauvegarder la catégorie modifiée
     await category.save();
     return category;
   }
