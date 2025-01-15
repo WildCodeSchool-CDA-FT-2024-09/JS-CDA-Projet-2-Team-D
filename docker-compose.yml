@@ -36,7 +36,7 @@ services:
   redis:
     image: redis
     container_name: redis_cache
-    ports: 
+    ports:
       - 6379:6379
 
   api_email:
@@ -46,8 +46,6 @@ services:
     env_file: .env
     volumes:
       - ./api_email:/app/
-    ports:
-      - 3100:3000 # to be removed
 
   api_upload:
     build: ./api_upload
@@ -87,8 +85,3 @@ services:
       - api_data
       - api_email
       - api_upload
-
-
-
-
-    
