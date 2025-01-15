@@ -18,13 +18,25 @@ describe("Bank resolvers", () => {
     schema = await getSchema();
   });
 
-  it("get all banks", async () => {
-    const result = (await graphql({
-      schema: schema,
-      source: print(GET_BANKS),
-    })) as { data: { getBanks: Array<unknown> } };
-    console.info(result);
+  it("Should successfully get banks with auth context", async () => {
+    // Mock authenticated user context
+    const context = {
+      loggedInUser: {
+        id: 21,
+        email: "super@admin.com",
+        firstname: "Super",
+        lastname: "Admin",
+        roles: [{ id: 1 }],
+      },
+    };
 
-    expect(result.data.getBanks).toEqual(expect.any(Array));
+    const result = await graphql({
+      schema,
+      source: print(GET_BANKS),
+      contextValue: context,
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.getBanks).toEqual(expect.any(Array));
   });
 });
