@@ -114,7 +114,7 @@ function DetailInvoice() {
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Facture n°{invoice.id}
       </Typography>
-      <AddBankAccount />
+      <AddBankAccount invoiceId={invoice.id} />
       <Snackbar open={false} autoHideDuration={8000}>
         <Alert
           severity="error"

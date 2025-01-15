@@ -176,6 +176,23 @@ export const UPDATE_STATUS_INVOICE = gql`
   }
 `;
 
+export const ASSOCIATED_BANK_ACCOUNT_TO_INVOICE = gql`
+  mutation AssociateBankAccountToInvoice(
+    $invoiceId: Float!
+    $bankAccountId: Float
+  ) {
+    associateBankAccountToInvoice(
+      invoiceId: $invoiceId
+      bankAccountId: $bankAccountId
+    ) {
+      id
+      bankAccount {
+        id
+      }
+    }
+  }
+`;
+
 export const REQUEST_RESET_PASSWORD = gql`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email)

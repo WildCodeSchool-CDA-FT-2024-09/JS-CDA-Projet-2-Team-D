@@ -5,6 +5,7 @@ import "reflect-metadata";
 import { AppDataSource } from "./db/data-source";
 import * as jwt from "jsonwebtoken";
 import getSchema from "./schema";
+import redisClient from "../redis.config";
 
 dotenv.config();
 const { PORT, AUTH_SECRET_KEY } = process.env;
@@ -22,7 +23,13 @@ function parseCookies(cookieHeader: string | undefined) {
 
 (async () => {
   await AppDataSource.initialize();
-
+  try {
+    await redisClient.connect();
+    console.info("Connecté à Redis avec succès !");
+  } catch (error) {
+    console.error("Erreur de connexion à Redis :", error);
+    return;
+  }
   const schema = await getSchema();
 
   const server = new ApolloServer({
@@ -30,7 +37,7 @@ function parseCookies(cookieHeader: string | undefined) {
   });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: Number(PORT) },
+    listen: { port: Number(PORT), host: "0.0.0.0" },
     context: async ({ req, res }) => {
       if (!req.headers.cookie) return { res };
 

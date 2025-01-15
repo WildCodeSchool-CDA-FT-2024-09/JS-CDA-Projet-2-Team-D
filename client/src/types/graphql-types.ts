@@ -154,8 +154,10 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: "Mutation";
+  addBank: Bank;
   addCategory: Category;
   addSubcategory: Subcategory;
+  associateBankAccountToInvoice: Invoice;
   createNewExercise: Exercise;
   createNewUser: User;
   login: LoginResponse;
@@ -180,6 +182,11 @@ export type MutationAddSubcategoryArgs = {
   categoryId: Scalars["Float"]["input"];
   code: Scalars["String"]["input"];
   label: Scalars["String"]["input"];
+};
+
+export type MutationAssociateBankAccountToInvoiceArgs = {
+  bankAccountId?: InputMaybe<Scalars["Float"]["input"]>;
+  invoiceId: Scalars["Float"]["input"];
 };
 
 export type MutationCreateNewExerciseArgs = {
@@ -289,6 +296,10 @@ export type QueryGetExerciseBudgetsArgs = {
 
 export type QueryGetInvoiceByIdArgs = {
   invoiceId: Scalars["Float"]["input"];
+};
+
+export type QueryGetInvoicesArgs = {
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QueryGetInvoicesByCommissionIdArgs = {
@@ -576,6 +587,20 @@ export type UpdateStatusInvoiceMutation = {
     __typename?: "Invoice";
     id: number;
     status: { __typename?: "Status"; id: number };
+  };
+};
+
+export type AssociateBankAccountToInvoiceMutationVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+  bankAccountId?: InputMaybe<Scalars["Float"]["input"]>;
+}>;
+
+export type AssociateBankAccountToInvoiceMutation = {
+  __typename?: "Mutation";
+  associateBankAccountToInvoice: {
+    __typename?: "Invoice";
+    id: number;
+    bankAccount?: { __typename?: "BankAccount"; id: number } | null;
   };
 };
 
@@ -1699,6 +1724,67 @@ export type UpdateStatusInvoiceMutationOptions = Apollo.BaseMutationOptions<
   UpdateStatusInvoiceMutation,
   UpdateStatusInvoiceMutationVariables
 >;
+export const AssociateBankAccountToInvoiceDocument = gql`
+  mutation AssociateBankAccountToInvoice(
+    $invoiceId: Float!
+    $bankAccountId: Float
+  ) {
+    associateBankAccountToInvoice(
+      invoiceId: $invoiceId
+      bankAccountId: $bankAccountId
+    ) {
+      id
+      bankAccount {
+        id
+      }
+    }
+  }
+`;
+export type AssociateBankAccountToInvoiceMutationFn = Apollo.MutationFunction<
+  AssociateBankAccountToInvoiceMutation,
+  AssociateBankAccountToInvoiceMutationVariables
+>;
+
+/**
+ * __useAssociateBankAccountToInvoiceMutation__
+ *
+ * To run a mutation, you first call `useAssociateBankAccountToInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssociateBankAccountToInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [associateBankAccountToInvoiceMutation, { data, loading, error }] = useAssociateBankAccountToInvoiceMutation({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *      bankAccountId: // value for 'bankAccountId'
+ *   },
+ * });
+ */
+export function useAssociateBankAccountToInvoiceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >(AssociateBankAccountToInvoiceDocument, options);
+}
+export type AssociateBankAccountToInvoiceMutationHookResult = ReturnType<
+  typeof useAssociateBankAccountToInvoiceMutation
+>;
+export type AssociateBankAccountToInvoiceMutationResult =
+  Apollo.MutationResult<AssociateBankAccountToInvoiceMutation>;
+export type AssociateBankAccountToInvoiceMutationOptions =
+  Apollo.BaseMutationOptions<
+    AssociateBankAccountToInvoiceMutation,
+    AssociateBankAccountToInvoiceMutationVariables
+  >;
 export const RequestPasswordResetDocument = gql`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email)
@@ -3476,6 +3562,7 @@ export const namedOperations = {
     CreateNewExercise: "CreateNewExercise",
     SetCommissionBudgetAmount: "SetCommissionBudgetAmount",
     UpdateStatusInvoice: "UpdateStatusInvoice",
+    AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",
   },

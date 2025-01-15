@@ -33,6 +33,12 @@ services:
       db:
         condition: service_healthy
 
+  redis:
+    image: redis
+    container_name: redis_cache
+    ports: 
+      - 6379:6379
+
   api_email:
     build: ./api_email
     command: npm run dev
@@ -81,3 +87,8 @@ services:
       - api_data
       - api_email
       - api_upload
+
+
+
+
+    

@@ -1,4 +1,4 @@
-name: static-test
+name: static-test (Integration)
 
 on:
   pull_request:
