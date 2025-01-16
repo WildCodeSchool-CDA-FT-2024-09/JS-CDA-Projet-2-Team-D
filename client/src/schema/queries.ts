@@ -401,3 +401,14 @@ export const GET_INVOICE_BY_EXERCISE = gql`
     }
   }
 `;
+
+export const GET_EXERCISE_BY_ID = gql`
+  query GetExerciseById($exerciseId: Float!) {
+    getExerciseById(exerciseId: $exerciseId) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;

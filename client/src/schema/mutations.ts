@@ -213,3 +213,14 @@ export const UPDATE_BALANCE = gql`
     }
   }
 `;
+
+export const UPDATE_EXERCISE = gql`
+  mutation UpdateExercise($data: ExerciseInput!, $exerciseId: Float!) {
+    updateExercise(data: $data, exerciseId: $exerciseId) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;

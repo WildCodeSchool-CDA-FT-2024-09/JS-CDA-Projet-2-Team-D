@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import useNotification from "../hooks/useNotification";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import {
   Button,
   FormControl,
@@ -108,6 +107,7 @@ export default function Login() {
               fullWidth
               id="email"
               label="Adresse Email"
+              aria-label="Adresse Email"
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -121,6 +121,7 @@ export default function Login() {
                 fullWidth
                 id="password"
                 label="Mot de passe"
+                aria-label="Mot de passe"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -149,6 +150,7 @@ export default function Login() {
               type="submit"
               fullWidth
               variant="contained"
+              aria-label="Se connecter"
               sx={{ mt: 3, mb: 2 }}
             >
               Se connecter
@@ -162,11 +164,6 @@ export default function Login() {
             </BtnLink>
           </Box>
         </form>
-
-        <Stack spacing={2} sx={{ marginTop: "4em", marginBottom: "2em" }}>
-          Compte de démonstration SUPERADMIN: super@admin.net (mdp :
-          whS0@cqnuros )
-        </Stack>
       </Box>
     </>
   );
