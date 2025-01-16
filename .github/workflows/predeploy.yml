@@ -5,7 +5,7 @@ name: Compile and push all images (Deploiement)
 on:
   # Triggers the workflow on push or pull request events but only for the predeploy branch
   push:
-    branches: ['predeploy']
+    branches: ["predeploy"]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +33,7 @@ jobs:
 
       # build an push the newly created image
       - uses: docker/build-push-action@v2
-        name: Build and push
+        name: Build and push Client
         with:
           context: ./client
           file: ./client/Dockerfile
@@ -42,7 +42,7 @@ jobs:
 
         # build an push the newly created image
       - uses: docker/build-push-action@v2
-        name: Build and push
+        name: Build and push Data
         with:
           context: ./api_data
           file: ./api_data/Dockerfile
@@ -51,9 +51,18 @@ jobs:
 
       # build an push the newly created image
       - uses: docker/build-push-action@v2
-        name: Build and push
+        name: Build and push Upload
         with:
           context: ./api_upload
           file: ./api_upload/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_HUB_API_UPLOAD_IMAGE_NAME }}:latest
+
+      # build an push the newly created image
+      - uses: docker/build-push-action@v2
+        name: Build and push Email
+        with:
+          context: ./api_email
+          file: ./api_email/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_HUB_API_EMAIL_IMAGE_NAME }}:latest
