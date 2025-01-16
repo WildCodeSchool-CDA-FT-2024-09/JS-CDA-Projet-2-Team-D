@@ -42,11 +42,9 @@ export default class InvoiceResolver {
         ],
       });
 
-      // Processing invoices with default values
       const validInvoices: Invoice[] = invoices.map((invoice) => {
         const processedInvoice = { ...invoice };
 
-        // Check for Subcategory
         if (!processedInvoice.subcategory) {
           processedInvoice.subcategory = {
             id: 0,
@@ -54,17 +52,14 @@ export default class InvoiceResolver {
           } as Subcategory;
         }
 
-        // Check for Status
         if (!processedInvoice.status) {
           processedInvoice.status = { id: 1, label: "Non défini" } as Status;
         }
 
-        // Check for Vat
         if (!processedInvoice.vat) {
           processedInvoice.vat = { id: 0, rate: 0, label: "Pas de TVA" } as Vat;
         }
 
-        // Check for CreditDebit
         if (!processedInvoice.creditDebit) {
           processedInvoice.creditDebit = {
             id: 0,
@@ -72,7 +67,6 @@ export default class InvoiceResolver {
           } as CreditDebit;
         }
 
-        // Check for Commission
         if (!processedInvoice.commission) {
           processedInvoice.commission = {
             id: 0,
@@ -80,7 +74,6 @@ export default class InvoiceResolver {
           } as Commission;
         }
 
-        // Check for BankAccount
         if (!processedInvoice.bankAccount) {
           processedInvoice.bankAccount = {
             id: 0,
@@ -88,7 +81,6 @@ export default class InvoiceResolver {
           } as unknown as BankAccount;
         }
 
-        // Check for User
         if (!processedInvoice.user) {
           processedInvoice.user = {
             id: 0,
@@ -107,7 +99,7 @@ export default class InvoiceResolver {
       // Return the full list of valid invoices
       return validInvoices;
     } catch (error) {
-      console.error("Erreur lors de la récupération des factures:", error);
+      console.error("Error retrieving invoices:", error);
       throw new Error("Erreur lors de la récupération des factures");
     }
   }
@@ -128,53 +120,31 @@ export default class InvoiceResolver {
           "user",
         ],
       });
-      console.info("Raw invoices from database:", invoices);
 
-      // Déclarer validInvoices comme un tableau d'Invoice
       const validInvoices: Invoice[] = invoices.map((invoice) => {
-        // Vérification pour Subcategory
         if (!invoice.subcategory) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de sous-catégorie, valeur par défaut utilisée`
-          );
           invoice.subcategory = {
             id: 0,
             label: "Sous-catégorie non définie",
           } as Subcategory;
         }
 
-        // Vérification pour Status
         if (!invoice.status) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de statut, valeur par défaut utilisée`
-          );
           invoice.status = { id: 1, label: "Non défini" } as Status;
         }
 
-        // Vérification pour Vat
         if (!invoice.vat) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de TVA, valeur par défaut utilisée`
-          );
           invoice.vat = { id: 0, rate: 0, label: "Pas de TVA" } as Vat;
         }
 
-        // Vérification pour CreditDebit
         if (!invoice.creditDebit) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de CreditDebit, valeur par défaut utilisée`
-          );
           invoice.creditDebit = {
             id: 0,
             label: "Non défini",
           } as CreditDebit;
         }
 
-        // Vérification pour Commission
         if (!invoice.commission) {
-          console.warn(
-            `Facture ID ${invoice.id} n'a pas de Commission, valeur par défaut utilisée`
-          );
           invoice.commission = { id: 0, name: "Non défini" } as Commission;
         }
 
@@ -189,7 +159,7 @@ export default class InvoiceResolver {
 
       return sortedInvoices;
     } catch (error) {
-      console.error("Erreur lors de la récupération des factures:", error);
+      console.error("Error retrieving invoices:", error);
 
       throw new Error("Erreur lors de la récupération des factures");
     }
@@ -208,7 +178,7 @@ export default class InvoiceResolver {
       });
 
       if (!exercise) {
-        throw new Error("Exercise not found.");
+        throw new Error("Pas d'exercice trouvé.");
       }
 
       const [invoices, totalCount] = await Invoice.findAndCount({
@@ -232,7 +202,7 @@ export default class InvoiceResolver {
       return { invoices, totalCount };
     } catch (error) {
       console.error("Error fetching invoices by exercise:", error);
-      throw new Error("Unable to fetch invoices for the given exercise.");
+      throw new Error("Impossible de récupérer les factures pour l'exercice.");
     }
   }
 
@@ -261,7 +231,7 @@ export default class InvoiceResolver {
       return invoice;
     } catch (error) {
       console.error("Error fetching invoice by ID:", error);
-      throw new Error("Unable to fetch invoice for the given ID.");
+      throw new Error("Impossible de récupérer la facture.");
     }
   }
 
@@ -286,7 +256,7 @@ export default class InvoiceResolver {
       });
 
       if (!invoice) {
-        throw new Error("Invoice not found.");
+        throw new Error("Facture non trouvée.");
       }
 
       const status = await Status.findOne({
@@ -294,7 +264,7 @@ export default class InvoiceResolver {
       });
 
       if (!status) {
-        throw new Error("Status not found.");
+        throw new Error("Pas de statut trouvé.");
       }
 
       invoice.status = status;
@@ -304,7 +274,7 @@ export default class InvoiceResolver {
       return invoice;
     } catch (error) {
       console.error("Error updating invoice status:", error);
-      throw new Error("Unable to update invoice status.");
+      throw new Error("Impossible de mettre à jour le statut de la facture.");
     }
   }
 
@@ -338,13 +308,11 @@ export default class InvoiceResolver {
         });
 
         if (!bankAccount) {
-          throw new Error("Bank account not found.");
+          throw new Error("Compte bancaire non trouvé.");
         }
 
-        // Associer le compte bancaire
         invoice.bankAccount = bankAccount;
       } else {
-        // Dissocier le compte bancaire
         invoice.bankAccount = null;
       }
 
@@ -353,7 +321,7 @@ export default class InvoiceResolver {
       return invoice;
     } catch (error) {
       console.error("Error associating bank account to invoice:", error);
-      throw new Error("Unable to associate bank account to invoice.");
+      throw new Error("Impossible d'associer le compte bancaire à la facture.");
     }
   }
 }

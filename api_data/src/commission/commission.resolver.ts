@@ -36,7 +36,7 @@ export default class CommissionResolver {
         take: 1,
       });
       if (!lastExercise) {
-        throw new Error("No exercise found.");
+        throw new Error("Pas d'exercice trouvé");
       }
 
       const [invoices, totalCount] = await Invoice.findAndCount({
@@ -50,7 +50,7 @@ export default class CommissionResolver {
         skip: offset,
       });
       if (!invoices.length) {
-        throw new Error("No invoices found for the given commission.");
+        throw new Error("Pas de factures trouvées pour cette commission.");
       }
 
       const allInvoices = await Invoice.find({
@@ -79,7 +79,9 @@ export default class CommissionResolver {
       return result;
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
-      throw new Error("Unable to fetch invoices for the given commission ID.");
+      throw new Error(
+        "Impossible de récupérer les factures pour cette commission."
+      );
     }
   }
 }

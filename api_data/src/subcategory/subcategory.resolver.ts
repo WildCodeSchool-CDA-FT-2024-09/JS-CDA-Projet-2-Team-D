@@ -57,7 +57,6 @@ export default class SubcategoryResolver {
       throw new Error(`Category with id ${categoryId} not found`);
     }
 
-    // vérifier si aucun changement n'a été apporté
     if (
       subcategory.label.trim() === label.trim() &&
       subcategory.code.trim() === code.trim() &&
@@ -66,7 +65,6 @@ export default class SubcategoryResolver {
       throw new Error("Aucune modification n'a été apportée");
     }
 
-    // Mise à jour uniquement des champs modifiés
     if (subcategory.label.trim() !== label.trim()) {
       if (label.trim() === "") {
         throw new Error("Veuillez entrer un libellé de sous-catégorie");
@@ -81,15 +79,13 @@ export default class SubcategoryResolver {
       subcategory.code = code.trim();
     }
 
-    // Vérifier si la sous-catégorie existe déjà
     const existingSubcategory = await Subcategory.findOneBy({
       label: subcategory.label,
     });
     if (existingSubcategory && existingSubcategory.id !== subcategory.id) {
-      throw new Error(`Subcategory with label ${label} already exists`);
+      throw new Error(`La sous catégorie ${label} existe déjà`);
     }
 
-    // Validation des données
     const errors = await validate(subcategory);
     if (errors.length > 0) {
       throw new Error(
@@ -97,7 +93,6 @@ export default class SubcategoryResolver {
       );
     }
 
-    // Mise à jour de la catégorie parente
     subcategory.category = category;
 
     await subcategory.save();

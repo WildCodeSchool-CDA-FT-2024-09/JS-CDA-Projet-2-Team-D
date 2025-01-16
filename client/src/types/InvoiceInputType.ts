@@ -13,10 +13,9 @@ export interface InvoiceState {
   vat_id: number;
   status_id: number;
   user_id: number | null;
-  amount_with_vat: number; // Total amount (TTC)
+  amount_with_vat: number;
 }
 
-// ValidInvoice doit aussi avoir l'index signature
 export interface ValidInvoice {
   commission_id: number;
   date: Date;

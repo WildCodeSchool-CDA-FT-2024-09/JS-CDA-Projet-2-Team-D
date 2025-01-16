@@ -38,7 +38,6 @@ export default class ExerciseResolver {
 
       const newExercise = await exercise.save();
 
-      // Init all commissions' budgets
       const commissions = await Commission.find();
 
       commissions.forEach(async (commission) => {
