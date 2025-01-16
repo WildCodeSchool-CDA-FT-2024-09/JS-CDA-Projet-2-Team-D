@@ -27,18 +27,17 @@ const PriceInput: React.FC<PriceInputProps> = ({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
 
-    // Autorise uniquement les chiffres, un point ou une virgule
+    // Only allow numbers, a period or a comma
     if (!/^[0-9,.\b]+$/.test(inputValue) && inputValue !== "") {
       return;
     }
 
     setDisplayValue(inputValue);
 
-    // Convertit la valeur pour le state parent
+    // Converts the value for the parent state
     const normalizedValue = inputValue.replace(",", ".");
     const numberValue = parseFloat(normalizedValue);
 
-    // Crée l'événement pour le parent uniquement si c'est un nombre valide
     if (!isNaN(numberValue)) {
       const syntheticEvent = {
         target: {
@@ -51,7 +50,6 @@ const PriceInput: React.FC<PriceInputProps> = ({
     }
   };
 
-  // Met à jour l'affichage quand la valeur change depuis le parent
   React.useEffect(() => {
     setDisplayValue(value.toString());
   }, [value]);
