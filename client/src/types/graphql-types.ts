@@ -166,8 +166,8 @@ export type Mutation = {
   restoreUser: RestoreResponseStatus;
   setCommissionBudgetAmount: Budget;
   softDeleteUser: DeleteResponseStatus;
+  updateBalance: BankAccount;
   updateCategory: Category;
-  updateExercise: Exercise;
   updateInvoiceStatus: Invoice;
   updateSubcategory: Subcategory;
   updateUser: User;
@@ -225,15 +225,15 @@ export type MutationSoftDeleteUserArgs = {
   data: UserIdInput;
 };
 
+export type MutationUpdateBalanceArgs = {
+  amount: Scalars["Float"]["input"];
+  bankAccountId: Scalars["Float"]["input"];
+};
+
 export type MutationUpdateCategoryArgs = {
   creditDebitId: Scalars["Float"]["input"];
   id: Scalars["Float"]["input"];
   label: Scalars["String"]["input"];
-};
-
-export type MutationUpdateExerciseArgs = {
-  data: ExerciseInput;
-  exerciseId: Scalars["Float"]["input"];
 };
 
 export type MutationUpdateInvoiceStatusArgs = {
@@ -277,7 +277,6 @@ export type Query = {
   getCreditDebits: Array<CreditDebit>;
   getCurrentBudgetByCommissionID?: Maybe<Budget>;
   getExerciseBudgets: Array<Budget>;
-  getExerciseById: Exercise;
   getExercises: Array<Exercise>;
   getInvoiceById: Invoice;
   getInvoices: Array<Invoice>;
@@ -297,10 +296,6 @@ export type QueryGetCurrentBudgetByCommissionIdArgs = {
 };
 
 export type QueryGetExerciseBudgetsArgs = {
-  exerciseId: Scalars["Float"]["input"];
-};
-
-export type QueryGetExerciseByIdArgs = {
   exerciseId: Scalars["Float"]["input"];
 };
 
@@ -633,20 +628,14 @@ export type ResetPasswordMutation = {
   resetPassword: boolean;
 };
 
-export type UpdateExerciseMutationVariables = Exact<{
-  data: ExerciseInput;
-  exerciseId: Scalars["Float"]["input"];
+export type UpdateBalanceMutationVariables = Exact<{
+  bankAccountId: Scalars["Float"]["input"];
+  amount: Scalars["Float"]["input"];
 }>;
 
-export type UpdateExerciseMutation = {
+export type UpdateBalanceMutation = {
   __typename?: "Mutation";
-  updateExercise: {
-    __typename?: "Exercise";
-    id: number;
-    label: string;
-    start_date: string;
-    end_date: string;
-  };
+  updateBalance: { __typename?: "BankAccount"; id: number; balance: number };
 };
 
 export type GetUsersQueryVariables = Exact<{
@@ -1018,21 +1007,6 @@ export type GetInvoicesByExerciseQuery = {
       creditDebit: { __typename?: "CreditDebit"; label: string };
       subcategory: { __typename?: "Subcategory"; label: string };
     }>;
-  };
-};
-
-export type GetExerciseByIdQueryVariables = Exact<{
-  exerciseId: Scalars["Float"]["input"];
-}>;
-
-export type GetExerciseByIdQuery = {
-  __typename?: "Query";
-  getExerciseById: {
-    __typename?: "Exercise";
-    id: number;
-    label: string;
-    start_date: string;
-    end_date: string;
   };
 };
 
@@ -1923,59 +1897,57 @@ export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<
   ResetPasswordMutation,
   ResetPasswordMutationVariables
 >;
-export const UpdateExerciseDocument = gql`
-  mutation UpdateExercise($data: ExerciseInput!, $exerciseId: Float!) {
-    updateExercise(data: $data, exerciseId: $exerciseId) {
+export const UpdateBalanceDocument = gql`
+  mutation UpdateBalance($bankAccountId: Float!, $amount: Float!) {
+    updateBalance(bankAccountId: $bankAccountId, amount: $amount) {
       id
-      label
-      start_date
-      end_date
+      balance
     }
   }
 `;
-export type UpdateExerciseMutationFn = Apollo.MutationFunction<
-  UpdateExerciseMutation,
-  UpdateExerciseMutationVariables
+export type UpdateBalanceMutationFn = Apollo.MutationFunction<
+  UpdateBalanceMutation,
+  UpdateBalanceMutationVariables
 >;
 
 /**
- * __useUpdateExerciseMutation__
+ * __useUpdateBalanceMutation__
  *
- * To run a mutation, you first call `useUpdateExerciseMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateExerciseMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateBalanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBalanceMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateExerciseMutation, { data, loading, error }] = useUpdateExerciseMutation({
+ * const [updateBalanceMutation, { data, loading, error }] = useUpdateBalanceMutation({
  *   variables: {
- *      data: // value for 'data'
- *      exerciseId: // value for 'exerciseId'
+ *      bankAccountId: // value for 'bankAccountId'
+ *      amount: // value for 'amount'
  *   },
  * });
  */
-export function useUpdateExerciseMutation(
+export function useUpdateBalanceMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    UpdateExerciseMutation,
-    UpdateExerciseMutationVariables
+    UpdateBalanceMutation,
+    UpdateBalanceMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    UpdateExerciseMutation,
-    UpdateExerciseMutationVariables
-  >(UpdateExerciseDocument, options);
+    UpdateBalanceMutation,
+    UpdateBalanceMutationVariables
+  >(UpdateBalanceDocument, options);
 }
-export type UpdateExerciseMutationHookResult = ReturnType<
-  typeof useUpdateExerciseMutation
+export type UpdateBalanceMutationHookResult = ReturnType<
+  typeof useUpdateBalanceMutation
 >;
-export type UpdateExerciseMutationResult =
-  Apollo.MutationResult<UpdateExerciseMutation>;
-export type UpdateExerciseMutationOptions = Apollo.BaseMutationOptions<
-  UpdateExerciseMutation,
-  UpdateExerciseMutationVariables
+export type UpdateBalanceMutationResult =
+  Apollo.MutationResult<UpdateBalanceMutation>;
+export type UpdateBalanceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateBalanceMutation,
+  UpdateBalanceMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers($limit: Int!, $offset: Int!) {
@@ -3622,91 +3594,6 @@ export type GetInvoicesByExerciseQueryResult = Apollo.QueryResult<
   GetInvoicesByExerciseQuery,
   GetInvoicesByExerciseQueryVariables
 >;
-export const GetExerciseByIdDocument = gql`
-  query GetExerciseById($exerciseId: Float!) {
-    getExerciseById(exerciseId: $exerciseId) {
-      id
-      label
-      start_date
-      end_date
-    }
-  }
-`;
-
-/**
- * __useGetExerciseByIdQuery__
- *
- * To run a query within a React component, call `useGetExerciseByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetExerciseByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetExerciseByIdQuery({
- *   variables: {
- *      exerciseId: // value for 'exerciseId'
- *   },
- * });
- */
-export function useGetExerciseByIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetExerciseByIdQuery,
-    GetExerciseByIdQueryVariables
-  > &
-    (
-      | { variables: GetExerciseByIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetExerciseByIdQuery, GetExerciseByIdQueryVariables>(
-    GetExerciseByIdDocument,
-    options,
-  );
-}
-export function useGetExerciseByIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetExerciseByIdQuery,
-    GetExerciseByIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetExerciseByIdQuery,
-    GetExerciseByIdQueryVariables
-  >(GetExerciseByIdDocument, options);
-}
-export function useGetExerciseByIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetExerciseByIdQuery,
-        GetExerciseByIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetExerciseByIdQuery,
-    GetExerciseByIdQueryVariables
-  >(GetExerciseByIdDocument, options);
-}
-export type GetExerciseByIdQueryHookResult = ReturnType<
-  typeof useGetExerciseByIdQuery
->;
-export type GetExerciseByIdLazyQueryHookResult = ReturnType<
-  typeof useGetExerciseByIdLazyQuery
->;
-export type GetExerciseByIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetExerciseByIdSuspenseQuery
->;
-export type GetExerciseByIdQueryResult = Apollo.QueryResult<
-  GetExerciseByIdQuery,
-  GetExerciseByIdQueryVariables
->;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -3727,7 +3614,6 @@ export const namedOperations = {
     GetBanks: "GetBanks",
     GetExerciseBudgets: "GetExerciseBudgets",
     GetInvoicesByExercise: "GetInvoicesByExercise",
-    GetExerciseById: "GetExerciseById",
   },
   Mutation: {
     AddCategory: "AddCategory",
@@ -3746,6 +3632,6 @@ export const namedOperations = {
     AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",
-    UpdateExercise: "UpdateExercise",
+    UpdateBalance: "UpdateBalance",
   },
 };

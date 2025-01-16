@@ -205,6 +205,15 @@ export const RESET_PASSWORD = gql`
   }
 `;
 
+export const UPDATE_BALANCE = gql`
+  mutation UpdateBalance($bankAccountId: Float!, $amount: Float!) {
+    updateBalance(bankAccountId: $bankAccountId, amount: $amount) {
+      id
+      balance
+    }
+  }
+`;
+
 export const UPDATE_EXERCISE = gql`
   mutation UpdateExercise($data: ExerciseInput!, $exerciseId: Float!) {
     updateExercise(data: $data, exerciseId: $exerciseId) {

@@ -6,7 +6,6 @@ import {
   TableCell,
   TableBody,
   Paper,
-  Button,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -62,7 +61,10 @@ function DisplayInvoicesForAccountant() {
       </Box>
 
       {!isMobile ? (
-        <TableContainer component={Paper}>
+        <TableContainer
+          component={Paper}
+          sx={{ maxWidth: "80%", overflowX: "auto" }}
+        >
           <Table>
             <TableHead>
               <TableRow
@@ -85,7 +87,6 @@ function DisplayInvoicesForAccountant() {
                 <TableCell align="right">Montant TTC</TableCell>
                 <TableCell align="right">Status</TableCell>
                 <TableCell align="right">Détail</TableCell>
-                <TableCell align="right">Validation ou Refus</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -97,42 +98,28 @@ function DisplayInvoicesForAccountant() {
                   </TableCell>
                   <TableCell align="right">{row.commission || "-"}</TableCell>
                   <TableCell align="right">
-                    {row.amountHT
+                    {`
+                    ${row.amountHT
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">
                     {row.vat ? `${row.vat}%` : "-"}
                   </TableCell>
                   <TableCell align="right">
-                    {Number(row.amountTTC)
+                    {`
+                    ${Number(row.amountTTC)
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/B(?=(d{3})+(?!d))/g, " ")}
+                    \u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">
                     <Link to={`/accountant/invoice/${row.invoiceId}`}>
                       <RemoveRedEyeOutlinedIcon />
                     </Link>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      color="success"
-                      sx={{ color: "white", fontWeight: "bold" }}
-                    >
-                      Valider
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      sx={{
-                        color: "white",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Refuser
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -193,26 +180,6 @@ function DisplayInvoicesForAccountant() {
               </Box>
               <Box>
                 <strong>Status :</strong> {row.status}
-              </Box>
-              <Box alignContent={"center"}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  sx={{
-                    marginRight: "0.5rem",
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Valider
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                >
-                  Refuser
-                </Button>
               </Box>
             </Paper>
           ))}
