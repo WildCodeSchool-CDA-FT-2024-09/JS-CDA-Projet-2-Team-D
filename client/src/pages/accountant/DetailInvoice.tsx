@@ -304,7 +304,7 @@ function DetailInvoice() {
           <Grid size={6}>
             <TextField
               label="Prix HT"
-              type="number"
+              type="text"
               fullWidth
               value={`${invoice.price_without_vat}\u202F€`}
             />
