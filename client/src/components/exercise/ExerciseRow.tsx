@@ -1,6 +1,6 @@
-import { useState } from "react";
-// import { Exercise } from "../../types/graphql-types";
+import { useEffect, useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
+import BtnLink from "../BtnLink";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
@@ -12,6 +12,7 @@ import Collapse from "@mui/material/Collapse";
 import Typography from "@mui/material/Typography";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { useTheme } from "@mui/system";
 
 type Budget = {
   amount: number;
@@ -32,6 +33,18 @@ type Exercise = {
 
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState<boolean>(false);
+  const [enableManageBtn, setEnableManageBtn] = useState<boolean>(false);
+
+  const theme = useTheme();
+
+  // If the exercise.end_date is bigger than the current date, we can manage that exercise
+  useEffect(() => {
+    if (new Date(exercise.end_date) >= new Date()) {
+      setEnableManageBtn(true);
+    } else {
+      setEnableManageBtn(false);
+    }
+  }, []);
 
   return (
     <>
@@ -54,6 +67,52 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         </TableCell>
         <TableCell align="left">{formatDate(exercise.start_date)}</TableCell>
         <TableCell align="left">{formatDate(exercise.end_date)}</TableCell>
+        <TableCell align="right">
+          {enableManageBtn && (
+            <>
+              <BtnLink
+                aria-label="Mettre à jour"
+                to={`/administrator/exercise/edit/${exercise.id}`}
+                sx={{
+                  display: "inline-block",
+                  marginLeft: "auto",
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  padding: "8px 16px",
+                  marginRight: ".5em",
+                  textTransform: "uppercase",
+                  borderRadius: "4px",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
+                }}
+              >
+                Mettre à jour
+              </BtnLink>
+              <BtnLink
+                aria-label="Gérer"
+                to={`/administrator/exercise/${exercise.id}/budgets`}
+                sx={{
+                  display: "inline-block",
+                  marginLeft: "auto",
+                  backgroundColor: "primary.main",
+                  padding: "8px 16px",
+                  color: "primary.contrastText",
+                  textTransform: "uppercase",
+                  borderRadius: "4px",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
+                }}
+              >
+                Gérer
+              </BtnLink>
+            </>
+          )}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -79,7 +138,9 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
                       >
                         {budget.commissions.name}
                       </TableCell>
-                      <TableCell align="right">{budget.amount} €</TableCell>
+                      <TableCell align="right">
+                        {budget.amount.toFixed(2)} €
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

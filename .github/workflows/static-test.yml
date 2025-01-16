@@ -1,4 +1,4 @@
-name: static-test
+name: static-test (Integration)
 
 on:
   pull_request:
@@ -36,8 +36,8 @@ jobs:
       - name: Run linters
         run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
 
-      #- name: Run Unit test on client
-      # run: cd ./client && npm run test
+      - name: Run Unit test on client
+        run: cd ./client && npm run unit-test
 
       #- name: Run Unit test on api data
       #  run: cd ./api_data && npm run test

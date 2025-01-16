@@ -36,7 +36,7 @@ export class BankAccount extends BaseEntity {
   @Column({ nullable: false, type: "float" })
   balance: number;
 
-  @Field(() => Bank)
+  @Field(() => Bank, { nullable: true })
   @ManyToOne(() => Bank, (bank) => bank.bankAccounts)
   bank?: Bank;
 

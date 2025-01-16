@@ -77,6 +77,56 @@ export const GET_INVOICES = gql`
   }
 `;
 
+export const GET_INVOICE_BY_ID = gql`
+  query GetInvoiceById($invoiceId: Float!) {
+    getInvoiceById(invoiceId: $invoiceId) {
+      id
+      price_without_vat
+      label
+      receipt
+      info
+      paid
+      date
+      invoiceNumber
+      status {
+        id
+        label
+      }
+      vat {
+        id
+        rate
+      }
+      creditDebit {
+        id
+        label
+      }
+      subcategory {
+        id
+        code
+        label
+        category {
+          id
+          label
+        }
+      }
+
+      commission {
+        id
+        name
+      }
+      bankAccount {
+        id
+        name
+      }
+      user {
+        id
+        firstname
+        lastname
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORIES = gql`
   query GetCategories {
     getCategories {
@@ -91,6 +141,15 @@ export const GET_CATEGORIES = gql`
         id
         label
       }
+    }
+  }
+`;
+
+export const GET_CREDIT_DEBITS = gql`
+  query GetCreditDebits {
+    getCreditDebits {
+      id
+      label
     }
   }
 `;
@@ -135,6 +194,7 @@ export const GET_INVOICE_BY_COMMISSION = gql`
         invoiceNumber
         label
         price_without_vat
+        amount_with_vat
         status {
           label
           id
@@ -284,6 +344,71 @@ export const GET_BANKS = gql`
         balance
         id
       }
+    }
+  }
+`;
+
+export const GET_EXERCISE_BUDGETS = gql`
+  query GetExerciseBudgets($exerciseId: Float!) {
+    getExerciseBudgets(exerciseId: $exerciseId) {
+      commissionId
+      amount
+      exercise {
+        id
+        label
+        start_date
+        end_date
+      }
+      commissions {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_INVOICE_BY_EXERCISE = gql`
+  query GetInvoicesByExercise(
+    $exerciseId: Float!
+    $limit: Float!
+    $offset: Float!
+  ) {
+    getInvoicesByExercise(
+      exerciseId: $exerciseId
+      limit: $limit
+      offset: $offset
+    ) {
+      totalCount
+      invoices {
+        id
+        invoiceNumber
+        label
+        date
+        amount_with_vat
+        status {
+          label
+        }
+        commission {
+          name
+        }
+        creditDebit {
+          label
+        }
+        subcategory {
+          label
+        }
+      }
+    }
+  }
+`;
+
+export const GET_EXERCISE_BY_ID = gql`
+  query GetExerciseById($exerciseId: Float!) {
+    getExerciseById(exerciseId: $exerciseId) {
+      id
+      label
+      start_date
+      end_date
     }
   }
 `;

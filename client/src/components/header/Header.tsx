@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { useUser } from "../../hooks/useUser";
 import UserBar from "../UserBar";
 
@@ -14,6 +14,7 @@ const roleMapping: { [key: string]: string } = {
   2: "Comptable",
   3: "Responsable",
 };
+
 interface HeaderProps {
   title: string;
   subtitle?: string;
@@ -22,12 +23,13 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { user } = useUser();
 
   const roleColorMapping: { [key: string]: string } = {
-    Administrateur: theme.palette.error.main, // Red
-    Comptable: theme.palette.warning.main, // Yellow
-    Responsable: theme.palette.success.main, // Green
+    Administrateur: theme.palette.error.main,
+    Comptable: theme.palette.warning.main,
+    Responsable: theme.palette.success.main,
   };
 
   const userRole = user?.roles[0];
@@ -51,9 +53,16 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
           sx={{
             display: "flex",
             justifyContent: "space-between",
+            pl: isMobile ? "48px" : 0,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
             <Link
               to="/"
               style={{
@@ -66,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
             >
               <Box
                 sx={{
-                  display: "flex",
+                  display: isMobile ? "none" : "flex",
                   justifyContent: "center",
                   alignItems: "center",
                   backgroundColor: "white",
@@ -90,7 +99,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
                   component="div"
                   className="header-title"
                   sx={{
-                    display: { xs: "none", sm: "block" },
+                    display: isMobile ? "none" : "block",
                   }}
                 >
                   {title}
@@ -101,6 +110,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
                     className="header-subtitle"
                     sx={{
                       color: "black",
+                      fontSize: isMobile ? "1rem" : "1.25rem",
                     }}
                   >
                     {subtitle} {userType && `- ${userType}`}
@@ -109,10 +119,21 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
               </Box>
             </Link>
           </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: isMobile ? "8px" : "16px",
+            }}
+          >
             <UserBar />
-            <Box sx={{ flexGrow: 0, width: "40px", height: "40px" }}>
+            <Box
+              sx={{
+                flexGrow: 0,
+                width: isMobile ? "32px" : "40px",
+                height: isMobile ? "32px" : "40px",
+              }}
+            >
               <Avatar color={avatarColor} />
             </Box>
           </Box>

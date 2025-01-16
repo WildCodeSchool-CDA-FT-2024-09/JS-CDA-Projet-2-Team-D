@@ -8,18 +8,21 @@ import App from "./App.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import RoleProtectedRoute from "./components/RoleProtectedRoute.tsx";
 import ManageUser from "./pages/administrator/user/ManageUser.tsx";
-import CreateUser from "./pages/administrator/user/CreateUser.tsx";
-import UpdateUser from "./pages/administrator/user/UpdateUser.tsx";
+import UserForm from "./pages/administrator/user/UserForm.tsx";
 import ManageExercise from "./pages/administrator/exercise/ManageExercise.tsx";
-import CreateExercise from "./pages/administrator/exercise/CreateExercise.tsx";
-import HomePageCommission from "./pages/homePageCommission/HomePageCommission.tsx";
+import ExerciseForm from "./pages/administrator/exercise/ExerciseForm.tsx";
+import HomePageCommission from "./pages/commission/HomePageCommission.tsx";
 import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
-import Administrator from "./pages/administrator/Administrator.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
-import BudgetOverview from "./components/BudgetOverview/BudgetOverview.tsx";
+import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
+import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
+import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
+import DetailInvoice from "./pages/accountant/DetailInvoice.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
+import ILostMyPassword from "./pages/ILostMyPassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +35,14 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "lost-password",
+        element: <ILostMyPassword />,
+      },
+      {
         path: "administrator",
         element: (
           <RoleProtectedRoute requiredRole="1">
@@ -41,15 +52,15 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Administrator />,
+            element: <BudgetOverview />,
           },
           {
-            path: "overview",
+            path: "invoiceOverview",
             element: <Outlet />,
             children: [
               {
                 index: true,
-                element: <BudgetOverview />,
+                element: <InvoiceOverview />,
               },
             ],
           },
@@ -73,11 +84,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "add",
-                element: <CreateUser />,
+                element: <UserForm mode="create" />,
               },
               {
                 path: "edit/:userId",
-                element: <UpdateUser />,
+                element: <UserForm mode="update" />,
               },
             ],
           },
@@ -91,7 +102,15 @@ const router = createBrowserRouter([
               },
               {
                 path: "add",
-                element: <CreateExercise />,
+                element: <ExerciseForm mode="create" />,
+              },
+              {
+                path: "edit/:exerciseId",
+                element: <ExerciseForm mode="update" />,
+              },
+              {
+                path: ":exerciseId/budgets",
+                element: <SetupBudgets />,
               },
             ],
           },
@@ -119,8 +138,23 @@ const router = createBrowserRouter([
               },
             ],
           },
+          {
+            path: "invoice/:invoiceId",
+            element: <DetailInvoice />,
+          },
+          {
+            path: "invoiceOverview",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <InvoiceOverview />,
+              },
+            ],
+          },
         ],
       },
+
       {
         path: "commission",
         element: (

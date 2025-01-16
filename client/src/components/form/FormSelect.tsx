@@ -24,6 +24,7 @@ interface FormSelectProps {
     event: SelectChangeEvent<string | number>,
     creditDebitId?: number,
   ) => void;
+  creditDebitId?: number;
   error?: string;
   required?: boolean;
 }
@@ -34,6 +35,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   value,
   subValue,
   handleSelect,
+  creditDebitId,
 }) => {
   const { user } = useUser();
   const [getUserById] = useGetUserByIdLazyQuery();
@@ -61,7 +63,18 @@ const FormSelect: React.FC<FormSelectProps> = ({
         } else if (name === "category_id" || name === "subcategory_id") {
           const { data } = await getCategory();
           if (data) {
-            setItems(data);
+            // Filter categories based on creditDebitId
+            if (name === "category_id" && creditDebitId) {
+              const filteredCategories = {
+                ...data,
+                getCategories: data.getCategories.filter(
+                  (category) => category.creditDebit?.id === creditDebitId,
+                ),
+              };
+              setItems(filteredCategories);
+            } else {
+              setItems(data);
+            }
           }
         }
       } catch (err) {
@@ -70,7 +83,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
     };
 
     getItems();
-  }, [name, user, getUserById, getCategory]); // Dépend de `user`
+  }, [name, user, getUserById, getCategory, creditDebitId]); // Dépend de `user`
 
   const getCreditDebitId = (categoryId: number): number => {
     if (items && "getCategories" in items) {

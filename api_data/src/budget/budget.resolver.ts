@@ -1,10 +1,11 @@
-import { Resolver, Query, Arg, Int } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Int, Authorized } from "type-graphql";
 import { Budget } from "./budget.entity";
 import { Exercise } from "../exercise/exercise.entity";
 import { BudgetOverview } from "./budget.type";
 
 @Resolver(Budget)
 export class BudgetResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => Budget, { nullable: true })
   async getCurrentBudgetByCommissionID(
     @Arg("commissionId", () => Int) commissionId: number
@@ -35,6 +36,8 @@ export class BudgetResolver {
       throw new Error("Impossible de récupérer le dernier budget.");
     }
   }
+
+  @Authorized(["1", "2", "3"])
   @Query(() => BudgetOverview)
   async getBudgetOverview(): Promise<BudgetOverview> {
     try {
@@ -62,6 +65,56 @@ export class BudgetResolver {
     } catch (error) {
       throw new Error(
         `Erreur lors de la récupération des budgets: ${error.message}`
+      );
+    }
+  }
+
+  @Authorized(["1", "2", "3"])
+  @Query(() => [Budget])
+  async getExerciseBudgets(@Arg("exerciseId") exerciseId: number) {
+    try {
+      const budgets = await Budget.find({
+        where: {
+          exerciseId: exerciseId,
+        },
+      });
+
+      if (!budgets.length) {
+        throw new Error("Aucun budget trouvé.");
+      }
+
+      return budgets;
+    } catch (error) {
+      throw new Error(
+        `Erreur lors de la récupération des budgets: ${error.message}`
+      );
+    }
+  }
+
+  @Authorized(["1", "2", "3"])
+  @Mutation(() => Budget)
+  async setCommissionBudgetAmount(
+    @Arg("exerciseId") exerciseId: number,
+    @Arg("commissionId") commissionId: number,
+    @Arg("amount") amount: number
+  ) {
+    try {
+      const budget = await Budget.findOneOrFail({
+        where: {
+          exerciseId: exerciseId,
+          commissionId: commissionId,
+        },
+      });
+
+      budget.amount = amount;
+
+      const newBudget = await budget.save();
+
+      return newBudget;
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        `Problème avec la mise en place du budget pour la commission ${commissionId} de l'exercise ${exerciseId}.`
       );
     }
   }

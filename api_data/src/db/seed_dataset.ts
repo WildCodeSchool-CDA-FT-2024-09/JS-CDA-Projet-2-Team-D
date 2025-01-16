@@ -213,31 +213,45 @@ import { AppDataSource } from "./data-source";
       ON CONFLICT ("userId", "commissionId") DO NOTHING;
     `);
 
-    // insert exercise (civil year)
-    // await queryRunner.query(`
-    //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
-    //     ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
-    //     ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
-    //     ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
-    //     ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
-    //     ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00');
-    // `);
+    // superadmin gets all the commissions
+    await queryRunner.query(`
+      INSERT INTO user_commissions_commission ("userId", "commissionId") VALUES
+        (21, 1),
+        (21, 2),
+        (21, 3),
+        (21, 4),
+        (21, 5),
+        (21, 6),
+        (21, 7);
+    `);
 
-    // insert exercise (school year)
+    // insert exercise (civil year)
     await queryRunner.query(`
       INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
-        ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
-        ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
-        ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
-        ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
-        ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
-        ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
-    `);
+        ('Budget 2019', '2019-01-01 00:00:00', '2019-12-31 00:00:00'),
+        ('Budget 2020', '2020-01-01 00:00:00', '2020-12-31 00:00:00'),
+        ('Budget 2021', '2021-01-01 00:00:00', '2021-12-31 00:00:00'),
+        ('Budget 2022',	'2022-01-01 00:00:00', '2022-12-31 00:00:00'),
+        ('Budget 2023',	'2023-01-01 00:00:00', '2023-12-31 00:00:00'),
+        ('Budget 2024',	'2024-01-01 00:00:00', '2024-12-31 00:00:00');
+      `);
+
+    // insert exercise (school year)
+    // await queryRunner.query(`
+    //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
+    //     ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
+    //     ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
+    //     ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
+    //     ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
+    //     ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
+    //     ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
+    // `);
 
     // insert invoices
     await queryRunner.query(`
       INSERT INTO invoice (
         price_without_vat,
+        amount_with_vat,
         label,
         receipt,
         info,
@@ -254,6 +268,7 @@ import { AppDataSource } from "./data-source";
       )
       SELECT
           ci.amount_without_vat,
+          ci.amount_with_vat,
           ci.label,
           ci.receipt,
           ci.info,

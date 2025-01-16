@@ -146,3 +146,81 @@ export const CREATE_EXERCISE = gql`
     }
   }
 `;
+
+export const SET_COMMISSION_BUDGET_AMOUNT = gql`
+  mutation SetCommissionBudgetAmount(
+    $exerciseId: Float!
+    $commissionId: Float!
+    $amount: Float!
+  ) {
+    setCommissionBudgetAmount(
+      exerciseId: $exerciseId
+      commissionId: $commissionId
+      amount: $amount
+    ) {
+      commissionId
+      exerciseId
+      amount
+    }
+  }
+`;
+
+export const UPDATE_STATUS_INVOICE = gql`
+  mutation UpdateStatusInvoice($invoiceId: Float!, $statusId: Float!) {
+    updateInvoiceStatus(invoiceId: $invoiceId, statusId: $statusId) {
+      id
+      status {
+        id
+      }
+    }
+  }
+`;
+
+export const ASSOCIATED_BANK_ACCOUNT_TO_INVOICE = gql`
+  mutation AssociateBankAccountToInvoice(
+    $invoiceId: Float!
+    $bankAccountId: Float
+  ) {
+    associateBankAccountToInvoice(
+      invoiceId: $invoiceId
+      bankAccountId: $bankAccountId
+    ) {
+      id
+      bankAccount {
+        id
+      }
+    }
+  }
+`;
+
+export const REQUEST_RESET_PASSWORD = gql`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($newPassword: String!, $token: String!) {
+    resetPassword(newPassword: $newPassword, token: $token)
+  }
+`;
+
+export const UPDATE_BALANCE = gql`
+  mutation UpdateBalance($bankAccountId: Float!, $amount: Float!) {
+    updateBalance(bankAccountId: $bankAccountId, amount: $amount) {
+      id
+      balance
+    }
+  }
+`;
+
+export const UPDATE_EXERCISE = gql`
+  mutation UpdateExercise($data: ExerciseInput!, $exerciseId: Float!) {
+    updateExercise(data: $data, exerciseId: $exerciseId) {
+      id
+      label
+      start_date
+      end_date
+    }
+  }
+`;

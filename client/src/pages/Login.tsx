@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import useNotification from "../hooks/useNotification";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import {
   Button,
   FormControl,
-  Grid2,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -18,6 +16,7 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import logo from "/Logo_seul.svg";
+import BtnLink from "../components/BtnLink";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -92,6 +91,8 @@ export default function Login() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          maxWidth: { xs: "100%", md: "40%" },
+          margin: "0 auto",
         }}
       >
         <img src={logo} alt="ClubCompta" style={{ marginBottom: "20px" }} />
@@ -106,6 +107,7 @@ export default function Login() {
               fullWidth
               id="email"
               label="Adresse Email"
+              aria-label="Adresse Email"
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -119,6 +121,7 @@ export default function Login() {
                 fullWidth
                 id="password"
                 label="Mot de passe"
+                aria-label="Mot de passe"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -147,24 +150,20 @@ export default function Login() {
               type="submit"
               fullWidth
               variant="contained"
+              aria-label="Se connecter"
               sx={{ mt: 3, mb: 2 }}
             >
               Se connecter
             </Button>
+            <BtnLink
+              aria-label="J'ai perdu mon mot de passe"
+              to="/lost-password"
+              sx={{ fontSize: ".8em" }}
+            >
+              J'ai perdu mon mot de passe
+            </BtnLink>
           </Box>
         </form>
-
-        <Stack spacing={2} sx={{ marginTop: "4em", marginBottom: "2em" }}>
-          <Grid2 container spacing={12}>
-            Comptes de démonstration : <br />
-            SUPERADMIN: super@admin.net (mdp : whS0@cqnuros ) <br />
-            Administrateur : zen@noisette.net (mdp : whS0@cqnuros )
-            <br />
-            Comptable : wanda.hayes@example.com (mdp : whS0@cqnuros )
-            <br />
-            Commission : vincent.harris@example.com (mdp : whS0@cqnuros )
-          </Grid2>
-        </Stack>
       </Box>
     </>
   );

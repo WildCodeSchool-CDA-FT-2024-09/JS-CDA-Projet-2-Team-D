@@ -2,15 +2,19 @@ import { Between } from "typeorm";
 import { Exercise } from "../exercise/exercise.entity";
 import { Invoice } from "../invoice/invoice.entity";
 import { Commission } from "./commission.entity";
-import { Resolver, Query, Arg } from "type-graphql";
+import { Resolver, Query, Arg, Authorized } from "type-graphql";
 import { PaginatedInvoices } from "../invoice/paginatedInvoice.type";
+import redisClient from "../../redis.config";
 
 @Resolver(Commission)
 export default class CommissionResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Commission])
   async getCommissions() {
     return Commission.find();
   }
+
+  @Authorized(["1", "2", "3"])
   @Query(() => PaginatedInvoices)
   async getInvoicesByCommissionId(
     @Arg("commissionId") commissionId: number,
@@ -18,12 +22,21 @@ export default class CommissionResolver {
     @Arg("limit", { defaultValue: 5 }) limit: number
   ): Promise<PaginatedInvoices> {
     try {
+      const cacheKey = commissionId
+        ? `invoicesByCommissionId:keyword:${commissionId}`
+        : "invoicesByCommissionId:all";
+
+      const cachedInvoicesByCommissionId = await redisClient.get(cacheKey);
+      if (cachedInvoicesByCommissionId) {
+        return JSON.parse(cachedInvoicesByCommissionId);
+      }
+
       const [lastExercise] = await Exercise.find({
         order: { end_date: "DESC" },
         take: 1,
       });
       if (!lastExercise) {
-        throw new Error("No exercise found.");
+        throw new Error("Pas d'exercice trouvé");
       }
 
       const [invoices, totalCount] = await Invoice.findAndCount({
@@ -37,7 +50,7 @@ export default class CommissionResolver {
         skip: offset,
       });
       if (!invoices.length) {
-        throw new Error("No invoices found for the given commission.");
+        throw new Error("Pas de factures trouvées pour cette commission.");
       }
 
       const allInvoices = await Invoice.find({
@@ -45,19 +58,30 @@ export default class CommissionResolver {
           commission: { id: commissionId },
           date: Between(lastExercise.start_date, lastExercise.end_date),
         },
-        relations: ["vat", "creditDebit"],
+        relations: ["creditDebit"],
       });
 
-      const totalAmount = allInvoices.reduce((sum, invoice) => {
-        const vatRate = invoice.vat?.rate || 0;
-        const ttc = invoice.price_without_vat * (1 + vatRate / 100);
-        return sum + (invoice.creditDebit.id === 2 ? -ttc : ttc);
-      }, 0);
+      const totalAmount = Number(
+        allInvoices
+          .reduce((sum, invoice) => {
+            const amount = Number(invoice.amount_with_vat);
+            return sum + (invoice.creditDebit.id === 2 ? -amount : amount);
+          }, 0)
+          .toFixed(2)
+      );
 
-      return { invoices, totalCount, totalAmount };
+      const result = { invoices, totalCount, totalAmount };
+
+      await redisClient.set(cacheKey, JSON.stringify(result), {
+        EX: 60,
+      });
+
+      return result;
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
-      throw new Error("Unable to fetch invoices for the given commission ID.");
+      throw new Error(
+        "Impossible de récupérer les factures pour cette commission."
+      );
     }
   }
 }

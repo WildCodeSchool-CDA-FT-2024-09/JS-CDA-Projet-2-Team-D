@@ -8,6 +8,11 @@ import {
   SelectChangeEvent,
   Checkbox,
   FormControlLabel,
+  FormControl,
+  RadioGroup,
+  Radio,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import BtnUpload from "../../components/BtnUpload";
@@ -20,6 +25,8 @@ import {
   isValidInvoice,
 } from "../../types/InvoiceInputType";
 import { useGetVatsQuery } from "../../types/graphql-types";
+import useNotification from "../../hooks/useNotification";
+import { Snackbar, Alert, AlertTitle } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -28,9 +35,29 @@ import { useUser } from "../../hooks/useUser";
 
 const InvoiceForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { user } = useUser();
   const userId = user?.id;
+  const [creditDebitType, setCreditDebitType] = useState<number>(0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const { notifySuccess, notifyError } = useNotification();
+  const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [errorOpen, setErrorOpen] = useState(false);
+
+  const handleCreditDebitChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = parseInt(event.target.value);
+    setCreditDebitType(value);
+    setInvoice((prevState) => ({
+      ...prevState,
+      credit_debit_id: value,
+      // Reset the category when changing credit/debit type
+      category_id: 0,
+      subcategory_id: 0,
+    }));
+  };
 
   const {
     data: vatRatesData,
@@ -108,7 +135,6 @@ const InvoiceForm: React.FC = () => {
     if (userId) {
       setInvoice((prevState) => ({ ...prevState, user_id: userId }));
     }
-    console.info("Données de la facture :", invoice);
 
     // Checks of mandatory fields
     const missingFields: string[] = [];
@@ -122,9 +148,8 @@ const InvoiceForm: React.FC = () => {
     if (!invoice.receipt) missingFields.push("Justificatif");
 
     if (missingFields.length > 0) {
-      alert(
-        `Veuillez remplir les champs obligatoires suivants :\n- ${missingFields.join("\n- ")}`,
-      );
+      setMissingFields(missingFields); // Saves missing fields
+      setErrorOpen(true);
       setIsSubmitting(false);
       return;
     }
@@ -157,7 +182,7 @@ const InvoiceForm: React.FC = () => {
       formData.append("date", invoice.date.toISOString());
       formData.append("category_id", invoice.category_id.toString());
       formData.append("invoice_id", invoice.invoice_id ?? ""); // optional field
-      formData.append("total", invoice.total.toString());
+      formData.append("amount_with_vat", invoice.amount_with_vat.toString());
       formData.append("bankAccountId", ""); // optional field
 
       const response = await axios.post("/upload", formData, {
@@ -167,7 +192,7 @@ const InvoiceForm: React.FC = () => {
       });
 
       console.info("Réponse du serveur :", response.data);
-      alert("Facture envoyée avec succès !");
+      notifySuccess("Facture envoyée avec succès !");
 
       resetForm();
     } catch (error: unknown) {
@@ -175,7 +200,7 @@ const InvoiceForm: React.FC = () => {
         console.error("Erreur lors de l'envoi :", error.message);
       } else {
         console.error("Erreur inconnue :", error);
-        alert("Échec de l'envoi de la facture.");
+        notifyError("Échec de l'envoi de la facture.");
       }
     } finally {
       setIsSubmitting(false);
@@ -199,14 +224,49 @@ const InvoiceForm: React.FC = () => {
   return (
     <Paper
       elevation={3}
-      style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
+      style={{
+        padding: "20px",
+        maxWidth: isMobile ? "100%" : "800px",
+        margin: "auto",
+      }}
     >
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Nouvelle Facture
       </Typography>
+      <Snackbar
+        open={errorOpen}
+        onClose={() => setErrorOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={8000}
+      >
+        <Alert
+          onClose={() => setErrorOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{
+            backgroundColor: "#F03D3D",
+            color: "black",
+            fontWeight: "bold",
+            fontSize: "1.25rem",
+          }}
+        >
+          <AlertTitle>Erreur</AlertTitle>
+          Veuillez remplir les champs obligatoires suivants :
+          <ul style={{ margin: 0, paddingLeft: "20px" }}>
+            {missingFields.map((field, index) => (
+              <li key={index}>{field}</li>
+            ))}
+          </ul>
+        </Alert>
+      </Snackbar>
+
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid size={6}>
+        <Grid
+          container
+          spacing={isMobile ? 2 : 3}
+          direction={isMobile ? "column" : "row"}
+        >
+          <Grid size={isMobile ? 12 : 6}>
             <FormSelect
               name="commission_id"
               property="name"
@@ -216,8 +276,7 @@ const InvoiceForm: React.FC = () => {
               required
             />
           </Grid>
-
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <LocalizationProvider
               dateAdapter={AdapterDateFns}
               adapterLocale={fr}
@@ -234,37 +293,92 @@ const InvoiceForm: React.FC = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={6}>
-            <FormSelect
-              name="category_id"
-              label="Catégories"
-              property="label"
-              value={invoice.category_id ?? ""}
-              handleSelect={handleInvoiceChange}
-              required
-            />
+
+          <Grid container size={12} alignItems="center" justifyContent="center">
+            <Grid size={9} alignItems="center" justifyContent="center">
+              <FormControl component="fieldset">
+                <Typography>
+                  <strong>Type de transaction</strong> (
+                  <em>Cocher pour voir les catégories</em>)
+                </Typography>
+                <RadioGroup
+                  row
+                  name="credit-debit-type"
+                  value={creditDebitType.toString()}
+                  onChange={handleCreditDebitChange}
+                >
+                  <FormControlLabel
+                    value="2"
+                    control={<Radio />}
+                    label="Crédit"
+                  />
+                  <FormControlLabel
+                    value="1"
+                    control={<Radio />}
+                    label="Débit"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid
+              size={3}
+              container
+              direction="column"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={invoice.paid}
+                    onChange={(e) => handleInvoiceChange(e)}
+                    name="paid"
+                    aria-checked={invoice.paid ? "true" : "false"}
+                  />
+                }
+                label="Payé"
+                aria-live="polite"
+              />
+            </Grid>
           </Grid>
-          <Grid size={6}>
-            <FormSelect
-              name="subcategory_id"
-              label="Sous-catégories"
-              property="label"
-              value={invoice.subcategory_id?.toString() ?? ""}
-              subValue={invoice.category_id ?? undefined}
-              handleSelect={handleInvoiceChange}
-              required
-            />
-          </Grid>
+
+          {/* Only show categories if a credit/debit type is selected */}
+          {creditDebitType !== 0 && (
+            <>
+              <Grid size={isMobile ? 12 : 6}>
+                <FormSelect
+                  name="category_id"
+                  label="Catégories"
+                  property="label"
+                  value={invoice.category_id ?? ""}
+                  handleSelect={handleInvoiceChange}
+                  creditDebitId={creditDebitType}
+                  required
+                />
+              </Grid>
+
+              {invoice.category_id !== 0 && (
+                <Grid size={isMobile ? 12 : 6}>
+                  <FormSelect
+                    name="subcategory_id"
+                    label="Sous-catégories"
+                    property="label"
+                    value={invoice.subcategory_id?.toString() ?? ""}
+                    subValue={invoice.category_id ?? undefined}
+                    handleSelect={handleInvoiceChange}
+                    required
+                  />
+                </Grid>
+              )}
+            </>
+          )}
           <FormTextField
             name="label"
             label="Libellé"
             value={invoice.label || ""}
             onChange={handleInvoiceChange}
-            required={true}
-            error={invoice.label.length === 0}
-            helperText={invoice.label.length === 0 ? "Ce champ est requis" : ""}
           />
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <FormTextField
               name="price_without_vat"
               label="Prix HT"
@@ -272,13 +386,9 @@ const InvoiceForm: React.FC = () => {
               value={invoice.price_without_vat.toString()}
               onChange={handleInvoiceChange}
               required={true}
-              error={invoice.price_without_vat === 0}
-              helperText={
-                invoice.price_without_vat === 0 ? "Ce champ est requis" : ""
-              }
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={isMobile ? 12 : 6}>
             <FormSelectVat
               name="vat_id"
               label="Taux de TVA"
@@ -289,26 +399,6 @@ const InvoiceForm: React.FC = () => {
               setInvoice={
                 setInvoice as React.Dispatch<React.SetStateAction<Invoice>>
               }
-            />
-          </Grid>
-          <Grid
-            size={6}
-            container
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={invoice.paid}
-                  onChange={(e) => handleInvoiceChange(e)}
-                  name="paid"
-                  aria-checked={invoice.paid ? "true" : "false"}
-                />
-              }
-              label="Payé"
-              aria-live="polite"
             />
           </Grid>
           <Grid
@@ -326,21 +416,21 @@ const InvoiceForm: React.FC = () => {
                     style={{
                       fontWeight: "bold",
                       color:
-                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                        invoice.credit_debit_id === 2 ? "#6EBF8B" : "#E21818",
                     }}
                   >
-                    {invoice.credit_debit_id === 1 ? "+" : "-"}
+                    {invoice.credit_debit_id === 2 ? "+" : "-"}
                   </span>
-                  {(invoice.total || 0).toFixed(2)} €
+                  {(invoice.amount_with_vat || 0).toFixed(2)} €
                   <span
                     style={{
                       fontWeight: "bold",
                       color:
-                        invoice.credit_debit_id === 1 ? "#6EBF8B" : "#E21818",
+                        invoice.credit_debit_id === 2 ? "#6EBF8B" : "#E21818",
                       marginLeft: "5px",
                     }}
                   >
-                    ({invoice.credit_debit_id === 1 ? "crédit" : "débit"})
+                    ({invoice.credit_debit_id === 2 ? "crédit" : "débit"})
                   </span>
                 </>
               ) : (
@@ -351,18 +441,26 @@ const InvoiceForm: React.FC = () => {
           <Grid
             size={12}
             container
-            direction="column"
+            direction="row"
             alignItems="center"
             justifyContent="center"
+            spacing={2}
           >
-            <Typography>Justificatif</Typography>
-            <BtnUpload onFileChange={handleFileUpload} />
+            <Grid>
+              <Typography>Justificatif</Typography>
+            </Grid>
+            <Grid>
+              <BtnUpload onFileChange={handleFileUpload} />
+            </Grid>
             {invoice.receipt && (
-              <Typography variant="body2" color="textSecondary">
-                {invoice.receipt.name}
-              </Typography>
+              <Grid>
+                <Typography variant="body2" color="textSecondary">
+                  {invoice.receipt.name}
+                </Typography>
+              </Grid>
             )}
           </Grid>
+
           <Grid size={12}>
             <FormTextField
               name="info"

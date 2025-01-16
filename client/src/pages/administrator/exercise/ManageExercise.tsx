@@ -1,6 +1,7 @@
 import { useGetExercisesQuery } from "../../../types/graphql-types";
 import ExerciseRow from "../../../components/exercise/ExerciseRow";
 import BtnLink from "../../../components/BtnLink";
+import PageTitle from "../../../components/PageTitle";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
@@ -8,7 +9,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
 
 export default function ManageExercise() {
   const { data, loading, error } = useGetExercisesQuery();
@@ -17,15 +17,8 @@ export default function ManageExercise() {
   if (error) return <p>☠️ Erreur: {error.message}</p>;
 
   return (
-    <div>
-      <h1>Gestion des exercices</h1>
-
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+    <>
+      <PageTitle title="Gestion des exercices">
         <BtnLink
           to="/administrator/exercise/add"
           sx={{
@@ -44,7 +37,7 @@ export default function ManageExercise() {
         >
           Ajouter un exercise
         </BtnLink>
-      </Box>
+      </PageTitle>
 
       <TableContainer component={Paper} sx={{ marginTop: "1em" }}>
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des exercices">
@@ -54,6 +47,7 @@ export default function ManageExercise() {
               <TableCell align="left">Libellé</TableCell>
               <TableCell align="left">Début</TableCell>
               <TableCell align="left">Fin</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -64,6 +58,6 @@ export default function ManageExercise() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </>
   );
 }

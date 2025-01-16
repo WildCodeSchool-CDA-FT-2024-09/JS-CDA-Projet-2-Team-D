@@ -7,11 +7,12 @@ import {
   InputLabel,
   SelectChangeEvent,
 } from "@mui/material";
+import { calculateAmountWithVAT } from "../../utils/vatCalculator";
 
 export interface Invoice {
   vat_id: number;
   price_without_vat: number;
-  total: number;
+  amount_with_vat: number;
 }
 
 interface FormSelectVatProps {
@@ -41,27 +42,23 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
       const selectedVat = options.find((option) => option.id === selectedVatId);
 
       if (selectedVat) {
-        const vatRate = selectedVat.rate;
-        const parsedPriceWithoutVat = parseFloat(priceWithoutVat) || 0;
-        const totalTTC =
-          parsedPriceWithoutVat + (parsedPriceWithoutVat * vatRate) / 100;
+        const totalTTC = calculateAmountWithVAT(
+          priceWithoutVat || 0,
+          selectedVat.rate,
+        );
 
-        if (Number.isFinite(totalTTC)) {
-          setInvoice((prevState) => ({
-            ...prevState,
-            vat_id: selectedVatId,
-            total: totalTTC,
-          }));
-        } else {
-          setInvoice((prevState) => ({
-            ...prevState,
-            vat_id: selectedVatId,
-            total: 0,
-          }));
-        }
+        setInvoice((prevState) => ({
+          ...prevState,
+          vat_id: selectedVatId,
+          amount_with_vat: totalTTC,
+        }));
       }
     }
   }, [value, priceWithoutVat, options, setInvoice]);
+
+  const selectedLabel =
+    options.find((option) => option.id.toString() === value)?.label ||
+    "Non sélectionné";
 
   return (
     <FormControl fullWidth error={error}>
@@ -72,7 +69,7 @@ export const FormSelectVat: React.FC<FormSelectVatProps> = ({
         onChange={(e) => {
           onChange(e);
         }}
-        label={`Taux de TVA : ${options.find((option) => option.id.toString() === value)?.label || "Non sélectionné"}`}
+        label={`Taux de TVA : ${selectedLabel}`}
       >
         {options.map((vat) => (
           <MenuItem key={vat.id} value={vat.id.toString()}>

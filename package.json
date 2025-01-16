@@ -6,7 +6,8 @@
   },
   "scripts": {
     "prepare": "husky",
-    "lint": "lint-staged"
+    "lint": "lint-staged",
+    "unit-test-client": "cd client && npm run unit-test"
   },
   "lint-staged": {
     "api_data/**/*.{js,jsx,ts,tsx}": [

@@ -1,10 +1,11 @@
 import { Category } from "./category.entity";
 import { CreditDebit } from "../creditDebit/creditDebit.entity";
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { validate } from "class-validator";
 
 @Resolver(Category)
 export default class CategoryResolver {
+  @Authorized(["1", "2", "3"])
   @Query(() => [Category])
   async getCategories() {
     return Category.find({
@@ -17,7 +18,7 @@ export default class CategoryResolver {
     });
   }
 
-  // add a new category
+  @Authorized(["2"])
   @Mutation(() => Category)
   async addCategory(
     @Arg("label") label: string,
@@ -30,8 +31,16 @@ export default class CategoryResolver {
     if (label.trim() === "") {
       throw new Error("Veuillez entrer un libellé de catégorie !");
     }
-    if (await Category.findOneBy({ label })) {
-      throw new Error("Cette catégorie existe déjà !");
+
+    const existingCategory = await Category.findOneBy({
+      label,
+      creditDebit: { id: creditDebitId },
+    });
+
+    if (existingCategory) {
+      throw new Error(
+        "Cette catégorie existe déjà pour cette option de crédit/débit !"
+      );
     }
 
     const category = new Category();
@@ -49,7 +58,7 @@ export default class CategoryResolver {
     return category;
   }
 
-  // update a category
+  @Authorized(["2"])
   @Mutation(() => Category)
   async updateCategory(
     @Arg("id") id: number,
@@ -67,7 +76,6 @@ export default class CategoryResolver {
 
     const currentCreditDebitId = category.creditDebit.id;
 
-    // Vérifiez si aucun changement n'a été apporté
     if (
       label.trim() === category.label.trim() &&
       creditDebitId === currentCreditDebitId
@@ -75,13 +83,11 @@ export default class CategoryResolver {
       throw new Error("Aucune modification n'a été apportée !");
     }
 
-    // Récupérer le nouveau crédit/débit
     const creditDebit = await CreditDebit.findOneBy({ id: creditDebitId });
     if (!creditDebit) {
       throw new Error("Veuillez sélectionner un type de crédit/débit valide !");
     }
 
-    // Mise à jour uniquement des champs modifiés
     if (label.trim() !== category.label.trim()) {
       if (label.trim() === "") {
         throw new Error("Veuillez entrer un libellé de catégorie !");
@@ -93,7 +99,6 @@ export default class CategoryResolver {
       category.creditDebit = creditDebit;
     }
 
-    // Validations des données
     const errors = await validate(category);
     if (errors.length > 0) {
       throw new Error(
@@ -101,7 +106,6 @@ export default class CategoryResolver {
       );
     }
 
-    // Sauvegarder la catégorie modifiée
     await category.save();
     return category;
   }

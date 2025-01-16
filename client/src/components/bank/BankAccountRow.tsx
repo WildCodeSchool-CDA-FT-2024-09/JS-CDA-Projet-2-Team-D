@@ -23,8 +23,10 @@ function BankAccountRow({ bank }: { bank: Bank }) {
       >
         <TableCell>
           <IconButton
-            aria-label="expand row"
+            aria-label="détail des comptes de la banque"
+            role="button"
             size="small"
+            data-testid={`expand-bank-accounts-button-${bank.id}`}
             onClick={() => setOpen(!open)}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}

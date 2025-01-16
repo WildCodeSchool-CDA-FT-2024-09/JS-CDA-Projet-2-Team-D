@@ -6,13 +6,14 @@ import {
   TableCell,
   TableBody,
   Paper,
-  Button,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
 
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { Box } from "@mui/system";
+
+import { Link } from "react-router-dom";
 
 import { useGetInvoicesToValidateOrRefusedQuery } from "../../types/graphql-types";
 
@@ -37,7 +38,7 @@ function DisplayInvoicesForAccountant() {
   }
 
   const rows = data.getInvoicesToValidateOrRefused.map((invoice) => ({
-    invoiceNumber: invoice.id,
+    invoiceId: invoice.id,
     date: invoice.date,
     commission: invoice.commission?.name,
     amountHT: invoice.price_without_vat,
@@ -56,17 +57,19 @@ function DisplayInvoicesForAccountant() {
           fontWeight: "bold",
         }}
       >
-        <h1>LISTE DES FACTURES EN ATTENTE ET REFUSÉES</h1>
+        <h1>Liste des factures en attente et refusées</h1>
       </Box>
 
       {!isMobile ? (
-        <TableContainer component={Paper}>
+        <TableContainer
+          component={Paper}
+          sx={{ maxWidth: "80%", overflowX: "auto" }}
+        >
           <Table>
             <TableHead>
               <TableRow
                 sx={{
                   backgroundColor: theme.palette.primary.main,
-                  color: "white",
                   fontWeight: "bold",
                   fontSize: "1rem",
                   "& .MuiTableCell-root": {
@@ -84,52 +87,39 @@ function DisplayInvoicesForAccountant() {
                 <TableCell align="right">Montant TTC</TableCell>
                 <TableCell align="right">Status</TableCell>
                 <TableCell align="right">Détail</TableCell>
-                <TableCell align="right">Validation ou Refus</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.invoiceNumber}>
-                  <TableCell>{row.invoiceNumber}</TableCell>
+                <TableRow key={row.invoiceId}>
+                  <TableCell>{row.invoiceId}</TableCell>
                   <TableCell align="right">
                     {new Date(row.date).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell align="right">{row.commission || "-"}</TableCell>
                   <TableCell align="right">
-                    {row.amountHT
+                    {`
+                    ${row.amountHT
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">
                     {row.vat ? `${row.vat}%` : "-"}
                   </TableCell>
                   <TableCell align="right">
-                    {Number(row.amountTTC)
+                    {`
+                    ${Number(row.amountTTC)
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/B(?=(d{3})+(?!d))/g, " ")}
+                    \u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">
-                    <RemoveRedEyeOutlinedIcon />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      color="success"
-                      sx={{ color: "white", fontWeight: "bold" }}
-                    >
-                      Valider
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      sx={{
-                        color: "white",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Refuser
-                    </Button>
+                    <Link to={`/accountant/invoice/${row.invoiceId}`}>
+                      <RemoveRedEyeOutlinedIcon />
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
@@ -140,7 +130,7 @@ function DisplayInvoicesForAccountant() {
         <Box>
           {rows.map((row) => (
             <Paper
-              key={row.invoiceNumber}
+              key={row.invoiceId}
               sx={{
                 marginBottom: "1rem",
                 padding: "1rem",
@@ -151,7 +141,7 @@ function DisplayInvoicesForAccountant() {
               }}
             >
               <Box>
-                <strong>Numéro :</strong> {row.invoiceNumber}
+                <strong>Numéro :</strong> {row.invoiceId}
               </Box>
               <Box>
                 <strong>Date :</strong>{" "}
@@ -179,32 +169,17 @@ function DisplayInvoicesForAccountant() {
                 }}
               >
                 <strong>Détail :</strong>
-                <RemoveRedEyeOutlinedIcon
-                  sx={{ mt: "auto" }}
-                ></RemoveRedEyeOutlinedIcon>
+                <Link
+                  key={row.invoiceId}
+                  to={`/accountant/invoice/${row.invoiceId}`}
+                >
+                  <RemoveRedEyeOutlinedIcon
+                    sx={{ mt: "auto" }}
+                  ></RemoveRedEyeOutlinedIcon>
+                </Link>
               </Box>
               <Box>
                 <strong>Status :</strong> {row.status}
-              </Box>
-              <Box alignContent={"center"}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  sx={{
-                    marginRight: "0.5rem",
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Valider
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                >
-                  Refuser
-                </Button>
               </Box>
             </Paper>
           ))}
