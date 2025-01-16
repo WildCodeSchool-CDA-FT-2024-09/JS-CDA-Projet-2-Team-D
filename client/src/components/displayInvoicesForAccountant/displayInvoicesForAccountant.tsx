@@ -98,17 +98,22 @@ function DisplayInvoicesForAccountant() {
                   </TableCell>
                   <TableCell align="right">{row.commission || "-"}</TableCell>
                   <TableCell align="right">
-                    {row.amountHT
+                    {`
+                    ${row.amountHT
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">
                     {row.vat ? `${row.vat}%` : "-"}
                   </TableCell>
                   <TableCell align="right">
-                    {Number(row.amountTTC)
+                    {`
+                    ${Number(row.amountTTC)
                       .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                      .replace(/B(?=(d{3})+(?!d))/g, " ")}
+                    \u202F€
+                  `}
                   </TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">

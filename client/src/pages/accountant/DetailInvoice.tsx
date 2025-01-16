@@ -306,7 +306,7 @@ function DetailInvoice() {
               label="Prix HT"
               type="number"
               fullWidth
-              value={invoice.price_without_vat}
+              value={`${invoice.price_without_vat}\u202F€`}
             />
           </Grid>
           <Grid
@@ -323,7 +323,7 @@ function DetailInvoice() {
               <TextField
                 label="Taux de TVA"
                 fullWidth
-                value={invoice.vat.rate}
+                value={`${invoice.vat.rate}\u202F%`}
               />
             </Grid>
           </Grid>
@@ -355,7 +355,7 @@ function DetailInvoice() {
                   fontWeight: "bold",
                 }}
               >
-                Total TTC : <strong>{totalPrice}</strong>
+                Total TTC : <strong>{`${totalPrice.toFixed(2)}\u202F€`}</strong>
               </Typography>
             </Grid>
           </Grid>
