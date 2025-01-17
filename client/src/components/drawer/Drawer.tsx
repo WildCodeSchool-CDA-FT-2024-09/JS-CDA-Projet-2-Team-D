@@ -122,6 +122,11 @@ function CustomDrawer() {
           >
             Commissions
           </Typography>
+          <DrawerMenuItem
+            to="/commission/invoice"
+            icon={<InboxIcon />}
+            text="Nouvelle Facture"
+          />
           <List component="nav" sx={{ px: 1 }}>
             {commissions.map((commission) => (
               <DrawerMenuItem
@@ -131,11 +136,6 @@ function CustomDrawer() {
                 text={commission.name}
               />
             ))}
-            <DrawerMenuItem
-              to="/commission/invoice"
-              icon={<InboxIcon />}
-              text="Nouvelle Facture"
-            />
           </List>
         </>
       )}
