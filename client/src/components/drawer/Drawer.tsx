@@ -59,26 +59,31 @@ function CustomDrawer() {
               to="/administrator"
               icon={<PieChartSharpIcon />}
               text="Vue globale du budget"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/administrator/invoiceOverview"
               icon={<ReceiptLongSharpIcon />}
               text="Factures par exercice"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/administrator/user"
               icon={<GroupIcon />}
               text="Gestion des utilisateurs"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/administrator/exercise"
               icon={<CardTravelIcon />}
               text="Gestion des exercises"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/administrator/bank"
               icon={<AccountBalanceIcon />}
               text="Consultation des comptes bancaires"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
           </List>
         </>
@@ -98,16 +103,19 @@ function CustomDrawer() {
               to="/accountant"
               icon={<TableIcon />}
               text="Partie Comptable"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/accountant/category"
               icon={<InboxIcon />}
               text="Gestion des catégories"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem
               to="/accountant/invoiceOverview"
               icon={<ReceiptLongSharpIcon />}
               text="Factures par exercice"
+              onClose={isMobile ? handleDrawerToggle : undefined}
             />
           </List>
         </>
@@ -122,6 +130,12 @@ function CustomDrawer() {
           >
             Commissions
           </Typography>
+          <DrawerMenuItem
+            to="/commission/invoice"
+            icon={<InboxIcon />}
+            text="Nouvelle Facture"
+            onClose={isMobile ? handleDrawerToggle : undefined}
+          />
           <List component="nav" sx={{ px: 1 }}>
             {commissions.map((commission) => (
               <DrawerMenuItem
@@ -129,13 +143,9 @@ function CustomDrawer() {
                 to={`/commission/${commission.id}`}
                 icon={<TableIcon />}
                 text={commission.name}
+                onClose={isMobile ? handleDrawerToggle : undefined}
               />
             ))}
-            <DrawerMenuItem
-              to="/commission/invoice"
-              icon={<InboxIcon />}
-              text="Nouvelle Facture"
-            />
           </List>
         </>
       )}
