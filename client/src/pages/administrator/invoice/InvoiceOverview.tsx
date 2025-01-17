@@ -27,8 +27,11 @@ import {
 } from "../../../types/graphql-types";
 import { formatDate } from "../../../utils/dateUtils";
 import PageTitle from "../../../components/PageTitle";
+import SearchBar from "../../../components/SearchBar";
 
 const InvoiceOverview = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -91,6 +94,12 @@ const InvoiceOverview = () => {
   const totalCount = invoiceData?.getInvoicesByExercise.totalCount || 0;
   const totalPages = Math.ceil(totalCount / limit);
 
+  const filteredInvoices = invoices.filter(
+    (invoice) =>
+      invoice.invoiceNumber.toString().includes(searchQuery) ||
+      invoice.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   const getChipStyles = (status: string) => {
     let backgroundColor;
     switch (status) {
@@ -137,6 +146,15 @@ const InvoiceOverview = () => {
           </Select>
         </FormControl>
 
+        <Box sx={{ marginBottom: 2 }}>
+          <SearchBar
+            placeholder="Rechercher une facture"
+            value={searchQuery}
+            onSearch={setSearchQuery}
+            onClear={() => setSearchQuery("")}
+          />
+        </Box>
+
         {invoiceLoading ? (
           <Box display="flex" justifyContent="center">
             <CircularProgress />
@@ -162,14 +180,14 @@ const InvoiceOverview = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {invoices.length === 0 ? (
+                {filteredInvoices.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={isMobile ? 5 : 7} align="center">
                       Aucune facture disponible
                     </TableCell>
                   </TableRow>
                 ) : (
-                  invoices.map((row) => {
+                  filteredInvoices.map((row) => {
                     const montantTTC =
                       row.creditDebit?.label?.toLowerCase() === "débit"
                         ? -row.amount_with_vat

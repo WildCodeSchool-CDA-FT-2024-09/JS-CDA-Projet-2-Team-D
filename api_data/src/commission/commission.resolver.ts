@@ -79,9 +79,7 @@ export default class CommissionResolver {
       return result;
     } catch (error) {
       console.error("Error fetching invoices by commission ID:", error);
-      throw new Error(
-        "Impossible de récupérer les factures pour cette commission."
-      );
+      throw new Error("Il n'y a pas de factures pour cette commission.");
     }
   }
 }
