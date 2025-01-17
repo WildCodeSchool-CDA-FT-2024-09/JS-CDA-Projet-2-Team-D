@@ -63,7 +63,7 @@ function DisplayInvoicesForAccountant() {
       {!isMobile ? (
         <TableContainer
           component={Paper}
-          sx={{ maxWidth: "80%", overflowX: "auto" }}
+          sx={{ maxWidth: "100%", overflowX: "auto" }}
         >
           <Table>
             <TableHead>

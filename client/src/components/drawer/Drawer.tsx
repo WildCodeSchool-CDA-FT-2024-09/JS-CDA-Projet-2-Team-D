@@ -97,7 +97,7 @@ function CustomDrawer() {
             <DrawerMenuItem
               to="/accountant"
               icon={<TableIcon />}
-              text="Partie Comptable"
+              text="Gestion des factures"
             />
             <DrawerMenuItem
               to="/accountant/category"

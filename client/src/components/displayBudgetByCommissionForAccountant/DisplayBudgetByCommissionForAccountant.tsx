@@ -1,15 +1,14 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Slider from "@mui/material/Slider";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
+// import Slider from "@mui/material/Slider";
+// import FormControlLabel from "@mui/material/FormControlLabel";
+// import Checkbox from "@mui/material/Checkbox";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
 
 function DisplayBudgetByCommissionForAccountant() {
-  const [seriesNb, setSeriesNb] = React.useState(7);
-  const [skipAnimation, setSkipAnimation] = React.useState(false);
+  // const [seriesNb, setSeriesNb] = React.useState(7);
+  // const [skipAnimation, setSkipAnimation] = React.useState(false);
 
   const { data, loading, error } = useGetBudgetOverviewQuery();
 
@@ -32,12 +31,12 @@ function DisplayBudgetByCommissionForAccountant() {
     data: [budget.amount],
   }));
 
-  const handleSeriesNbChange = (_: Event, newValue: number | number[]) => {
-    if (typeof newValue !== "number") {
-      return;
-    }
-    setSeriesNb(newValue);
-  };
+  // const handleSeriesNbChange = (_: Event, newValue: number | number[]) => {
+  //   if (typeof newValue !== "number") {
+  //     return;
+  //   }
+  //   setSeriesNb(newValue);
+  // };
 
   const predefinedColors = [
     "#018571",
@@ -64,8 +63,8 @@ function DisplayBudgetByCommissionForAccountant() {
       </Typography>
       <BarChart
         height={600}
-        series={series.slice(0, seriesNb)}
-        skipAnimation={skipAnimation}
+        series={series.slice(0, 7)}
+        // skipAnimation={skipAnimation}
         colors={colors}
         sx={{
           "& .MuiLegend-root": {
@@ -80,7 +79,7 @@ function DisplayBudgetByCommissionForAccountant() {
           },
         }}
       />
-      <FormControlLabel
+      {/* <FormControlLabel
         checked={skipAnimation}
         control={
           <Checkbox
@@ -100,7 +99,7 @@ function DisplayBudgetByCommissionForAccountant() {
         min={1}
         max={series.length}
         aria-labelledby="input-series-number"
-      />
+      /> */}
     </Box>
   );
 }
