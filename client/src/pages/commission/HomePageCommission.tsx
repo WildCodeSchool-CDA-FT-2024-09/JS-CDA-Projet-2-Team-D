@@ -87,7 +87,6 @@ const HomePageCommission = () => {
   if (budgetError || invoiceError || userError)
     return (
       <Typography>
-        Erreur :{" "}
         {budgetError?.message || invoiceError?.message || userError?.message}
       </Typography>
     );
