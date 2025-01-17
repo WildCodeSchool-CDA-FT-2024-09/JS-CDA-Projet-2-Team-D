@@ -15,6 +15,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import PriceInput from "../../components/form/PriceInput";
 import BtnUpload from "../../components/BtnUpload";
 import FormSelect from "../../components/form/FormSelect";
 import FormTextField from "../../components/form/FormTextField";
@@ -379,11 +380,8 @@ const InvoiceForm: React.FC = () => {
             onChange={handleInvoiceChange}
           />
           <Grid size={isMobile ? 12 : 6}>
-            <FormTextField
-              name="price_without_vat"
-              label="Prix HT"
-              type="number"
-              value={invoice.price_without_vat.toString()}
+            <PriceInput
+              value={invoice.price_without_vat}
               onChange={handleInvoiceChange}
               required={true}
             />
