@@ -176,6 +176,14 @@ export const UPDATE_STATUS_INVOICE = gql`
   }
 `;
 
+export const REJECT_INVOICE = gql`
+  mutation RejectInvoice($invoiceId: Float!) {
+    rejectInvoice(invoiceId: $invoiceId) {
+      id
+    }
+  }
+`;
+
 export const ASSOCIATED_BANK_ACCOUNT_TO_INVOICE = gql`
   mutation AssociateBankAccountToInvoice(
     $invoiceId: Float!
