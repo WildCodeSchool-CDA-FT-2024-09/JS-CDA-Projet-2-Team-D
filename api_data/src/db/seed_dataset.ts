@@ -236,17 +236,6 @@ import { AppDataSource } from "./data-source";
         ('Budget 2024',	'2024-01-01 00:00:00', '2024-12-31 00:00:00');
       `);
 
-    // insert exercise (school year)
-    // await queryRunner.query(`
-    //   INSERT INTO "exercise" ("label", "start_date", "end_date") VALUES
-    //     ('Budget 2019', '2019-09-01 00:00:00', '2020-08-31 00:00:00'),
-    //     ('Budget 2020', '2020-09-01 00:00:00', '2021-08-31 00:00:00'),
-    //     ('Budget 2021', '2021-09-01 00:00:00', '2022-08-31 00:00:00'),
-    //     ('Budget 2022',	'2022-09-01 00:00:00', '2023-08-31 00:00:00'),
-    //     ('Budget 2023',	'2023-09-01 00:00:00', '2024-08-31 00:00:00'),
-    //     ('Budget 2024',	'2024-09-01 00:00:00', '2025-08-31 00:00:00');
-    // `);
-
     // insert invoices
     await queryRunner.query(`
       INSERT INTO invoice (
@@ -295,24 +284,6 @@ import { AppDataSource } from "./data-source";
       JOIN vat v ON v.rate = ci.vat;
     `);
 
-    // insert budget
-    // await queryRunner.query(`
-    //   INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
-    //   SELECT DISTINCT
-    //       e.id as "exerciseId",
-    //       c.id as "commissionId",
-    //       0.0 as "amount"
-    //   FROM exercise e
-    //   CROSS JOIN commission c -- the cross join combines all of the rows from the first table with all of the rows from the second table
-    //   WHERE EXISTS (
-    //       SELECT 1 -- performance optimization, we don't care about the result, we only want to know if there is at least one invoice
-    //       FROM invoice i
-    //       WHERE i."commissionId" = c.id
-    //       AND i.date >= e.start_date
-    //       AND i.date <= e.end_date
-    //   )
-    // `);
-
     await queryRunner.query(`
       INSERT INTO "budget" ("exerciseId", "commissionId", "amount")
       SELECT
@@ -332,6 +303,22 @@ import { AppDataSource } from "./data-source";
       LEFT JOIN vat v ON v.id = i."vatId"
       LEFT JOIN credit_debit cd ON cd.id = i."creditDebitId"
       GROUP BY e.id, c.id
+    `);
+
+    // Calculate bank accounts balances
+    await queryRunner.query(`
+      UPDATE bank_account
+      SET balance = subquery.balance
+      FROM (
+          SELECT
+              "bankAccountId",
+              SUM(CASE WHEN "creditDebitId" = 1 THEN "amount_with_vat" ELSE -"amount_with_vat" END) AS balance
+          FROM
+              invoice
+          GROUP BY
+              "bankAccountId"
+      ) AS subquery
+      WHERE id = subquery."bankAccountId";
     `);
 
     await queryRunner.commitTransaction();
