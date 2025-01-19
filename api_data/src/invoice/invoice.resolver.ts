@@ -1,5 +1,6 @@
 import { Resolver, Query, Arg, Authorized, Mutation } from "type-graphql";
 import { Invoice } from "./invoice.entity";
+import { RejectInvoiceResponse } from "./rejectInvoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
 import { Vat } from "../vat/vat.entity";
@@ -327,44 +328,37 @@ export default class InvoiceResolver {
   }
 
   @Authorized(["2"])
-  @Mutation(() => Invoice)
-  async rejectInvoice(@Arg("invoiceId") invoiceId: number): Promise<Invoice> {
+  @Mutation(() => RejectInvoiceResponse)
+  async rejectInvoice(
+    @Arg("invoiceId") invoiceId: number,
+    @Arg("reason", { nullable: true }) reason?: string
+  ): Promise<RejectInvoiceResponse> {
     try {
       const invoice = await Invoice.findOne({
         where: { id: invoiceId },
-        relations: [
-          "bankAccount",
-          "subcategory",
-          "creditDebit",
-          "commission",
-          "status",
-          "vat",
-          "user",
-        ],
+        relations: ["status", "user"],
       });
       if (!invoice) {
         throw new Error("Facture non trouvée.");
       }
+
       if (invoice.status.id === 3) {
         throw new Error("La facture a déjà été refusée.");
       }
-      const status = await Status.findOne({
-        where: { id: 3 },
-      });
+
+      const status = await Status.findOne({ where: { id: 3 } });
       if (!status) {
         throw new Error("Statut non trouvé.");
       }
 
+      let emailSent = false;
       if (invoice.user.email) {
-        const emailSucessToComission = await sendEmailToCommission(
+        emailSent = await sendEmailToCommission(
           invoice.user.email,
           invoice.user.firstname,
-          invoice.user.lastname
+          invoice.user.lastname,
+          reason || "Aucune raison donnée."
         );
-
-        if (!emailSucessToComission) {
-          console.warn("Erreur lors de l'envoi de l'email à la commission.");
-        }
       } else {
         console.warn(
           "Impossible d'envoyer l'email à la commission, l'utilisateur n'a pas d'email."
@@ -373,9 +367,17 @@ export default class InvoiceResolver {
 
       invoice.status = status;
       await invoice.save();
-      return invoice;
+
+      return {
+        id: invoice.id,
+        reason: reason || "Aucune raison donnée.",
+        emailSent,
+      };
     } catch (error) {
-      console.error("Erreur lors du rejet de la facture:", error);
+      console.error(
+        "Erreur lors du rejet de la facture:",
+        error instanceof Error ? error.message : error
+      );
       throw new Error("Impossible de rejeter la facture.");
     }
   }

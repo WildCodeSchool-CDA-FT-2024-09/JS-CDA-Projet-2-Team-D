@@ -161,7 +161,7 @@ export type Mutation = {
   createNewUser: User;
   login: LoginResponse;
   logout: Scalars["String"]["output"];
-  rejectInvoice: Invoice;
+  rejectInvoice: RejectInvoiceResponse;
   requestPasswordReset: Scalars["Boolean"]["output"];
   resetPassword: Scalars["Boolean"]["output"];
   restoreUser: RestoreResponseStatus;
@@ -206,6 +206,7 @@ export type MutationLoginArgs = {
 
 export type MutationRejectInvoiceArgs = {
   invoiceId: Scalars["Float"]["input"];
+  reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationRequestPasswordResetArgs = {
@@ -342,6 +343,12 @@ export type QueryGetUserByIdArgs = {
 export type QueryGetUsersArgs = {
   limit?: Scalars["Int"]["input"];
   offset?: Scalars["Int"]["input"];
+};
+
+export type RejectInvoiceResponse = {
+  __typename?: "RejectInvoiceResponse";
+  id: Scalars["Int"]["output"];
+  reason: Scalars["String"]["output"];
 };
 
 export type RestoreResponseStatus = {
@@ -613,11 +620,16 @@ export type UpdateStatusInvoiceMutation = {
 
 export type RejectInvoiceMutationVariables = Exact<{
   invoiceId: Scalars["Float"]["input"];
+  reason: Scalars["String"]["input"];
 }>;
 
 export type RejectInvoiceMutation = {
   __typename?: "Mutation";
-  rejectInvoice: { __typename?: "Invoice"; id: number };
+  rejectInvoice: {
+    __typename?: "RejectInvoiceResponse";
+    id: number;
+    reason: string;
+  };
 };
 
 export type AssociateBankAccountToInvoiceMutationVariables = Exact<{
@@ -1796,9 +1808,10 @@ export type UpdateStatusInvoiceMutationOptions = Apollo.BaseMutationOptions<
   UpdateStatusInvoiceMutationVariables
 >;
 export const RejectInvoiceDocument = gql`
-  mutation RejectInvoice($invoiceId: Float!) {
-    rejectInvoice(invoiceId: $invoiceId) {
+  mutation RejectInvoice($invoiceId: Float!, $reason: String!) {
+    rejectInvoice(invoiceId: $invoiceId, reason: $reason) {
       id
+      reason
     }
   }
 `;
@@ -1821,6 +1834,7 @@ export type RejectInvoiceMutationFn = Apollo.MutationFunction<
  * const [rejectInvoiceMutation, { data, loading, error }] = useRejectInvoiceMutation({
  *   variables: {
  *      invoiceId: // value for 'invoiceId'
+ *      reason: // value for 'reason'
  *   },
  * });
  */

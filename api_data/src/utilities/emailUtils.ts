@@ -64,7 +64,8 @@ export async function sendResetPasswordEmail(
 export async function sendEmailToCommission(
   email: string,
   firstname: string,
-  lastname: string
+  lastname: string,
+  reason?: string
 ): Promise<boolean> {
   try {
     const response = await fetch(
@@ -76,6 +77,7 @@ export async function sendEmailToCommission(
           recipient: email,
           subject: "ClubCompta - Facture refusée",
           fullname: `${firstname} ${lastname}`,
+          reason: reason ? ` ${reason}` : "",
         }),
       }
     );

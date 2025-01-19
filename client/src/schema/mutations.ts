@@ -177,9 +177,10 @@ export const UPDATE_STATUS_INVOICE = gql`
 `;
 
 export const REJECT_INVOICE = gql`
-  mutation RejectInvoice($invoiceId: Float!) {
-    rejectInvoice(invoiceId: $invoiceId) {
+  mutation RejectInvoice($invoiceId: Float!, $reason: String!) {
+    rejectInvoice(invoiceId: $invoiceId, reason: $reason) {
       id
+      reason
     }
   }
 `;
