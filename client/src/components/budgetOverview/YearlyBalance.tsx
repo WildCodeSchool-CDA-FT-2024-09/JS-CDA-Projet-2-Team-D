@@ -1,12 +1,13 @@
-import { BarChart } from "@mui/x-charts/BarChart";
-import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { useGetYearlyInvoiceSummaryQuery } from "../../types/graphql-types";
 import { currencySignValueFormatter } from "../../utils/chartsUtils";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { axisClasses } from "@mui/x-charts/ChartsAxis";
+import { Box } from "@mui/system";
 
 const chartSetting = {
   width: 800,
   height: 300,
-  margin: { left: 200 },
+  // margin: { left: 10 },
   sx: {
     [`.${axisClasses.left} .${axisClasses.label}`]: {
       transform: "translate(-20px, 0)",
@@ -22,39 +23,41 @@ function YearlyBalance() {
 
   return (
     <>
-      <BarChart
-        dataset={data?.getYearlyInvoiceSummary}
-        xAxis={[{ scaleType: "band", dataKey: "year" }]}
-        yAxis={[
-          {
-            scaleType: "linear",
-            dataKey: "balance",
-            valueFormatter: (value: number) =>
-              new Intl.NumberFormat("fr-FR", {
-                style: "currency",
-                currency: "EUR",
-              }).format(value),
-          },
-        ]}
-        series={[
-          {
-            dataKey: "total_credits",
-            label: "Crédit",
-            valueFormatter: currencySignValueFormatter,
-          },
-          {
-            dataKey: "total_debits",
-            label: "Débit",
-            valueFormatter: currencySignValueFormatter,
-          },
-          {
-            dataKey: "balance",
-            label: "Balance",
-            valueFormatter: currencySignValueFormatter,
-          },
-        ]}
-        {...chartSetting}
-      />
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <BarChart
+          dataset={data?.getYearlyInvoiceSummary}
+          xAxis={[{ scaleType: "band", dataKey: "year" }]}
+          yAxis={[
+            {
+              scaleType: "linear",
+              dataKey: "balance",
+              valueFormatter: (value: number) =>
+                new Intl.NumberFormat("fr-FR", {
+                  style: "currency",
+                  currency: "EUR",
+                }).format(value),
+            },
+          ]}
+          series={[
+            {
+              dataKey: "total_credits",
+              label: "Crédit",
+              valueFormatter: currencySignValueFormatter,
+            },
+            {
+              dataKey: "total_debits",
+              label: "Débit",
+              valueFormatter: currencySignValueFormatter,
+            },
+            {
+              dataKey: "balance",
+              label: "Balance",
+              valueFormatter: currencySignValueFormatter,
+            },
+          ]}
+          {...chartSetting}
+        />
+      </Box>
     </>
   );
 }

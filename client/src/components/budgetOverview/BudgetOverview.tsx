@@ -83,6 +83,7 @@ const BudgetOverview: React.FC = () => {
         />
       </article>
       <article style={{ textAlign: "center" }}>
+        <h2>Etats des exercises annuels</h2>
         <YearlyBalance />
       </article>
     </>
