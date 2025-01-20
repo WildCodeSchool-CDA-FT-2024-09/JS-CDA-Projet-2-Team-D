@@ -142,6 +142,14 @@ export type Invoice = {
   vat: Vat;
 };
 
+export type InvoiceYearlySummary = {
+  __typename?: "InvoiceYearlySummary";
+  balance: Scalars["Float"]["output"];
+  total_credits: Scalars["Float"]["output"];
+  total_debits: Scalars["Float"]["output"];
+  year: Scalars["Int"]["output"];
+};
+
 export type LoginResponse = {
   __typename?: "LoginResponse";
   email: Scalars["String"]["output"];
@@ -302,6 +310,7 @@ export type Query = {
   getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
+  getYearlyInvoiceSummary: Array<InvoiceYearlySummary>;
 };
 
 export type QueryGetCurrentBudgetByCommissionIdArgs = {
@@ -1076,6 +1085,21 @@ export type GetExerciseByIdQuery = {
     start_date: string;
     end_date: string;
   };
+};
+
+export type GetYearlyInvoiceSummaryQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetYearlyInvoiceSummaryQuery = {
+  __typename?: "Query";
+  getYearlyInvoiceSummary: Array<{
+    __typename?: "InvoiceYearlySummary";
+    year: number;
+    total_debits: number;
+    total_credits: number;
+    balance: number;
+  }>;
 };
 
 export const AddCategoryDocument = gql`
@@ -3853,6 +3877,86 @@ export type GetExerciseByIdQueryResult = Apollo.QueryResult<
   GetExerciseByIdQuery,
   GetExerciseByIdQueryVariables
 >;
+export const GetYearlyInvoiceSummaryDocument = gql`
+  query GetYearlyInvoiceSummary {
+    getYearlyInvoiceSummary {
+      year
+      total_debits
+      total_credits
+      balance
+    }
+  }
+`;
+
+/**
+ * __useGetYearlyInvoiceSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetYearlyInvoiceSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetYearlyInvoiceSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetYearlyInvoiceSummaryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetYearlyInvoiceSummaryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export function useGetYearlyInvoiceSummaryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export function useGetYearlyInvoiceSummarySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetYearlyInvoiceSummaryQuery,
+        GetYearlyInvoiceSummaryQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export type GetYearlyInvoiceSummaryQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummaryQuery
+>;
+export type GetYearlyInvoiceSummaryLazyQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummaryLazyQuery
+>;
+export type GetYearlyInvoiceSummarySuspenseQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummarySuspenseQuery
+>;
+export type GetYearlyInvoiceSummaryQueryResult = Apollo.QueryResult<
+  GetYearlyInvoiceSummaryQuery,
+  GetYearlyInvoiceSummaryQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -3874,6 +3978,7 @@ export const namedOperations = {
     GetExerciseBudgets: "GetExerciseBudgets",
     GetInvoicesByExercise: "GetInvoicesByExercise",
     GetExerciseById: "GetExerciseById",
+    GetYearlyInvoiceSummary: "GetYearlyInvoiceSummary",
   },
   Mutation: {
     AddCategory: "AddCategory",

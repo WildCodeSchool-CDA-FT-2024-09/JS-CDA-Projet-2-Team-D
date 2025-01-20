@@ -16,7 +16,7 @@ import ManageCategory from "./pages/accountant/category/ManageCategory.tsx";
 import Invoice from "./pages/commission/Invoice.tsx";
 import Login from "./pages/Login.tsx";
 import BankAccount from "./pages/administrator/bank/BankAccount.tsx";
-import BudgetOverview from "./components/budgetOverview/BudgetOverview.tsx";
+import HomePageAdministrator from "./pages/administrator/HomePageAdministrator.tsx";
 import HomePageAccountant from "./pages/accountant/HomePageAccountant.tsx";
 import SetupBudgets from "./pages/administrator/exercise/SetupBudgets.tsx";
 import InvoiceOverview from "./pages/administrator/invoice/InvoiceOverview.tsx";
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <BudgetOverview />,
+            element: <HomePageAdministrator />,
           },
           {
             path: "invoiceOverview",

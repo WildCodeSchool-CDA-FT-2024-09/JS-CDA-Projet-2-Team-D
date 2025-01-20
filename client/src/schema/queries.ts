@@ -412,3 +412,14 @@ export const GET_EXERCISE_BY_ID = gql`
     }
   }
 `;
+
+export const GET_YEARLY_BALANCES = gql`
+  query GetYearlyInvoiceSummary {
+    getYearlyInvoiceSummary {
+      year
+      total_debits
+      total_credits
+      balance
+    }
+  }
+`;

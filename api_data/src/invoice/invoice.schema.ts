@@ -20,10 +20,10 @@ export class InvoiceInput {
   @Field()
   date: Date;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   receipt?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   info?: string | null;
 
   @Field(() => Int)
@@ -97,4 +97,19 @@ export class Invoice {
 
   @Field(() => Int)
   amount_with_vat: number;
+}
+
+@ObjectType()
+export class InvoiceYearlySummary {
+  @Field(() => Int)
+  year: number;
+
+  @Field(() => Float)
+  total_debits: number;
+
+  @Field(() => Float)
+  total_credits: number;
+
+  @Field(() => Float)
+  balance: number;
 }
