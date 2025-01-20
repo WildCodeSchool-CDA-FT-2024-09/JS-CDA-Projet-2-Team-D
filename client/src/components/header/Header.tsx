@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Avatar from "../avatar/Avatar";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useUser } from "../../hooks/useUser";
-import UserBar from "../UserBar";
+import UserMenu from "../UserMenu";
 
 const roleMapping: { [key: string]: string } = {
   1: "Administrateur",
@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
               gap: isMobile ? "8px" : "16px",
             }}
           >
-            <UserBar />
+            <UserMenu />
             <Box
               sx={{
                 flexGrow: 0,
