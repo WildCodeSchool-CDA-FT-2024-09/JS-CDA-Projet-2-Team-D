@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetInvoiceByIdQuery,
@@ -7,6 +7,7 @@ import {
   useGetBanksQuery,
   Bank,
   useUpdateBalanceMutation,
+  useRejectInvoiceMutation,
 } from "../../types/graphql-types";
 import {
   TextField,
@@ -21,6 +22,7 @@ import {
   Snackbar,
   Alert,
   AlertTitle,
+  Modal,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -30,6 +32,7 @@ import fr from "date-fns/locale/fr";
 import UploadFileTwoToneIcon from "@mui/icons-material/UploadFileTwoTone";
 import AddBankAccount from "../../components/addBankAccount/AddBankAccount";
 import useNotification from "../../hooks/useNotification";
+import { Box } from "@mui/system";
 
 function DetailInvoice() {
   const navigate = useNavigate();
@@ -56,6 +59,13 @@ function DetailInvoice() {
 
   const [updateBalanceMutation, { error: updateBalanceError }] =
     useUpdateBalanceMutation();
+
+  const [rejectInvoiceMutation, { error: rejectInvoiceError }] =
+    useRejectInvoiceMutation();
+
+  const [open, setOpen] = useState(false);
+
+  const [reason, setReason] = useState("");
 
   const { data: bankData } = useGetBanksQuery();
   useEffect(() => {
@@ -118,11 +128,11 @@ function DetailInvoice() {
     return <p>No data</p>;
   }
 
-  if (updateBalanceError) {
+  if (rejectInvoiceError) {
     return (
       <div>
         <p>Error :(</p>
-        <pre>{JSON.stringify(updateBalanceError, null, 2)}</pre>
+        <pre>{JSON.stringify(rejectInvoiceError, null, 2)}</pre>
       </div>
     );
   }
@@ -183,6 +193,37 @@ function DetailInvoice() {
   } else {
     totalPrice = 0;
   }
+
+  const handleRejectInvoice = async () => {
+    try {
+      const response = await rejectInvoiceMutation({
+        variables: {
+          invoiceId: invoice.id,
+          reason,
+        },
+      });
+      if (response.data?.rejectInvoice.reason) {
+        notifySuccess("Facture refusée avec succès et email envoyé");
+      } else {
+        notifySuccess(
+          "Facture refusée avec succès, mais l'email n'a pas pu être envoyé",
+        );
+      }
+
+      navigate("/accountant");
+    } catch {
+      notifyError("Erreur lors du refus de la facture");
+    }
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const addAReason = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setReason(e.target.value);
+  };
 
   return (
     <Paper
@@ -399,9 +440,48 @@ function DetailInvoice() {
                 variant="contained"
                 color="error"
                 sx={{ fontWeight: "bold", fontSize: "1rem" }}
+                onClick={handleOpen}
               >
                 Refuser la facture
               </Button>
+              <Modal open={open} onClose={handleClose}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: 500,
+                    bgcolor: "background.paper",
+                    border: "2px solid #000",
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography variant="h6" component="h2">
+                    Ajoutez une raison pour ce refus
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    label="Raison du refus"
+                    type="email"
+                    variant="outlined"
+                    margin="normal"
+                    multiline
+                    rows={4}
+                    onChange={(e) => addAReason(e)}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleRejectInvoice()}
+                    sx={{ mt: 2 }}
+                  >
+                    Envoyer l'email
+                  </Button>
+                </Box>
+              </Modal>
             </Grid>
           </Grid>
         </Grid>

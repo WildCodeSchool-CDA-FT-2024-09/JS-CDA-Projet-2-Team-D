@@ -169,6 +169,7 @@ export type Mutation = {
   createNewUser: User;
   login: LoginResponse;
   logout: Scalars["String"]["output"];
+  rejectInvoice: RejectInvoiceResponse;
   requestPasswordReset: Scalars["Boolean"]["output"];
   resetPassword: Scalars["Boolean"]["output"];
   restoreUser: RestoreResponseStatus;
@@ -209,6 +210,11 @@ export type MutationCreateNewUserArgs = {
 export type MutationLoginArgs = {
   email: Scalars["String"]["input"];
   password: Scalars["String"]["input"];
+};
+
+export type MutationRejectInvoiceArgs = {
+  invoiceId: Scalars["Float"]["input"];
+  reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationRequestPasswordResetArgs = {
@@ -346,6 +352,12 @@ export type QueryGetUserByIdArgs = {
 export type QueryGetUsersArgs = {
   limit?: Scalars["Int"]["input"];
   offset?: Scalars["Int"]["input"];
+};
+
+export type RejectInvoiceResponse = {
+  __typename?: "RejectInvoiceResponse";
+  id: Scalars["Int"]["output"];
+  reason: Scalars["String"]["output"];
 };
 
 export type RestoreResponseStatus = {
@@ -612,6 +624,20 @@ export type UpdateStatusInvoiceMutation = {
     __typename?: "Invoice";
     id: number;
     status: { __typename?: "Status"; id: number };
+  };
+};
+
+export type RejectInvoiceMutationVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+  reason: Scalars["String"]["input"];
+}>;
+
+export type RejectInvoiceMutation = {
+  __typename?: "Mutation";
+  rejectInvoice: {
+    __typename?: "RejectInvoiceResponse";
+    id: number;
+    reason: string;
   };
 };
 
@@ -1804,6 +1830,58 @@ export type UpdateStatusInvoiceMutationResult =
 export type UpdateStatusInvoiceMutationOptions = Apollo.BaseMutationOptions<
   UpdateStatusInvoiceMutation,
   UpdateStatusInvoiceMutationVariables
+>;
+export const RejectInvoiceDocument = gql`
+  mutation RejectInvoice($invoiceId: Float!, $reason: String!) {
+    rejectInvoice(invoiceId: $invoiceId, reason: $reason) {
+      id
+      reason
+    }
+  }
+`;
+export type RejectInvoiceMutationFn = Apollo.MutationFunction<
+  RejectInvoiceMutation,
+  RejectInvoiceMutationVariables
+>;
+
+/**
+ * __useRejectInvoiceMutation__
+ *
+ * To run a mutation, you first call `useRejectInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRejectInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [rejectInvoiceMutation, { data, loading, error }] = useRejectInvoiceMutation({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *      reason: // value for 'reason'
+ *   },
+ * });
+ */
+export function useRejectInvoiceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RejectInvoiceMutation,
+    RejectInvoiceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RejectInvoiceMutation,
+    RejectInvoiceMutationVariables
+  >(RejectInvoiceDocument, options);
+}
+export type RejectInvoiceMutationHookResult = ReturnType<
+  typeof useRejectInvoiceMutation
+>;
+export type RejectInvoiceMutationResult =
+  Apollo.MutationResult<RejectInvoiceMutation>;
+export type RejectInvoiceMutationOptions = Apollo.BaseMutationOptions<
+  RejectInvoiceMutation,
+  RejectInvoiceMutationVariables
 >;
 export const AssociateBankAccountToInvoiceDocument = gql`
   mutation AssociateBankAccountToInvoice(
@@ -3916,6 +3994,7 @@ export const namedOperations = {
     CreateNewExercise: "CreateNewExercise",
     SetCommissionBudgetAmount: "SetCommissionBudgetAmount",
     UpdateStatusInvoice: "UpdateStatusInvoice",
+    RejectInvoice: "RejectInvoice",
     AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",

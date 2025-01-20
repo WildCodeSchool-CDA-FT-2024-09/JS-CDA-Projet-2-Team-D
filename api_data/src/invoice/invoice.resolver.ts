@@ -3,6 +3,7 @@ import { Equal } from "typeorm";
 import { Between } from "typeorm";
 import redisClient from "../../redis.config";
 import { Invoice } from "./invoice.entity";
+import { RejectInvoiceResponse } from "./rejectInvoice.entity";
 import { Subcategory } from "../subcategory/subcategory.entity";
 import { Status } from "../status/status.entity";
 import { Vat } from "../vat/vat.entity";
@@ -13,6 +14,7 @@ import { User } from "../user/user.entity";
 import { Exercise } from "../exercise/exercise.entity";
 import { PaginatedInvoices } from "./paginatedInvoice.type";
 import { InvoiceYearlySummary } from "./invoice.schema";
+import { sendEmailToCommission } from "../utilities/emailUtils";
 
 @Resolver(Invoice)
 export default class InvoiceResolver {
@@ -367,6 +369,61 @@ export default class InvoiceResolver {
     } catch (error) {
       console.error("Error getting the yearly balances. ", error);
       throw new Error("Impossible de récupérer les balances par années.");
+    }
+  }
+
+  @Authorized(["2"])
+  @Mutation(() => RejectInvoiceResponse)
+  async rejectInvoice(
+    @Arg("invoiceId") invoiceId: number,
+    @Arg("reason", { nullable: true }) reason?: string
+  ): Promise<RejectInvoiceResponse> {
+    try {
+      const invoice = await Invoice.findOne({
+        where: { id: invoiceId },
+        relations: ["status", "user"],
+      });
+      if (!invoice) {
+        throw new Error("Facture non trouvée.");
+      }
+
+      if (invoice.status.id === 3) {
+        throw new Error("La facture a déjà été refusée.");
+      }
+
+      const status = await Status.findOne({ where: { id: 3 } });
+      if (!status) {
+        throw new Error("Statut non trouvé.");
+      }
+
+      let emailSent = false;
+      if (invoice.user.email) {
+        emailSent = await sendEmailToCommission(
+          invoice.user.email,
+          invoice.user.firstname,
+          invoice.user.lastname,
+          reason || "Aucune raison donnée."
+        );
+      } else {
+        console.warn(
+          "Impossible d'envoyer l'email à la commission, l'utilisateur n'a pas d'email."
+        );
+      }
+
+      invoice.status = status;
+      await invoice.save();
+
+      return {
+        id: invoice.id,
+        reason: reason || "Aucune raison donnée.",
+        emailSent,
+      };
+    } catch (error) {
+      console.error(
+        "Erreur lors du rejet de la facture:",
+        error instanceof Error ? error.message : error
+      );
+      throw new Error("Impossible de rejeter la facture.");
     }
   }
 }

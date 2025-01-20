@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ClubCompta - Demande d'informations complémentaires</title>
     <style>
       body {
@@ -16,12 +18,17 @@
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       h1 {
         color: #333;
       }
+      h3 {
+        color: #555;
+      }
       p {
         color: #555;
+        line-height: 1.6;
       }
       .footer {
         margin-top: 20px;
@@ -36,10 +43,16 @@
       <h1>ClubCompta</h1>
       <h3>Bonjour <%= fullname %>,</h3>
       <p>
-        Nous avons besoin de plus d'informations sur la facture
-        <b><%= invoiceNumber %></b>. Merci de nous envoyer un justificatif.
+        Nous avons besoin de plus d'informations concernant la facture
+        <b><%= invoiceNumber %></b>.
+        <% if (reason) { %>
+          <br /><strong>Motif supplémentaire :</strong> <%= reason %>
+        <% } %>
+        Merci de nous transmettre un justificatif dès que possible.
       </p>
-      <div class="footer">&copy; 2025 ClubCompta</div>
+      <div class="footer">
+        &copy; 2025 ClubCompta - Tous droits réservés.
+      </div>
     </div>
   </body>
 </html>
