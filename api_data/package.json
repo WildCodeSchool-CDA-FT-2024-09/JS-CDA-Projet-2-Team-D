@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config ./jest.config.ts",
+    "test": "ts-node-dev ./src/db/seed_dataset.ts && jest --config ./jest.config.ts",
     "lint": "eslint '*/**/*.{js,jsx,ts,tsx}'",
     "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'",
     "compile": "tsc",

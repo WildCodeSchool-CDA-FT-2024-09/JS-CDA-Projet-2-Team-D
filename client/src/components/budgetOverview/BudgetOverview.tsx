@@ -1,17 +1,8 @@
 import React from "react";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
 import { PieChart } from "@mui/x-charts/PieChart";
+import { colors } from "../../utils/chartColors";
 import { Paper, useMediaQuery, useTheme } from "@mui/material";
-
-const colors = [
-  "#018571",
-  "#DFC27D",
-  "#80CDC1",
-  "#EA452F",
-  "#7570B3",
-  "#A6611A",
-  "#0F2080",
-];
 
 const BudgetOverview: React.FC = () => {
   const theme = useTheme();

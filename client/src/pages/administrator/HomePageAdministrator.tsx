@@ -1,5 +1,6 @@
 import BudgetOverview from "../../components/budgetOverview/BudgetOverview";
 import YearlyBalance from "../../components/budgetOverview/YearlyBalance";
+import DisplayBalanceBankAccountForAdmin from "../../components/displayBalanceBankAccountForAdmin/displayBalanceBankAccountForAdmin";
 import {
   CommissionDistribution,
   RoleDistribution,
@@ -11,6 +12,7 @@ function HomePageAdministrator() {
     <>
       <BudgetOverview />
       <YearlyBalance />
+      <DisplayBalanceBankAccountForAdmin />
       <Grid
         container
         spacing={2}
