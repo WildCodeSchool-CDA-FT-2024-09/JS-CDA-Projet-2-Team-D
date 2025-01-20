@@ -18,6 +18,7 @@ import {
   Button,
   Checkbox,
   FormControl,
+  FormHelperText,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -87,16 +88,16 @@ export default function UserForm({ mode }: UserFormProps) {
   useEffect(() => {
     if (isUpdateMode && data?.getUserById) {
       const userData = data.getUserById;
-      setValue("firstname", userData.firstname || "");
-      setValue("lastname", userData.lastname || "");
-      setValue("email", userData.email || "");
-
-      // Set roles and commissions
-      const userRoles = userData.roles?.map((role) => role.label) || [];
       const userCommissions =
         userData.commissions?.map((comm) => comm.name) || [];
 
-      setRoles(userRoles);
+      setValue("firstname", userData.firstname || "");
+      setValue("lastname", userData.lastname || "");
+      setValue("email", userData.email || "");
+      setValue("roles", userData.roles?.map((role) => role.label) || []);
+      setValue("commissions", userCommissions, { shouldValidate: true });
+
+      setRoles(userData.roles?.map((role) => role.label) || []);
       setCommissions(userCommissions);
     }
   }, [data, setValue, isUpdateMode]);
@@ -121,7 +122,10 @@ export default function UserForm({ mode }: UserFormProps) {
       typeof value === "string" ? value.split(",") : value;
 
     // Update the form field value and trigger validation immediately
-    setValue("commissions", selectedCommissions);
+    setValue("commissions", selectedCommissions, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
 
     // Trigger validation
     await trigger("commissions");
@@ -327,8 +331,8 @@ export default function UserForm({ mode }: UserFormProps) {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            Il est possible d'associer un utilisateur à une ou plusieurs
-            commissions.
+            Il est obligatoire d'associer un utilisateur à au moins une
+            commission.
           </Grid>
           <Grid size={12}>
             <FormControl sx={{ width: "100%" }}>
@@ -356,9 +360,9 @@ export default function UserForm({ mode }: UserFormProps) {
                   ))}
               </Select>
               {errors.commissions && (
-                <p style={{ color: "red", margin: "4px 14px 0" }}>
+                <FormHelperText error>
                   {errors.commissions.message}
-                </p>
+                </FormHelperText>
               )}
             </FormControl>
           </Grid>
