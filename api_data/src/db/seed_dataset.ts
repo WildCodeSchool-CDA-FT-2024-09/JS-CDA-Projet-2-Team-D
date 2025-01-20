@@ -312,7 +312,7 @@ import { AppDataSource } from "./data-source";
       FROM (
           SELECT
               "bankAccountId",
-              SUM(CASE WHEN "creditDebitId" = 1 THEN "amount_with_vat" ELSE -"amount_with_vat" END) AS balance
+              SUM(CASE WHEN "creditDebitId" = 1 THEN -"amount_with_vat" ELSE "amount_with_vat" END) AS balance
           FROM
               invoice
           GROUP BY
