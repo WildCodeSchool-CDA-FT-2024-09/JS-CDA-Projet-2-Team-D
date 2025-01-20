@@ -100,6 +100,7 @@ function App() {
                           flexGrow: 1,
                           p: 3,
                           mt: "4rem",
+                          width: "100%",
                         }}
                       >
                         <Outlet />
