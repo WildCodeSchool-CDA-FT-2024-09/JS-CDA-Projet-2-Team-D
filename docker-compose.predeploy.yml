@@ -32,7 +32,6 @@ services:
 
   predeploy-redis:
     image: redis
-    env_file: .env-predeploy
     container_name: redis_cache
     ports:
       - 6379:6379
