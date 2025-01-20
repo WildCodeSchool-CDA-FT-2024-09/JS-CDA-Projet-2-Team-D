@@ -11,7 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import UserRow from "../../../components/user/UserRow";
-import BtnPagination from "../../../components/BtnPagination";
+import BtnPagination from "../../../components/btnPagination/BtnPagination";
 
 export default function ManageUser() {
   const [page, setPage] = useState<number>(1);

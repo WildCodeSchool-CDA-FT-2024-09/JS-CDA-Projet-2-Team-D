@@ -24,7 +24,7 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import PageTitle from "../../components/PageTitle";
 import SearchBar from "../../components/SearchBar";
-import BtnPagination from "../../components/BtnPagination";
+import BtnPagination from "../../components/btnPagination/BtnPagination";
 
 const HomePageCommission = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
