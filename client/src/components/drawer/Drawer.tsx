@@ -58,7 +58,7 @@ function CustomDrawer() {
             <DrawerMenuItem
               to="/administrator"
               icon={<PieChartSharpIcon />}
-              text="Vue globale du budget"
+              text="Accueil administrateur"
               onClose={isMobile ? handleDrawerToggle : undefined}
             />
             <DrawerMenuItem

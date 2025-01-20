@@ -10,8 +10,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import Pagination from "@mui/material/Pagination";
 import UserRow from "../../../components/user/UserRow";
+import BtnPagination from "../../../components/BtnPagination";
 
 export default function ManageUser() {
   const [page, setPage] = useState<number>(1);
@@ -92,12 +92,10 @@ export default function ManageUser() {
             alignItems: "flex-end",
           }}
         >
-          <Pagination
-            count={totalPages}
+          <BtnPagination
             page={page}
-            onChange={handlePageChange}
-            showFirstButton
-            showLastButton
+            totalPages={totalPages}
+            handlePageChange={handlePageChange}
           />
         </Stack>
       </TableContainer>
