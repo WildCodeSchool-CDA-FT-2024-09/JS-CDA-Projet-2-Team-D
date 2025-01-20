@@ -460,7 +460,7 @@ function DetailInvoice() {
                   }}
                 >
                   <Typography variant="h6" component="h2">
-                    Ajoutez une raison relative à ce refus
+                    Ajoutez une raison pour ce refus
                   </Typography>
                   <TextField
                     fullWidth
@@ -478,7 +478,7 @@ function DetailInvoice() {
                     onClick={() => handleRejectInvoice()}
                     sx={{ mt: 2 }}
                   >
-                    Envoyer l'email de refus
+                    Envoyer l'email
                   </Button>
                 </Box>
               </Modal>
