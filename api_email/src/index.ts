@@ -21,10 +21,10 @@ app.get("/", (_, res: Response) => {
 });
 
 app.post("/send-email-invoice", async (req: Request, res: Response) => {
-  const { recipient, subject, fullname, invoiceNumber } = req.body;
+  const { recipient, subject, fullname, invoiceNumber, reason } = req.body;
 
   // Data for the template
-  const templateData = { fullname, invoiceNumber };
+  const templateData = { fullname, invoiceNumber, reason };
 
   // Render the email template
   const emailHtml = await ejs.renderFile(

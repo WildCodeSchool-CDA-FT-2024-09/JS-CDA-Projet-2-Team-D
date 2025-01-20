@@ -142,6 +142,14 @@ export type Invoice = {
   vat: Vat;
 };
 
+export type InvoiceYearlySummary = {
+  __typename?: "InvoiceYearlySummary";
+  balance: Scalars["Float"]["output"];
+  total_credits: Scalars["Float"]["output"];
+  total_debits: Scalars["Float"]["output"];
+  year: Scalars["Int"]["output"];
+};
+
 export type LoginResponse = {
   __typename?: "LoginResponse";
   email: Scalars["String"]["output"];
@@ -161,6 +169,7 @@ export type Mutation = {
   createNewUser: User;
   login: LoginResponse;
   logout: Scalars["String"]["output"];
+  rejectInvoice: RejectInvoiceResponse;
   requestPasswordReset: Scalars["Boolean"]["output"];
   resetPassword: Scalars["Boolean"]["output"];
   restoreUser: RestoreResponseStatus;
@@ -201,6 +210,11 @@ export type MutationCreateNewUserArgs = {
 export type MutationLoginArgs = {
   email: Scalars["String"]["input"];
   password: Scalars["String"]["input"];
+};
+
+export type MutationRejectInvoiceArgs = {
+  invoiceId: Scalars["Float"]["input"];
+  reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationRequestPasswordResetArgs = {
@@ -296,6 +310,7 @@ export type Query = {
   getUserById: User;
   getUsers: PaginatedUsers;
   getVats: Array<Vat>;
+  getYearlyInvoiceSummary: Array<InvoiceYearlySummary>;
 };
 
 export type QueryGetCurrentBudgetByCommissionIdArgs = {
@@ -337,6 +352,12 @@ export type QueryGetUserByIdArgs = {
 export type QueryGetUsersArgs = {
   limit?: Scalars["Int"]["input"];
   offset?: Scalars["Int"]["input"];
+};
+
+export type RejectInvoiceResponse = {
+  __typename?: "RejectInvoiceResponse";
+  id: Scalars["Int"]["output"];
+  reason: Scalars["String"]["output"];
 };
 
 export type RestoreResponseStatus = {
@@ -603,6 +624,20 @@ export type UpdateStatusInvoiceMutation = {
     __typename?: "Invoice";
     id: number;
     status: { __typename?: "Status"; id: number };
+  };
+};
+
+export type RejectInvoiceMutationVariables = Exact<{
+  invoiceId: Scalars["Float"]["input"];
+  reason: Scalars["String"]["input"];
+}>;
+
+export type RejectInvoiceMutation = {
+  __typename?: "Mutation";
+  rejectInvoice: {
+    __typename?: "RejectInvoiceResponse";
+    id: number;
+    reason: string;
   };
 };
 
@@ -1050,6 +1085,21 @@ export type GetExerciseByIdQuery = {
     start_date: string;
     end_date: string;
   };
+};
+
+export type GetYearlyInvoiceSummaryQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetYearlyInvoiceSummaryQuery = {
+  __typename?: "Query";
+  getYearlyInvoiceSummary: Array<{
+    __typename?: "InvoiceYearlySummary";
+    year: number;
+    total_debits: number;
+    total_credits: number;
+    balance: number;
+  }>;
 };
 
 export const AddCategoryDocument = gql`
@@ -1780,6 +1830,58 @@ export type UpdateStatusInvoiceMutationResult =
 export type UpdateStatusInvoiceMutationOptions = Apollo.BaseMutationOptions<
   UpdateStatusInvoiceMutation,
   UpdateStatusInvoiceMutationVariables
+>;
+export const RejectInvoiceDocument = gql`
+  mutation RejectInvoice($invoiceId: Float!, $reason: String!) {
+    rejectInvoice(invoiceId: $invoiceId, reason: $reason) {
+      id
+      reason
+    }
+  }
+`;
+export type RejectInvoiceMutationFn = Apollo.MutationFunction<
+  RejectInvoiceMutation,
+  RejectInvoiceMutationVariables
+>;
+
+/**
+ * __useRejectInvoiceMutation__
+ *
+ * To run a mutation, you first call `useRejectInvoiceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRejectInvoiceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [rejectInvoiceMutation, { data, loading, error }] = useRejectInvoiceMutation({
+ *   variables: {
+ *      invoiceId: // value for 'invoiceId'
+ *      reason: // value for 'reason'
+ *   },
+ * });
+ */
+export function useRejectInvoiceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RejectInvoiceMutation,
+    RejectInvoiceMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RejectInvoiceMutation,
+    RejectInvoiceMutationVariables
+  >(RejectInvoiceDocument, options);
+}
+export type RejectInvoiceMutationHookResult = ReturnType<
+  typeof useRejectInvoiceMutation
+>;
+export type RejectInvoiceMutationResult =
+  Apollo.MutationResult<RejectInvoiceMutation>;
+export type RejectInvoiceMutationOptions = Apollo.BaseMutationOptions<
+  RejectInvoiceMutation,
+  RejectInvoiceMutationVariables
 >;
 export const AssociateBankAccountToInvoiceDocument = gql`
   mutation AssociateBankAccountToInvoice(
@@ -3775,6 +3877,86 @@ export type GetExerciseByIdQueryResult = Apollo.QueryResult<
   GetExerciseByIdQuery,
   GetExerciseByIdQueryVariables
 >;
+export const GetYearlyInvoiceSummaryDocument = gql`
+  query GetYearlyInvoiceSummary {
+    getYearlyInvoiceSummary {
+      year
+      total_debits
+      total_credits
+      balance
+    }
+  }
+`;
+
+/**
+ * __useGetYearlyInvoiceSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetYearlyInvoiceSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetYearlyInvoiceSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetYearlyInvoiceSummaryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetYearlyInvoiceSummaryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export function useGetYearlyInvoiceSummaryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export function useGetYearlyInvoiceSummarySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetYearlyInvoiceSummaryQuery,
+        GetYearlyInvoiceSummaryQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetYearlyInvoiceSummaryQuery,
+    GetYearlyInvoiceSummaryQueryVariables
+  >(GetYearlyInvoiceSummaryDocument, options);
+}
+export type GetYearlyInvoiceSummaryQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummaryQuery
+>;
+export type GetYearlyInvoiceSummaryLazyQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummaryLazyQuery
+>;
+export type GetYearlyInvoiceSummarySuspenseQueryHookResult = ReturnType<
+  typeof useGetYearlyInvoiceSummarySuspenseQuery
+>;
+export type GetYearlyInvoiceSummaryQueryResult = Apollo.QueryResult<
+  GetYearlyInvoiceSummaryQuery,
+  GetYearlyInvoiceSummaryQueryVariables
+>;
 export const namedOperations = {
   Query: {
     GetUsers: "GetUsers",
@@ -3796,6 +3978,7 @@ export const namedOperations = {
     GetExerciseBudgets: "GetExerciseBudgets",
     GetInvoicesByExercise: "GetInvoicesByExercise",
     GetExerciseById: "GetExerciseById",
+    GetYearlyInvoiceSummary: "GetYearlyInvoiceSummary",
   },
   Mutation: {
     AddCategory: "AddCategory",
@@ -3811,6 +3994,7 @@ export const namedOperations = {
     CreateNewExercise: "CreateNewExercise",
     SetCommissionBudgetAmount: "SetCommissionBudgetAmount",
     UpdateStatusInvoice: "UpdateStatusInvoice",
+    RejectInvoice: "RejectInvoice",
     AssociateBankAccountToInvoice: "AssociateBankAccountToInvoice",
     RequestPasswordReset: "RequestPasswordReset",
     ResetPassword: "ResetPassword",
