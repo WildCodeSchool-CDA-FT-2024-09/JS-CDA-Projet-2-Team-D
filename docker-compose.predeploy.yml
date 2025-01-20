@@ -30,6 +30,12 @@ services:
       predeploy-db:
         condition: service_healthy
 
+  predeploy-redis:
+    image: redis
+    container_name: redis_cache
+    ports:
+      - 6379:6379
+
   predeploy-api_upload:
     image: pierrejeanroggy/clubcompta-image-api-upload:latest
     restart: always

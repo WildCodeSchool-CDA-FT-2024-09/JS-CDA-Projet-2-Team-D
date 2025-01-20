@@ -10,9 +10,10 @@ type MenuItemType = {
   to: string;
   icon: React.ReactNode;
   text: string;
+  onClose?: () => void;
 };
 
-function DrawerMenuItem({ to, icon, text }: MenuItemType) {
+function DrawerMenuItem({ to, icon, text, onClose }: MenuItemType) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,7 +22,12 @@ function DrawerMenuItem({ to, icon, text }: MenuItemType) {
       <ListItem disablePadding>
         <ListItemButton
           selected={location.pathname === to}
-          onClick={() => navigate(to)}
+          onClick={() => {
+            navigate(to);
+            if (onClose) {
+              onClose();
+            }
+          }}
           sx={{
             "&.Mui-selected": {
               backgroundColor: "primary.main",
