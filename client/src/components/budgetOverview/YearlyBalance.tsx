@@ -23,41 +23,50 @@ function YearlyBalance() {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <BarChart
-          dataset={data?.getYearlyInvoiceSummary}
-          xAxis={[{ scaleType: "band", dataKey: "year" }]}
-          yAxis={[
-            {
-              scaleType: "linear",
-              dataKey: "balance",
-              valueFormatter: (value: number) =>
-                new Intl.NumberFormat("fr-FR", {
-                  style: "currency",
-                  currency: "EUR",
-                }).format(value),
-            },
-          ]}
-          series={[
-            {
-              dataKey: "total_credits",
-              label: "Crédit",
-              valueFormatter: currencySignValueFormatter,
-            },
-            {
-              dataKey: "total_debits",
-              label: "Débit",
-              valueFormatter: currencySignValueFormatter,
-            },
-            {
-              dataKey: "balance",
-              label: "Balance",
-              valueFormatter: currencySignValueFormatter,
-            },
-          ]}
-          {...chartSetting}
-        />
-      </Box>
+      <article style={{ textAlign: "center" }}>
+        <h2>Etats des exercises annuels</h2>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <BarChart
+            dataset={data?.getYearlyInvoiceSummary}
+            xAxis={[
+              {
+                scaleType: "band",
+                dataKey: "year",
+                valueFormatter: (value: number) => value.toString(),
+              },
+            ]}
+            yAxis={[
+              {
+                scaleType: "linear",
+                dataKey: "balance",
+                valueFormatter: (value: number) =>
+                  new Intl.NumberFormat("fr-FR", {
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(value),
+              },
+            ]}
+            series={[
+              {
+                dataKey: "total_credits",
+                label: "Crédit",
+                valueFormatter: currencySignValueFormatter,
+              },
+              {
+                dataKey: "total_debits",
+                label: "Débit",
+                valueFormatter: currencySignValueFormatter,
+              },
+              {
+                dataKey: "balance",
+                label: "Balance",
+                valueFormatter: currencySignValueFormatter,
+              },
+            ]}
+            {...chartSetting}
+          />
+        </Box>
+      </article>
     </>
   );
 }

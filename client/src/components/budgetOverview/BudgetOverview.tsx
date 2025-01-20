@@ -2,7 +2,6 @@ import React from "react";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useMediaQuery, useTheme } from "@mui/material";
-import YearlyBalance from "./YearlyBalance";
 
 const colors = [
   "#018571",
@@ -81,10 +80,6 @@ const BudgetOverview: React.FC = () => {
             left: 20,
           }}
         />
-      </article>
-      <article style={{ textAlign: "center" }}>
-        <h2>Etats des exercises annuels</h2>
-        <YearlyBalance />
       </article>
     </>
   );
