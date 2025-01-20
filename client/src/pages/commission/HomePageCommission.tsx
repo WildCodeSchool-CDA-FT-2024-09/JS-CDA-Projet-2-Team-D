@@ -24,7 +24,7 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import PageTitle from "../../components/PageTitle";
 import SearchBar from "../../components/SearchBar";
-import Pagination from "@mui/material/Pagination";
+import BtnPagination from "../../components/BtnPagination";
 
 const HomePageCommission = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -222,12 +222,10 @@ const HomePageCommission = () => {
               alignItems: "center",
             }}
           >
-            <Pagination
-              count={totalPages}
+            <BtnPagination
               page={page}
-              onChange={handlePageChange}
-              showFirstButton
-              showLastButton
+              totalPages={totalPages}
+              handlePageChange={handlePageChange}
             />
           </Stack>
         )}
