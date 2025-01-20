@@ -8,7 +8,6 @@ import { Paper } from "@mui/material";
 const chartSetting = {
   width: 800,
   height: 300,
-  // margin: { left: 10 },
   sx: {
     [`.${axisClasses.left} .${axisClasses.label}`]: {
       transform: "translate(-20px, 0)",

@@ -1,8 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { useMediaQuery, useTheme } from "@mui/material";
-// import { axisClasses } from '@mui/x-charts';
+import { Paper, useMediaQuery, useTheme } from "@mui/material";
 import { colors } from "../../utils/chartColors";
 import { useGetBanksQuery } from "../../types/graphql-types";
 
@@ -40,7 +39,7 @@ export function DisplayBalanceBankAccountForAdmin() {
   const banks = (data?.getBanks || []) as Bank[];
 
   return (
-    <Box>
+    <Paper elevation={10} sx={{ p: 3, mb: 3 }}>
       <Typography variant="h2" align="center" gutterBottom sx={{ mb: 4 }}>
         État des soldes bancaires par banque
       </Typography>
@@ -86,7 +85,7 @@ export function DisplayBalanceBankAccountForAdmin() {
                 margin={{
                   top: 20,
                   right: 20,
-                  bottom: 90, // Augmenté pour la légende
+                  bottom: 90,
                   left: 40,
                 }}
                 series={series}
@@ -115,7 +114,7 @@ export function DisplayBalanceBankAccountForAdmin() {
           );
         })}
       </Box>
-    </Box>
+    </Paper>
   );
 }
 
