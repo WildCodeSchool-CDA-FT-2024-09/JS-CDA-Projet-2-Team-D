@@ -14,15 +14,21 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const calculatePercentage = (current: number, total: number): number => {
-    if (total <= 0) return 0;
-    const percentage = Math.floor((current / total) * 100);
-    return Math.min(Math.max(percentage, 0), 100);
+  const calculatePercentage = (remaining: number, global: number): number => {
+    if (global <= 0) {
+      return 100;
+    }
+    const percentage = 100 - Math.floor((remaining / global) * 100);
+    if (remaining >= global) {
+      return 0;
+    } else {
+      return Math.max(0, Math.min(100, percentage));
+    }
   };
 
-  const percentage = calculatePercentage(currentBudget, globalBudget);
+  const remainingBudget = globalBudget + currentBudget;
 
-  const remainingBudget = globalBudget - currentBudget;
+  const percentage = calculatePercentage(remainingBudget, globalBudget);
 
   const getColor = (value: number) => {
     if (value <= 60) return theme.palette.success.main;
@@ -91,16 +97,15 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
                 fontWeight: "bold",
               }}
             >
-              Budget restant : {remainingBudget.toLocaleString()} €
+              Total des factures : {currentBudget.toLocaleString()} €
             </Typography>
-
             <Typography
               variant="h5"
               sx={{
                 fontWeight: "bold",
               }}
             >
-              Total des dépenses : {currentBudget.toLocaleString()} €
+              Budget restant : {remainingBudget.toLocaleString()} €
             </Typography>
           </Box>
         </Grid>
