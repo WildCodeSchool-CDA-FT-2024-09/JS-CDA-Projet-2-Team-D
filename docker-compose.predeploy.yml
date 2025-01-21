@@ -48,8 +48,6 @@ services:
     command: npm run dev
     restart: always
     env_file: .env-predeploy
-    volumes:
-      - ./api_email:/app/
 
   predeploy-client:
     image: pierrejeanroggy/clubcompta-image-client
@@ -69,3 +67,4 @@ services:
       - predeploy-client
       - predeploy-api_data
       - predeploy-api_upload
+      - predeploy-api_email

@@ -65,7 +65,7 @@ export default class CommissionResolver {
         allInvoices
           .reduce((sum, invoice) => {
             const amount = Number(invoice.amount_with_vat);
-            return sum + (invoice.creditDebit.id === 2 ? -amount : amount);
+            return sum + (invoice.creditDebit.id === 1 ? -amount : amount);
           }, 0)
           .toFixed(2)
       );
