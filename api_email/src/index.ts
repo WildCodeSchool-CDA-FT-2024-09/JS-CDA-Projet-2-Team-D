@@ -10,7 +10,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 dotenv.config();
-const { PORT, EMAIL_FROM } = process.env;
+const API_EMAIL_PORT = process.env.API_EMAIL_PORT
+  ? parseInt(process.env.API_EMAIL_PORT)
+  : 3000;
+const { EMAIL_FROM } = process.env;
 
 // Set the view engine to EJS
 app.set("view engine", "ejs");
@@ -122,6 +125,6 @@ app.post("/send-reset-password", async (req: Request, res: Response) => {
   );
 });
 
-app.listen(PORT, () => {
-  console.info(`🚀 API email server ready at http://localhost:${PORT}`);
+app.listen(API_EMAIL_PORT, () => {
+  console.info(`🚀 API email server ready at port ${API_EMAIL_PORT}`);
 });
