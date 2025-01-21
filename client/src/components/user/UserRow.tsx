@@ -92,13 +92,30 @@ function UserRow({ user, offset, limit }: UserRowType) {
     <>
       <TableRow
         key={user.id}
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+        sx={{
+          backgroundColor: user.deletedAt === null ? "white" : "#f1f1f1",
+          "&:last-child td, &:last-child th": { border: 0 },
+        }}
       >
         <TableCell component="th" scope="row">
           {user.id}
         </TableCell>
-        <TableCell align="left">{user.firstname}</TableCell>
-        <TableCell align="left">{user.lastname}</TableCell>
+        <TableCell align="left">
+          {user.deletedAt !== null && (
+            <span style={{ textDecoration: "line-through" }}>
+              {user.firstname}
+            </span>
+          )}
+          {user.deletedAt === null && user.firstname}
+        </TableCell>
+        <TableCell align="left">
+          {user.deletedAt !== null && (
+            <span style={{ textDecoration: "line-through" }}>
+              {user.lastname}
+            </span>
+          )}
+          {user.deletedAt === null && user.lastname}
+        </TableCell>
         <TableCell align="left">
           {user.email}
           <br />
