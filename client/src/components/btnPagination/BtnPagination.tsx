@@ -11,6 +11,9 @@ function BtnPagination({
   totalPages,
   handlePageChange,
 }: BtnPaginationType) {
+  if (totalPages === 1 || totalPages === 0) {
+    return null;
+  }
   return (
     <>
       <Pagination
