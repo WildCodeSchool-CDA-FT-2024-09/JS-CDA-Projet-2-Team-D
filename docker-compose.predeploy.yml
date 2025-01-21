@@ -6,7 +6,7 @@ services:
     volumes:
       - ./api_data/db_import:/docker-entrypoint-initdb.d/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d root -U root"]
+      test: ["CMD-SHELL", "pg_isready -d predeploy_clubcompta -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
         condition: service_healthy
 
   predeploy-api_data:
-    image: pierrejeanroggy/clubcompta-image-api-data:latest
+    image: pierrejeanroggy/clubcompta-image-api-data
     command: npm run initdataset
     restart: always
     env_file: .env-predeploy
@@ -36,17 +36,23 @@ services:
       - 6379:6379
 
   predeploy-api_upload:
-    image: pierrejeanroggy/clubcompta-image-api-upload:latest
+    image: pierrejeanroggy/clubcompta-image-api-upload
     restart: always
     env_file: .env-predeploy
-    volumes:
-      - ./api_upload/upload:/var/www/html/upload
     depends_on:
       predeploy-db:
         condition: service_healthy
 
+  predeploy-api_email:
+    image: pierrejeanroggy/clubcompta-image-api-email
+    command: npm run dev
+    restart: always
+    env_file: .env-predeploy
+    volumes:
+      - ./api_email:/app/
+
   predeploy-client:
-    image: pierrejeanroggy/clubcompta-image-client:latest
+    image: pierrejeanroggy/clubcompta-image-client
     command: npm run dev -- --host
     restart: always
     environment:
