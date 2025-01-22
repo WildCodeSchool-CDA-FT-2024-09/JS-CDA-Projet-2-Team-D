@@ -16,6 +16,7 @@ import { Box } from "@mui/system";
 import { Link } from "react-router-dom";
 
 import { useGetInvoicesToValidateOrRefusedQuery } from "../../types/graphql-types";
+import PageTitle from "../PageTitle";
 
 function DisplayInvoicesForAccountant() {
   const { loading, error, data } = useGetInvoicesToValidateOrRefusedQuery();
@@ -57,7 +58,7 @@ function DisplayInvoicesForAccountant() {
           fontWeight: "bold",
         }}
       >
-        <h1>Liste des factures en attente et refusées</h1>
+        <PageTitle title="Liste des factures en attente et refusées" />
       </Box>
 
       {!isMobile ? (

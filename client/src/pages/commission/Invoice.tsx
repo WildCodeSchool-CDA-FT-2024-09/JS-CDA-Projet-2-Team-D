@@ -33,6 +33,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fr } from "date-fns/locale";
 import { useUser } from "../../hooks/useUser";
+import PageTitle from "../../components/PageTitle";
 
 const InvoiceForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -231,9 +232,7 @@ const InvoiceForm: React.FC = () => {
         margin: "auto",
       }}
     >
-      <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
-        Nouvelle Facture
-      </Typography>
+      <PageTitle title="Nouvelle Facture" />
       <Snackbar
         open={errorOpen}
         onClose={() => setErrorOpen(false)}
