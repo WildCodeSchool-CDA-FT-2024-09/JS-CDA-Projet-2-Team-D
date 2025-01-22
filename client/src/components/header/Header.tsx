@@ -8,6 +8,7 @@ import Avatar from "../avatar/Avatar";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useUser } from "../../hooks/useUser";
 import UserBar from "../UserBar";
+import { useExercise } from "../../context/ExerciceContext";
 
 const roleMapping: { [key: string]: string } = {
   1: "Administrateur",
@@ -17,14 +18,14 @@ const roleMapping: { [key: string]: string } = {
 
 interface HeaderProps {
   title: string;
-  subtitle?: string;
   logoUrl: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
+const Header: React.FC<HeaderProps> = ({ title, logoUrl }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { user } = useUser();
+  const { currentExercise } = useExercise();
 
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main,
@@ -56,13 +57,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
             pl: isMobile ? "48px" : 0,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <Link
               to="/"
               style={{
@@ -98,24 +93,23 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, logoUrl }) => {
                   variant="h1"
                   component="div"
                   className="header-title"
-                  sx={{
-                    display: isMobile ? "none" : "block",
-                  }}
+                  sx={{ display: isMobile ? "none" : "block" }}
                 >
                   {title}
                 </Typography>
-                {(subtitle || userType) && (
-                  <Typography
-                    variant="h2"
-                    className="header-subtitle"
-                    sx={{
-                      color: "black",
-                      fontSize: isMobile ? "1rem" : "1.25rem",
-                    }}
-                  >
-                    {subtitle} {userType && `- ${userType}`}
-                  </Typography>
-                )}
+                <Typography
+                  variant="h2"
+                  className="header-subtitle"
+                  sx={{
+                    color: "black",
+                    fontSize: isMobile ? "1rem" : "1.25rem",
+                  }}
+                >
+                  {currentExercise
+                    ? `${currentExercise.label}`
+                    : "Aucun exercice"}{" "}
+                  {userType && `- ${userType}`}
+                </Typography>
               </Box>
             </Link>
           </Box>
