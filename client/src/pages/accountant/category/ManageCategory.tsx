@@ -1,11 +1,12 @@
 import AddCategory from "../../../components/addCategory/AddCategory";
 import DisplayCategory from "../../../components/displayCategorySubcategory/DisplayCategorySubcategory";
+import PageTitle from "../../../components/PageTitle";
 
 function ManageCategory() {
   return (
     <>
-      <h1>GESTION DES CATEGORIES</h1>
-      <h2>Nouvelle catégorie</h2>
+      <PageTitle title="Gestion des catégories" />
+      <PageTitle title="Nouvelle catégorie" />
       <AddCategory />
       <DisplayCategory />
     </>
