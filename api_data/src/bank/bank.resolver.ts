@@ -6,7 +6,12 @@ export default class BankResolver {
   @Authorized(["1", "2"])
   @Query(() => [Bank])
   async getBanks() {
-    const banks = await Bank.find({ relations: ["bankAccounts"] });
+    const banks = await Bank.find({
+      relations: ["bankAccounts"],
+      order: {
+        id: "ASC",
+      },
+    });
     return banks;
   }
 }
