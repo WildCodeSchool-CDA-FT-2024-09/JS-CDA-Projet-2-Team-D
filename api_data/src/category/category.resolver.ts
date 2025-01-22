@@ -11,6 +11,7 @@ export default class CategoryResolver {
     return Category.find({
       relations: ["subcategories", "creditDebit"],
       order: {
+        label: "ASC",
         subcategories: {
           id: "ASC",
         },
