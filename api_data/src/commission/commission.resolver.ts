@@ -73,7 +73,7 @@ export default class CommissionResolver {
       const result = { invoices, totalCount, totalAmount };
 
       await redisClient.set(cacheKey, JSON.stringify(result), {
-        EX: 60,
+        EX: 3,
       });
 
       return result;

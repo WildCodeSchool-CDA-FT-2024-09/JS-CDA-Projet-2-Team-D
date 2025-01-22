@@ -96,7 +96,7 @@ export default class InvoiceResolver {
 
       // Storage of the result in Redis
       await redisClient.set(cacheKey, JSON.stringify(validInvoices), {
-        EX: 60, // Expiration after 1 min
+        EX: 3, // Expiration after 3sec
       });
 
       // Return the full list of valid invoices
