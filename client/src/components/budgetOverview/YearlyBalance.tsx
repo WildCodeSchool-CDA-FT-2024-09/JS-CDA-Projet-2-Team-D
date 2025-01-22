@@ -4,6 +4,13 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { Box } from "@mui/system";
 import { Paper } from "@mui/material";
+import { colors } from "../../utils/chartColors";
+
+const colorsMap = new Map([
+  ["credit", colors[0]],
+  ["debit", colors[1]],
+  ["balance", colors[3]],
+]);
 
 const chartSetting = {
   width: 800,
@@ -52,16 +59,19 @@ function YearlyBalance() {
                   dataKey: "total_credits",
                   label: "Crédit",
                   valueFormatter: currencySignValueFormatter,
+                  color: colorsMap.get("credit"),
                 },
                 {
                   dataKey: "total_debits",
                   label: "Débit",
                   valueFormatter: currencySignValueFormatter,
+                  color: colorsMap.get("debit"),
                 },
                 {
                   dataKey: "balance",
                   label: "Balance",
                   valueFormatter: currencySignValueFormatter,
+                  color: colorsMap.get("balance"),
                 },
               ]}
               {...chartSetting}
