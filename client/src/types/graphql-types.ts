@@ -270,6 +270,7 @@ export type MutationUpdateSubcategoryArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserInput;
+  updatePassword: Scalars["Boolean"]["input"];
   userId: Scalars["Float"]["input"];
 };
 
@@ -519,6 +520,7 @@ export type CreateNewUserMutation = {
 export type UpdateUserMutationVariables = Exact<{
   data: UserInput;
   userId: Scalars["Float"]["input"];
+  updatePassword: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdateUserMutation = {
@@ -1410,8 +1412,12 @@ export type CreateNewUserMutationOptions = Apollo.BaseMutationOptions<
   CreateNewUserMutationVariables
 >;
 export const UpdateUserDocument = gql`
-  mutation UpdateUser($data: UserInput!, $userId: Float!) {
-    updateUser(data: $data, userId: $userId) {
+  mutation UpdateUser(
+    $data: UserInput!
+    $userId: Float!
+    $updatePassword: Boolean!
+  ) {
+    updateUser(data: $data, userId: $userId, updatePassword: $updatePassword) {
       id
       firstname
       lastname
@@ -1446,6 +1452,7 @@ export type UpdateUserMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      data: // value for 'data'
  *      userId: // value for 'userId'
+ *      updatePassword: // value for 'updatePassword'
  *   },
  * });
  */
