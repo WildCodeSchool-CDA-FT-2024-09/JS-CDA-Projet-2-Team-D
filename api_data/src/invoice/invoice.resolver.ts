@@ -191,6 +191,7 @@ export default class InvoiceResolver {
         relations: [
           "bankAccount",
           "subcategory",
+          "subcategory.category",
           "creditDebit",
           "commission",
           "status",

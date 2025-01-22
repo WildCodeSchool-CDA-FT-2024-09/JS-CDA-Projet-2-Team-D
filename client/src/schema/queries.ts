@@ -384,7 +384,11 @@ export const GET_INVOICE_BY_EXERCISE = gql`
         invoiceNumber
         label
         date
+        price_without_vat
         amount_with_vat
+        receipt
+        info
+        paid
         status {
           label
         }
@@ -395,6 +399,12 @@ export const GET_INVOICE_BY_EXERCISE = gql`
           label
         }
         subcategory {
+          label
+          category {
+            label
+          }
+        }
+        vat {
           label
         }
       }
