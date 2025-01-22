@@ -33,11 +33,7 @@ function DisplayInvoicesForAccountant() {
     );
   }
 
-  if (!data?.getInvoicesToValidateOrRefused) {
-    return <p>No data</p>;
-  }
-
-  const rows = data.getInvoicesToValidateOrRefused.map((invoice) => ({
+  const rows = data?.getInvoicesToValidateOrRefused.map((invoice) => ({
     invoiceId: invoice.id,
     date: invoice.date,
     commission: invoice.commission?.name,
@@ -60,7 +56,17 @@ function DisplayInvoicesForAccountant() {
         <h1>Liste des factures en attente et refusées</h1>
       </Box>
 
-      {!isMobile ? (
+      {rows?.length === 0 ? (
+        <Box
+          sx={{
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            textAlign: "left",
+          }}
+        >
+          Aucune facture actuellement
+        </Box>
+      ) : !isMobile ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -87,7 +93,7 @@ function DisplayInvoicesForAccountant() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {rows?.map((row) => (
                 <TableRow key={row.invoiceId}>
                   <TableCell>{row.invoiceId}</TableCell>
                   <TableCell align="right">
@@ -125,7 +131,7 @@ function DisplayInvoicesForAccountant() {
         </TableContainer>
       ) : (
         <Box>
-          {rows.map((row) => (
+          {rows?.map((row) => (
             <Paper
               key={row.invoiceId}
               sx={{
