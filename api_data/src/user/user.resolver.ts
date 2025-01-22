@@ -66,7 +66,6 @@ export default class UserResolver {
       skip: offset,
       take: limit,
       order: {
-        id: "DESC",
         lastname: "ASC",
       },
     });
