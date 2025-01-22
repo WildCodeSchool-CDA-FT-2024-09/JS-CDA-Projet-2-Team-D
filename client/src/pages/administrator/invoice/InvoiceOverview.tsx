@@ -154,6 +154,7 @@ const InvoiceOverview = () => {
                   {!isMobile && <TableCell>Commission</TableCell>}
                   {!isMobile && <TableCell>Sous-catégorie</TableCell>}
                   <TableCell>Montant TTC</TableCell>
+                  <TableCell></TableCell>
                   <TableCell>Status</TableCell>
                 </TableRow>
               </TableHead>
