@@ -18,6 +18,8 @@ import {
   Button,
   Checkbox,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   FormHelperText,
   InputLabel,
   ListItemText,
@@ -26,10 +28,12 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import Grid from "@mui/material/Grid2";
+import { Stack } from "@mui/system";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -59,6 +63,8 @@ export default function UserForm({ mode }: UserFormProps) {
   });
   const [updateUserMutation] = useUpdateUserMutation();
   const [createUserMutation] = useCreateNewUserMutation();
+  const [doIUpdateThePassword, setDoIUpdateThePassword] =
+    useState<boolean>(false);
 
   // User feedback
   const { notifySuccess, notifyError } = useNotification();
@@ -176,6 +182,7 @@ export default function UserForm({ mode }: UserFormProps) {
           variables: {
             data: userData,
             userId: parseInt(userId as string),
+            updatePassword: doIUpdateThePassword,
           },
         });
 
@@ -366,6 +373,26 @@ export default function UserForm({ mode }: UserFormProps) {
               )}
             </FormControl>
           </Grid>
+          {isUpdateMode && (
+            <Grid size={12}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={doIUpdateThePassword}
+                      onChange={(e) =>
+                        setDoIUpdateThePassword(e.target.checked)
+                      }
+                    />
+                  }
+                  label="Voulez-vous regénérer le mot de passe également ?"
+                />
+              </FormGroup>
+              <Stack>
+                <Typography></Typography>
+              </Stack>
+            </Grid>
+          )}
           <Grid size={6}></Grid>
 
           <Grid size={4}></Grid>
