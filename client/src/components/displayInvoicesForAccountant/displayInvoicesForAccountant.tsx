@@ -34,18 +34,16 @@ function DisplayInvoicesForAccountant() {
     );
   }
 
-  if (!data?.getInvoicesToValidateOrRefused) {
-    return <p>No data</p>;
-  }
-
-  const rows = data.getInvoicesToValidateOrRefused.map((invoice) => ({
+  const rows = data?.getInvoicesToValidateOrRefused.map((invoice) => ({
     invoiceId: invoice.id,
+    Numero: invoice.invoiceNumber,
     date: invoice.date,
     commission: invoice.commission?.name,
     amountHT: invoice.price_without_vat,
     vat: invoice.vat?.rate,
     amountTTC: invoice.price_without_vat * (1 + invoice.vat?.rate / 100),
     status: invoice.status.label,
+    creditDebit: invoice.creditDebit,
   }));
 
   return (
@@ -61,7 +59,17 @@ function DisplayInvoicesForAccountant() {
         <PageTitle title="Liste des factures en attente et refusées" />
       </Box>
 
-      {!isMobile ? (
+      {rows?.length === 0 ? (
+        <Box
+          sx={{
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            textAlign: "left",
+          }}
+        >
+          Aucune facture actuellement
+        </Box>
+      ) : !isMobile ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -88,30 +96,47 @@ function DisplayInvoicesForAccountant() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {rows?.map((row) => (
                 <TableRow key={row.invoiceId}>
-                  <TableCell>{row.invoiceId}</TableCell>
+                  <TableCell>{row.Numero}</TableCell>
                   <TableCell align="right">
                     {new Date(row.date).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell align="right">{row.commission || "-"}</TableCell>
                   <TableCell align="right">
-                    {`
-                    ${row.amountHT
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€
-                  `}
+                    {row.creditDebit.label === "Débit" ? (
+                      <Box sx={{ color: "red" }}>
+                        {`-${Number(row.amountHT)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                      </Box>
+                    ) : (
+                      <Box sx={{ color: "green" }}>
+                        {`${Number(row.amountHT)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                      </Box>
+                    )}
                   </TableCell>
                   <TableCell align="right">
-                    {row.vat ? `${row.vat}%` : "-"}
+                    {row.vat ? `${row.vat}%` : "0%"}
                   </TableCell>
                   <TableCell align="right">
-                    {`
-                    ${Number(row.amountTTC)
-                      .toFixed(2)
-                      .replace(/B(?=(d{3})+(?!d))/g, " ")}
-                    \u202F€
-                  `}
+                    {row.creditDebit.label === "Débit" ? (
+                      <Box sx={{ color: "red" }}>
+                        {`-${Number(row.amountTTC)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                        \u202F€`}
+                      </Box>
+                    ) : (
+                      <Box sx={{ color: "green" }}>
+                        {`${Number(row.amountTTC)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                        \u202F€`}
+                      </Box>
+                    )}
                   </TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">
@@ -126,7 +151,7 @@ function DisplayInvoicesForAccountant() {
         </TableContainer>
       ) : (
         <Box>
-          {rows.map((row) => (
+          {rows?.map((row) => (
             <Paper
               key={row.invoiceId}
               sx={{
@@ -150,14 +175,38 @@ function DisplayInvoicesForAccountant() {
               </Box>
               <Box>
                 <strong>Montant HT :</strong>{" "}
-                {row.amountHT.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                {row.creditDebit.label === "Débit" ? (
+                  <Box sx={{ color: "red" }}>
+                    {`-${row.amountHT
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                  </Box>
+                ) : (
+                  <Box sx={{ color: "green" }}>
+                    {`${row.amountHT
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                  </Box>
+                )}
               </Box>
               <Box>
-                <strong>TVA :</strong> {row.vat ? `${row.vat}%` : "-"}
+                <strong>TVA :</strong> {row.vat ? `${row.vat}%` : "0%"}
               </Box>
               <Box>
                 <strong>Montant TTC :</strong>{" "}
-                {row.amountTTC.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                {row.creditDebit.label === "Débit" ? (
+                  <Box sx={{ color: "red" }}>
+                    {`-${row.amountTTC
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                  </Box>
+                ) : (
+                  <Box sx={{ color: "green" }}>
+                    {`${row.amountTTC
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}\u202F€`}
+                  </Box>
+                )}
               </Box>
               <Box
                 sx={{
