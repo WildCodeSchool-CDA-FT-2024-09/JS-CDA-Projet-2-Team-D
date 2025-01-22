@@ -321,6 +321,29 @@ import { AppDataSource } from "./data-source";
       WHERE id = subquery."bankAccountId";
     `);
 
+    // The dataset being a bit dirty in the bank accounts totals, we more or less even
+    // the balances
+    // Add 13000€ for account FR7612345678900000001234561
+    await queryRunner.query(`
+      UPDATE bank_account SET
+        balance = balance + 13000
+      WHERE id = 1;
+    `);
+
+    // Add 13000€ for account FR7612345678900000001234564
+    await queryRunner.query(`
+      UPDATE bank_account SET
+        balance = balance + 40000
+      WHERE id = 2;
+    `);
+
+    // Add 13000€ for account FR7612345678900000001234566
+    await queryRunner.query(`
+      UPDATE bank_account SET
+        balance = balance + 50000
+      WHERE id = 9;
+    `);
+
     await queryRunner.commitTransaction();
 
     console.info("Finished Mega Seeding.");

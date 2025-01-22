@@ -62,7 +62,7 @@ function BankAccountRow({ bank }: { bank: Bank }) {
                         N° {bankAccount.account_number}
                       </TableCell>
                       <TableCell align="right">
-                        {bankAccount.balance} €
+                        {bankAccount.balance.toFixed(2)} €
                       </TableCell>
                     </TableRow>
                   ))}
