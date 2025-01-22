@@ -104,11 +104,19 @@ function InvoiceRow({ row }: { row: Invoice }) {
                 </TableRow>
                 <TableRow>
                   <TableCell align="left">Montant T.T.C. :</TableCell>
-                  <TableCell align="left">{row.amount_with_vat}</TableCell>
+                  <TableCell align="left">
+                    {row.amount_with_vat.toFixed(2)} €
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">T.V.A. :</TableCell>
+                  <TableCell align="left">{row.vat.label}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell align="left">Montant H.T. :</TableCell>
-                  <TableCell align="left">{row.price_without_vat}</TableCell>
+                  <TableCell align="left">
+                    {row.price_without_vat.toFixed(2)} €
+                  </TableCell>
                 </TableRow>
                 {row.info && (
                   <TableRow>

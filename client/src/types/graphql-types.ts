@@ -1077,6 +1077,7 @@ export type GetInvoicesByExerciseQuery = {
         label: string;
         category: { __typename?: "Category"; label: string };
       };
+      vat: { __typename?: "Vat"; label: string };
     }>;
   };
 };
@@ -3726,6 +3727,9 @@ export const GetInvoicesByExerciseDocument = gql`
           category {
             label
           }
+        }
+        vat {
+          label
         }
       }
     }

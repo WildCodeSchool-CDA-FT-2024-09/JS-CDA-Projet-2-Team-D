@@ -404,6 +404,9 @@ export const GET_INVOICE_BY_EXERCISE = gql`
             label
           }
         }
+        vat {
+          label
+        }
       }
     }
   }
