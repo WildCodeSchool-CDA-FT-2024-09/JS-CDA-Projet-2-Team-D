@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useGetExercisesLazyQuery, Exercise } from "../../types/graphql-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -23,7 +25,29 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, logoUrl }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { user, currentExercise } = useUser();
+
+  const [currentExercise, setCurrentExercise] = useState<
+    Exercise | undefined
+  >();
+  const [getExercices] = useGetExercisesLazyQuery();
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    const getMyExercice = async () => {
+      try {
+        const { data } = await getExercices();
+        if (!currentExercise && (data?.getExercises?.length as number) > 0) {
+          setCurrentExercise(data?.getExercises[0] as Exercise);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (user) {
+      getMyExercice();
+    }
+  }, [user, getExercices, currentExercise]);
 
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main,
