@@ -1,10 +1,13 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+
+// Comment code for slider and checkbox
 // import Slider from "@mui/material/Slider";
 // import FormControlLabel from "@mui/material/FormControlLabel";
 // import Checkbox from "@mui/material/Checkbox";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useGetBudgetOverviewQuery } from "../../types/graphql-types";
+import PageTitle from "../../components/PageTitle";
+import { colors } from "../../utils/chartColors";
 
 function DisplayBudgetByCommissionForAccountant() {
   // const [seriesNb, setSeriesNb] = React.useState(7);
@@ -31,6 +34,7 @@ function DisplayBudgetByCommissionForAccountant() {
     data: [budget.amount],
   }));
 
+  // Comment code for slider and checkbox
   // const handleSeriesNbChange = (_: Event, newValue: number | number[]) => {
   //   if (typeof newValue !== "number") {
   //     return;
@@ -38,34 +42,22 @@ function DisplayBudgetByCommissionForAccountant() {
   //   setSeriesNb(newValue);
   // };
 
-  const predefinedColors = [
-    "#018571",
-    "#DFC27D",
-    "#80CDC1",
-    "#EA452F",
-    "#7570B3",
-    "#A6611A",
-    "#0F2080",
-  ];
+  const predefinedColors = colors;
 
-  const colors = budgets.map(
+  const colorsMap = budgets.map(
     (_, index) => predefinedColors[index % predefinedColors.length],
   );
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ textAlign: "center", mt: 2, mb: 2 }}
-      >
-        Etat des budgets par commission
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <PageTitle title="Etat des budgets par commission" />
+      </Box>
       <BarChart
         height={600}
         series={series.slice(0, 7)}
         // skipAnimation={skipAnimation}
-        colors={colors}
+        colors={colorsMap}
         sx={{
           "& .MuiLegend-root": {
             marginTop: "16px",
@@ -79,7 +71,10 @@ function DisplayBudgetByCommissionForAccountant() {
           },
         }}
       />
-      {/* <FormControlLabel
+
+      {
+        // Comment code for slider and checkbox
+        /* <FormControlLabel
         checked={skipAnimation}
         control={
           <Checkbox
@@ -99,7 +94,8 @@ function DisplayBudgetByCommissionForAccountant() {
         min={1}
         max={series.length}
         aria-labelledby="input-series-number"
-      /> */}
+      /> */
+      }
     </Box>
   );
 }

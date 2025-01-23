@@ -80,8 +80,12 @@ export const CREATE_NEW_USER = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation UpdateUser($data: UserInput!, $userId: Float!) {
-    updateUser(data: $data, userId: $userId) {
+  mutation UpdateUser(
+    $data: UserInput!
+    $userId: Float!
+    $updatePassword: Boolean!
+  ) {
+    updateUser(data: $data, userId: $userId, updatePassword: $updatePassword) {
       id
       firstname
       lastname

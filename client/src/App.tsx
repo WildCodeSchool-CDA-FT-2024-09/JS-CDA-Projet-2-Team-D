@@ -88,11 +88,7 @@ function App() {
                   <>
                     <Box sx={{ display: "flex" }}>
                       <CssBaseline />
-                      <Header
-                        title="ClubCompta"
-                        subtitle="Budget 2024/2025"
-                        logoUrl="/Logo.svg"
-                      />
+                      <Header title="ClubCompta" logoUrl="/Logo.svg" />
                       <Drawer />
                       <Box
                         component="main"

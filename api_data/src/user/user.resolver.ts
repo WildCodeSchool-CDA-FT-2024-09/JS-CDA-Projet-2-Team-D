@@ -66,7 +66,6 @@ export default class UserResolver {
       skip: offset,
       take: limit,
       order: {
-        id: "DESC",
         lastname: "ASC",
       },
     });
@@ -144,7 +143,8 @@ export default class UserResolver {
   @Mutation(() => User)
   async updateUser(
     @Arg("userId") userId: number,
-    @Arg("data") data: UserInput
+    @Arg("data") data: UserInput,
+    @Arg("updatePassword") updatePassword: boolean = false
   ) {
     try {
       const user = await User.findOneOrFail({
@@ -157,7 +157,10 @@ export default class UserResolver {
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-      user.password = await argon2.hash(pwd);
+
+      if (updatePassword) {
+        user.password = await argon2.hash(pwd);
+      }
 
       const error = await validate(user);
 

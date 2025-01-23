@@ -97,8 +97,13 @@ function UserRow({ user, offset, limit }: UserRowType) {
           "&:last-child td, &:last-child th": { border: 0 },
         }}
       >
-        <TableCell component="th" scope="row">
-          {user.id}
+        <TableCell align="left">
+          {user.deletedAt !== null && (
+            <span style={{ textDecoration: "line-through" }}>
+              {user.lastname}
+            </span>
+          )}
+          {user.deletedAt === null && user.lastname}
         </TableCell>
         <TableCell align="left">
           {user.deletedAt !== null && (
@@ -107,14 +112,6 @@ function UserRow({ user, offset, limit }: UserRowType) {
             </span>
           )}
           {user.deletedAt === null && user.firstname}
-        </TableCell>
-        <TableCell align="left">
-          {user.deletedAt !== null && (
-            <span style={{ textDecoration: "line-through" }}>
-              {user.lastname}
-            </span>
-          )}
-          {user.deletedAt === null && user.lastname}
         </TableCell>
         <TableCell align="left">
           {user.email}

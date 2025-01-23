@@ -65,7 +65,6 @@ export default function ManageUser() {
         <Table sx={{ minWidth: 650 }} aria-label="Tableau des utilisateurs">
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
               <TableCell align="left">Nom</TableCell>
               <TableCell align="left">Prénom</TableCell>
               <TableCell align="left">Email</TableCell>

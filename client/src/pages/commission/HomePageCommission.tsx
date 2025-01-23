@@ -29,6 +29,7 @@ import BtnPagination from "../../components/btnPagination/BtnPagination";
 const HomePageCommission = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { commissionId } = useParams<{ commissionId: string }>();
+
   const commissionIdNumber = parseInt(commissionId || "0", 10);
 
   const theme = useTheme();
@@ -131,105 +132,116 @@ const HomePageCommission = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <PageTitle
-        title={`Récapitulatif des factures de la commission ${currentCommission?.name}`}
-      />
+      {commissionId !== undefined && (
+        <>
+          <PageTitle
+            title={`Récapitulatif des factures de la commission ${currentCommission?.name}`}
+          />
 
-      <BudgetGauge globalBudget={globalBudget} currentBudget={currentBudget} />
+          <BudgetGauge
+            globalBudget={globalBudget}
+            currentBudget={currentBudget}
+          />
 
-      <Box sx={{ marginBottom: 2 }}>
-        <SearchBar
-          placeholder="Rechercher une facture"
-          value={searchQuery}
-          onSearch={setSearchQuery}
-          onClear={() => setSearchQuery("")}
-        />
-      </Box>
-
-      <TableContainer component={Paper}>
-        <Table sx={{ tableLayout: "auto" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                {isMobile ? "N° de fact." : "Numéro de facture"}
-              </TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Libellé</TableCell>
-              {!isMobile && <TableCell>Montant HT</TableCell>}
-              {!isMobile && <TableCell>Taux TVA</TableCell>}
-              <TableCell>Montant TTC</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredInvoices.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={isMobile ? 5 : 7} align="center">
-                  Aucune facture disponible
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredInvoices.map((row) => {
-                const montantHT =
-                  row.creditDebit?.id === 2 //crédit
-                    ? row.price_without_vat
-                    : -row.price_without_vat;
-
-                const montantTTC =
-                  row.creditDebit?.id === 2 //crédit
-                    ? row.amount_with_vat
-                    : -row.amount_with_vat;
-
-                return (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.invoiceNumber}</TableCell>
-                    <TableCell>{formatDate(row.date)}</TableCell>
-                    <TableCell>{row.label}</TableCell>
-                    {!isMobile && (
-                      <TableCell sx={{ whiteSpace: "nowrap" }}>
-                        {montantHT.toFixed(2)} €
-                      </TableCell>
-                    )}
-                    {!isMobile && (
-                      <TableCell sx={{ whiteSpace: "nowrap" }}>
-                        {row.vat?.rate || 0}%
-                      </TableCell>
-                    )}
-                    <TableCell sx={{ whiteSpace: "nowrap" }}>
-                      {montantTTC.toFixed(2)} €
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={
-                          isMobile ? row.status?.label[0] : row.status?.label
-                        }
-                        sx={getChipStyles(row.status?.label)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-
-        {invoices.length > 0 && (
-          <Stack
-            spacing={2}
-            sx={{
-              margin: "1em 0",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <BtnPagination
-              page={page}
-              totalPages={totalPages}
-              handlePageChange={handlePageChange}
+          <Box sx={{ marginBottom: 2 }}>
+            <SearchBar
+              placeholder="Rechercher une facture"
+              value={searchQuery}
+              onSearch={setSearchQuery}
+              onClear={() => setSearchQuery("")}
             />
-          </Stack>
-        )}
-      </TableContainer>
+          </Box>
+        </>
+      )}
+
+      {commissionId !== undefined ? (
+        <TableContainer component={Paper}>
+          <Table sx={{ tableLayout: "auto" }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  {isMobile ? "N° de fact." : "Numéro de facture"}
+                </TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Libellé</TableCell>
+                {!isMobile && <TableCell>Montant HT</TableCell>}
+                {!isMobile && <TableCell>Taux TVA</TableCell>}
+                <TableCell>Montant TTC</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredInvoices.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={isMobile ? 5 : 7} align="center">
+                    Aucune facture disponible
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredInvoices.map((row) => {
+                  const montantHT =
+                    row.creditDebit?.id === 2 //crédit
+                      ? row.price_without_vat
+                      : -row.price_without_vat;
+
+                  const montantTTC =
+                    row.creditDebit?.id === 2 //crédit
+                      ? row.amount_with_vat
+                      : -row.amount_with_vat;
+
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell>{row.invoiceNumber}</TableCell>
+                      <TableCell>{formatDate(row.date)}</TableCell>
+                      <TableCell>{row.label}</TableCell>
+                      {!isMobile && (
+                        <TableCell sx={{ whiteSpace: "nowrap" }}>
+                          {montantHT.toFixed(2)} €
+                        </TableCell>
+                      )}
+                      {!isMobile && (
+                        <TableCell sx={{ whiteSpace: "nowrap" }}>
+                          {row.vat?.rate || 0}%
+                        </TableCell>
+                      )}
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {montantTTC.toFixed(2)} €
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={
+                            isMobile ? row.status?.label[0] : row.status?.label
+                          }
+                          sx={getChipStyles(row.status?.label)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+
+          {invoices.length > 0 && (
+            <Stack
+              spacing={2}
+              sx={{
+                margin: "1em 0",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <BtnPagination
+                page={page}
+                totalPages={totalPages}
+                handlePageChange={handlePageChange}
+              />
+            </Stack>
+          )}
+        </TableContainer>
+      ) : (
+        <PageTitle title={`Bienvenue ${user?.firstname} ${user?.lastname}`} />
+      )}
     </Box>
   );
 };

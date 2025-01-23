@@ -1,3 +1,10 @@
+import { useState, useEffect } from "react";
+import {
+  Invoice,
+  useGetExercisesQuery,
+  useGetInvoicesByExerciseQuery,
+} from "../../../types/graphql-types";
+import { formatDate } from "../../../utils/dateUtils";
 import {
   Box,
   Table,
@@ -8,7 +15,6 @@ import {
   TableRow,
   Paper,
   Typography,
-  Chip,
   Pagination,
   Stack,
   useMediaQuery,
@@ -20,12 +26,7 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
-import { useState, useEffect } from "react";
-import {
-  useGetExercisesQuery,
-  useGetInvoicesByExerciseQuery,
-} from "../../../types/graphql-types";
-import { formatDate } from "../../../utils/dateUtils";
+import InvoiceRow from "../../../components/invoiceOverview/InvoiceRow";
 import PageTitle from "../../../components/PageTitle";
 import SearchBar from "../../../components/SearchBar";
 
@@ -100,29 +101,6 @@ const InvoiceOverview = () => {
       invoice.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const getChipStyles = (status: string) => {
-    let backgroundColor;
-    switch (status) {
-      case "Validé":
-        backgroundColor = theme.palette.success.main;
-        break;
-      case "En attente":
-        backgroundColor = theme.palette.warning.main;
-        break;
-      case "Refusé":
-        backgroundColor = theme.palette.error.main;
-        break;
-      default:
-        backgroundColor = theme.palette.primary.main;
-    }
-    return {
-      backgroundColor,
-      color: theme.palette.getContrastText(backgroundColor),
-      fontWeight: "bold",
-      fontSize: "14px",
-    };
-  };
-
   return (
     <Box sx={{ padding: 2 }}>
       <Stack spacing={3}>
@@ -176,6 +154,7 @@ const InvoiceOverview = () => {
                   {!isMobile && <TableCell>Commission</TableCell>}
                   {!isMobile && <TableCell>Sous-catégorie</TableCell>}
                   <TableCell>Montant TTC</TableCell>
+                  <TableCell></TableCell>
                   <TableCell>Status</TableCell>
                 </TableRow>
               </TableHead>
@@ -187,39 +166,9 @@ const InvoiceOverview = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredInvoices.map((row) => {
-                    const montantTTC =
-                      row.creditDebit?.label?.toLowerCase() === "débit"
-                        ? -row.amount_with_vat
-                        : row.amount_with_vat;
-
-                    return (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.invoiceNumber}</TableCell>
-                        <TableCell>{formatDate(row.date)}</TableCell>
-                        <TableCell>{row.label}</TableCell>
-                        {!isMobile && (
-                          <TableCell>{row.commission?.name}</TableCell>
-                        )}
-                        {!isMobile && (
-                          <TableCell>{row.subcategory?.label}</TableCell>
-                        )}
-                        <TableCell sx={{ whiteSpace: "nowrap" }}>
-                          {montantTTC.toFixed(2)} €
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={
-                              isMobile
-                                ? row.status?.label[0]
-                                : row.status?.label
-                            }
-                            sx={getChipStyles(row.status?.label)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                  filteredInvoices.map((row) => (
+                    <InvoiceRow key={row.id} row={row as Invoice} />
+                  ))
                 )}
               </TableBody>
             </Table>

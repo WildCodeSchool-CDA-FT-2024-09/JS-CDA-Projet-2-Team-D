@@ -39,14 +39,14 @@ const BudgetGauge: React.FC<BudgetGaugeProps> = ({
   return (
     <Paper elevation={10} sx={{ p: 3, mb: 3 }}>
       <Typography
-        variant="h4"
+        variant="h5"
         sx={{
           fontWeight: "bold",
           color: theme.palette.primary.main,
           textAlign: "center",
         }}
       >
-        Budget global : {globalBudget.toLocaleString()} €
+        Budget attribué : {globalBudget.toLocaleString()} €
       </Typography>
 
       <Grid container spacing={1} alignItems="center">

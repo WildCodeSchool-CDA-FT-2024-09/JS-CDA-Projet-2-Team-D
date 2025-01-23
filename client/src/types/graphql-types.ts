@@ -270,6 +270,7 @@ export type MutationUpdateSubcategoryArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserInput;
+  updatePassword: Scalars["Boolean"]["input"];
   userId: Scalars["Float"]["input"];
 };
 
@@ -356,8 +357,9 @@ export type QueryGetUsersArgs = {
 
 export type RejectInvoiceResponse = {
   __typename?: "RejectInvoiceResponse";
+  emailSent: Scalars["Boolean"]["output"];
   id: Scalars["Int"]["output"];
-  reason: Scalars["String"]["output"];
+  reason?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type RestoreResponseStatus = {
@@ -518,6 +520,7 @@ export type CreateNewUserMutation = {
 export type UpdateUserMutationVariables = Exact<{
   data: UserInput;
   userId: Scalars["Float"]["input"];
+  updatePassword: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdateUserMutation = {
@@ -637,7 +640,7 @@ export type RejectInvoiceMutation = {
   rejectInvoice: {
     __typename?: "RejectInvoiceResponse";
     id: number;
-    reason: string;
+    reason?: string | null;
   };
 };
 
@@ -1063,11 +1066,20 @@ export type GetInvoicesByExerciseQuery = {
       invoiceNumber: string;
       label: string;
       date: string;
+      price_without_vat: number;
       amount_with_vat: number;
+      receipt: string;
+      info: string;
+      paid: boolean;
       status: { __typename?: "Status"; label: string };
       commission: { __typename?: "Commission"; name: string };
       creditDebit: { __typename?: "CreditDebit"; label: string };
-      subcategory: { __typename?: "Subcategory"; label: string };
+      subcategory: {
+        __typename?: "Subcategory";
+        label: string;
+        category: { __typename?: "Category"; label: string };
+      };
+      vat: { __typename?: "Vat"; label: string };
     }>;
   };
 };
@@ -1400,8 +1412,12 @@ export type CreateNewUserMutationOptions = Apollo.BaseMutationOptions<
   CreateNewUserMutationVariables
 >;
 export const UpdateUserDocument = gql`
-  mutation UpdateUser($data: UserInput!, $userId: Float!) {
-    updateUser(data: $data, userId: $userId) {
+  mutation UpdateUser(
+    $data: UserInput!
+    $userId: Float!
+    $updatePassword: Boolean!
+  ) {
+    updateUser(data: $data, userId: $userId, updatePassword: $updatePassword) {
       id
       firstname
       lastname
@@ -1436,6 +1452,7 @@ export type UpdateUserMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      data: // value for 'data'
  *      userId: // value for 'userId'
+ *      updatePassword: // value for 'updatePassword'
  *   },
  * });
  */
@@ -3698,7 +3715,11 @@ export const GetInvoicesByExerciseDocument = gql`
         invoiceNumber
         label
         date
+        price_without_vat
         amount_with_vat
+        receipt
+        info
+        paid
         status {
           label
         }
@@ -3709,6 +3730,12 @@ export const GetInvoicesByExerciseDocument = gql`
           label
         }
         subcategory {
+          label
+          category {
+            label
+          }
+        }
+        vat {
           label
         }
       }

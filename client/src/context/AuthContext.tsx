@@ -130,7 +130,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, checkAuth, login, logout }}
+      value={{
+        user,
+        setUser,
+        loading,
+        checkAuth,
+        login,
+        logout,
+      }}
     >
       {!loading && children}
     </AuthContext.Provider>
