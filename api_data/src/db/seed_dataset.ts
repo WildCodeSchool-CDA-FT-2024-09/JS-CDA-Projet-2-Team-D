@@ -166,6 +166,24 @@ import { AppDataSource } from "./data-source";
       ('super@admin.net', 'Super', 'Admin', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
     `);
 
+    // insert hélène responsable (test password: whS0@cqnuros)
+    await queryRunner.query(`
+      INSERT INTO "user" ("email", "firstname", "lastname", "password") VALUES
+      ('helene@association.com', 'Hélène', 'G', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
+    `);
+
+    // insert ludovic comptable (test password: whS0@cqnuros)
+    await queryRunner.query(`
+      INSERT INTO "user" ("email", "firstname", "lastname", "password") VALUES
+      ('ludovic@association.com', 'Ludovic', 'S', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
+    `);
+
+    // insert fabien admin (test password: whS0@cqnuros)
+    await queryRunner.query(`
+      INSERT INTO "user" ("email", "firstname", "lastname", "password") VALUES
+      ('fabien@association.com', 'Fabien', 'A', '$argon2id$v=19$m=65536,t=3,p=4$kjem4qjZeE8bL8x+Nwt6hg$UtS5vzoj5WOkINl0oyNWNVZtjtH8fWe76Wzy6OQsev8');
+    `);
+
     // insert ADMINs in user_roles_role
     await queryRunner.query(`
       INSERT INTO "user_roles_role" ("userId", "roleId")
@@ -173,7 +191,7 @@ import { AppDataSource } from "./data-source";
         id,
         1
       FROM "user"
-      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'super@admin.net')
+      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'super@admin.net', 'fabien@association.com')
       ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
@@ -184,7 +202,7 @@ import { AppDataSource } from "./data-source";
         id,
         2
       FROM "user"
-      WHERE email IN ('claire.simon@association.com', 'nicolas.perret@association.com', 'super@admin.net')
+      WHERE email IN ('claire.simon@association.com', 'nicolas.perret@association.com', 'super@admin.net', 'ludovic@association.com')
       ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
@@ -195,7 +213,7 @@ import { AppDataSource } from "./data-source";
         id,
         3
       FROM "user"
-      WHERE email NOT IN ('claire.simon@association.com', 'anne.robert@association.com', 'pierre.martin@association.com', 'nicolas.perret@association.com')
+      WHERE email NOT IN ('claire.simon@association.com', 'anne.robert@association.com', 'pierre.martin@association.com', 'nicolas.perret@association.com', 'ludovic@association.com', 'fabien@association.com')
       ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
@@ -222,7 +240,10 @@ import { AppDataSource } from "./data-source";
         (21, 4),
         (21, 5),
         (21, 6),
-        (21, 7);
+        (21, 7),
+        (22, 1),
+        (22, 2),
+        (22, 3);
     `);
 
     // insert exercise (civil year)
@@ -303,6 +324,12 @@ import { AppDataSource } from "./data-source";
       LEFT JOIN vat v ON v.id = i."vatId"
       LEFT JOIN credit_debit cd ON cd.id = i."creditDebitId"
       GROUP BY e.id, c.id
+    `);
+
+    // Update commission budgets for 2024 (Communication and Formation)
+    await queryRunner.query(`
+      UPDATE budget SET "amount" = 25369 WHERE "exerciseId" = 6 AND "commissionId" = 5;
+      UPDATE budget SET "amount" = 5912 WHERE "exerciseId" = 6 AND "commissionId" = 7;
     `);
 
     // Calculate bank accounts balances
