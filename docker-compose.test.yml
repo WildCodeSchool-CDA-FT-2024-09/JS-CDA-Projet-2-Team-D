@@ -1,0 +1,33 @@
+services:
+  staging_postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres
+    volumes:
+      - ./api_data/db_import:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d staging_db -U staging_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  staging_api_data:
+    build: ./api_data
+    command: npm run test
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=stagingpassword
+      - POSTGRES_DB=staging_db
+      - POSTGRES_USER=staging_user
+      - POSTGRES_HOST=staging_postgres
+      - REDIS_HOST=staging-redis
+      - REDIS_PORT=6379
+
+  staging-redis:
+    image: redis
+    container_name: redis_cache
+    ports:
+      - 6379:6379

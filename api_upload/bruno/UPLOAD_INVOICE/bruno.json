@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "UPLOAD_INVOICE",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
