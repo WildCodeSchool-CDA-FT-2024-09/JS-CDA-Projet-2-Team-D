@@ -8,7 +8,6 @@ import Avatar from "../avatar/Avatar";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useUser } from "../../hooks/useUser";
 import UserBar from "../UserBar";
-import { useExercise } from "../../context/ExerciceContext";
 
 const roleMapping: { [key: string]: string } = {
   1: "Administrateur",
@@ -24,8 +23,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, logoUrl }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { user } = useUser();
-  const { currentExercise } = useExercise();
+  const { user, currentExercise } = useUser();
 
   const roleColorMapping: { [key: string]: string } = {
     Administrateur: theme.palette.error.main,

@@ -3,6 +3,8 @@ import {
   useGetAuthenticatedUserQuery,
   useLoginMutation,
   useLogoutMutation,
+  useGetExercisesLazyQuery,
+  Exercise,
 } from "../types/graphql-types";
 
 type User = {
@@ -20,6 +22,7 @@ export type AuthContextType = {
   loading: boolean;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
+  currentExercise: Exercise | undefined;
 };
 
 // Create the context with default values
@@ -36,12 +39,32 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentExercise, setCurrentExercise] = useState<
+    Exercise | undefined
+  >();
+  const [getExercices] = useGetExercisesLazyQuery();
 
   useEffect(() => {
     // Check authentication status on mount
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.pathname]);
+
+  useEffect(() => {
+    const getMyExercice = async () => {
+      try {
+        const { data } = await getExercices();
+        if (!currentExercise && (data?.getExercises?.length as number) > 0) {
+          setCurrentExercise(data?.getExercises[0] as Exercise);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (user) {
+      getMyExercice();
+    }
+  }, [user, getExercices, currentExercise]);
 
   const {
     //data: loggedInUser,
@@ -130,7 +153,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, checkAuth, login, logout }}
+      value={{
+        user,
+        setUser,
+        loading,
+        checkAuth,
+        login,
+        logout,
+        currentExercise,
+      }}
     >
       {!loading && children}
     </AuthContext.Provider>
