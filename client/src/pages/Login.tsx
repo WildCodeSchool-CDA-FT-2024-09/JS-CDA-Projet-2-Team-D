@@ -91,12 +91,12 @@ export default function Login() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          maxWidth: { xs: "100%", md: "40%" },
+          maxWidth: { xs: "90%", md: "40%" },
           margin: "0 auto",
         }}
       >
         <img src={logo} alt="ClubCompta" style={{ marginBottom: "20px" }} />
-        <Typography variant="h4" component="h2">
+        <Typography variant="h4" component="h2" sx={{ textAlign: "center" }}>
           Connexion ClubCompta
         </Typography>
         <form action="" onSubmit={handleSubmitLogin}>
