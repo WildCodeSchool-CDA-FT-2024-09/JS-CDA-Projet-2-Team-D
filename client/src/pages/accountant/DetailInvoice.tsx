@@ -237,12 +237,7 @@ function DetailInvoice() {
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
         Facture n°{invoice.invoiceNumber}
       </Typography>
-      <AddBankAccount
-        invoiceId={invoice.id}
-        selectedBank={selectedBank}
-        setSelectedBank={setSelectedBank}
-        banks={banks}
-      />
+
       <Snackbar open={false} autoHideDuration={8000}>
         <Alert
           severity="error"
@@ -405,8 +400,13 @@ function DetailInvoice() {
             <a
               href={`http://localhost:7100/upload/get-file/${invoice.receipt}`}
               download={invoice.receipt}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+              }}
             >
-              <UploadFileTwoToneIcon />
+              <UploadFileTwoToneIcon style={{ marginBottom: "6px" }} />
               Télécharger le justificatif
             </a>
           </Grid>
@@ -420,6 +420,12 @@ function DetailInvoice() {
             />
           </Grid>
           <Grid size={12}>
+            <AddBankAccount
+              invoiceId={invoice.id}
+              selectedBank={selectedBank}
+              setSelectedBank={setSelectedBank}
+              banks={banks}
+            />
             <Grid
               container
               direction="row"
