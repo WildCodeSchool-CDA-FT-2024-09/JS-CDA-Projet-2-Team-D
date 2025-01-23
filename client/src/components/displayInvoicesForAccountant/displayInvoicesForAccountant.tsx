@@ -8,6 +8,7 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
@@ -45,6 +46,29 @@ function DisplayInvoicesForAccountant() {
     status: invoice.status.label,
     creditDebit: invoice.creditDebit,
   }));
+
+  const getChipStyles = (status: string) => {
+    let backgroundColor;
+    switch (status) {
+      case "Validé":
+        backgroundColor = theme.palette.success.main;
+        break;
+      case "En attente":
+        backgroundColor = theme.palette.warning.main;
+        break;
+      case "Refusé":
+        backgroundColor = theme.palette.error.main;
+        break;
+      default:
+        backgroundColor = theme.palette.primary.main;
+    }
+    return {
+      backgroundColor,
+      color: theme.palette.getContrastText(backgroundColor),
+      fontWeight: "bold",
+      fontSize: "14px",
+    };
+  };
 
   return (
     <Box>
@@ -91,8 +115,8 @@ function DisplayInvoicesForAccountant() {
                 <TableCell align="right">Montant HT</TableCell>
                 <TableCell align="right">TVA</TableCell>
                 <TableCell align="right">Montant TTC</TableCell>
-                <TableCell align="right">Status</TableCell>
-                <TableCell align="right">Détail</TableCell>
+                <TableCell align="center">Détail & Actions</TableCell>
+                <TableCell align="center">Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -138,11 +162,18 @@ function DisplayInvoicesForAccountant() {
                       </Box>
                     )}
                   </TableCell>
-                  <TableCell align="right">{row.status}</TableCell>
-                  <TableCell align="right">
+
+                  <TableCell align="center">
                     <Link to={`/accountant/invoice/${row.invoiceId}`}>
                       <RemoveRedEyeOutlinedIcon />
                     </Link>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Chip
+                      label={row.status}
+                      sx={getChipStyles(row.status)}
+                      variant="outlined"
+                    ></Chip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -211,22 +242,26 @@ function DisplayInvoicesForAccountant() {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: "row",
                   alignItems: "left",
                 }}
               >
-                <strong>Détail :</strong>
+                <strong>Détail & Actions :</strong>
                 <Link
                   key={row.invoiceId}
                   to={`/accountant/invoice/${row.invoiceId}`}
                 >
                   <RemoveRedEyeOutlinedIcon
-                    sx={{ mt: "auto" }}
+                    sx={{ mt: "auto", mb: "auto", ml: "0.2rem" }}
                   ></RemoveRedEyeOutlinedIcon>
                 </Link>
               </Box>
               <Box>
-                <strong>Status :</strong> {row.status}
+                <Chip
+                  label={row.status}
+                  sx={getChipStyles(row.status)}
+                  variant="outlined"
+                ></Chip>
               </Box>
             </Paper>
           ))}
