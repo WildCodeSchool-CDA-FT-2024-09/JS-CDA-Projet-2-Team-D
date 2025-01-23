@@ -9,7 +9,6 @@ import { Box, CssBaseline } from "@mui/material";
 import "./global.css";
 import ILostMyPassword from "./pages/ILostMyPassword";
 import ResetPassword from "./pages/ResetPassword";
-import { ExerciseProvider } from "./context/ExerciceContext";
 
 const theme = createTheme({
   typography: {
@@ -74,44 +73,42 @@ function App() {
 
   return (
     <>
-      <ExerciseProvider>
-        <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            {(() => {
-              switch (currentPage) {
-                case "/":
-                  return <Login />;
-                case "/lost-password":
-                  return <ILostMyPassword />;
-                case "/reset-password":
-                  return <ResetPassword />;
-                default:
-                  return (
-                    <>
-                      <Box sx={{ display: "flex" }}>
-                        <CssBaseline />
-                        <Header title="ClubCompta" logoUrl="/Logo.svg" />
-                        <Drawer />
-                        <Box
-                          component="main"
-                          sx={{
-                            flexGrow: 1,
-                            p: 3,
-                            mt: "4rem",
-                            width: "100%",
-                          }}
-                        >
-                          <Outlet />
-                          <Footer />
-                        </Box>
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          {(() => {
+            switch (currentPage) {
+              case "/":
+                return <Login />;
+              case "/lost-password":
+                return <ILostMyPassword />;
+              case "/reset-password":
+                return <ResetPassword />;
+              default:
+                return (
+                  <>
+                    <Box sx={{ display: "flex" }}>
+                      <CssBaseline />
+                      <Header title="ClubCompta" logoUrl="/Logo.svg" />
+                      <Drawer />
+                      <Box
+                        component="main"
+                        sx={{
+                          flexGrow: 1,
+                          p: 3,
+                          mt: "4rem",
+                          width: "100%",
+                        }}
+                      >
+                        <Outlet />
+                        <Footer />
                       </Box>
-                    </>
-                  );
-              }
-            })()}
-          </NotificationProvider>
-        </ThemeProvider>
-      </ExerciseProvider>
+                    </Box>
+                  </>
+                );
+            }
+          })()}
+        </NotificationProvider>
+      </ThemeProvider>
     </>
   );
 }
