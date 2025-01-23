@@ -173,7 +173,7 @@ import { AppDataSource } from "./data-source";
         id,
         1
       FROM "user"
-      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'super@admin.net')
+      WHERE email IN ('anne.robert@association.com', 'pierre.martin@association.com', 'super@admin.net')
       ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
@@ -195,7 +195,7 @@ import { AppDataSource } from "./data-source";
         id,
         3
       FROM "user"
-      WHERE email NOT IN ('anne.robert@association.com', 'pierre.martin@association.com', 'claire.simon@association.com', 'nicolas.perret@association.com')
+      WHERE email NOT IN ('claire.simon@association.com', 'anne.robert@association.com', 'pierre.martin@association.com', 'nicolas.perret@association.com')
       ON CONFLICT ("userId", "roleId") DO NOTHING;
     `);
 
