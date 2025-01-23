@@ -67,8 +67,23 @@ return function (App $app) {
         $allowedFileTypes = explode(',', $_ENV['ALLOWED_FILE_TYPES']);
         $maxFileSize = $_ENV['MAX_FILE_SIZE'];
 
+        // Retrieve POST parameters from the form body
+        $postData = $request->getParsedBody();
+        $price_without_vat = $postData['price_without_vat'];
+        $amount_with_vat = $postData['amount_with_vat'];
+        $label = $postData['label'];
+        $info = $postData['info'] ?? "";
+        $paid = $postData['paid'];
+        $date = $postData['date'];
+        $statusId = $postData['statusId'];
+        $vatId = $postData['vatId'];
+        $creditDebitId = $postData['creditDebitId'];
+        $subcategoryId = $postData['subcategoryId'];
+        $commissionId = $postData['commissionId'];
+        $userId = $postData['userId'];
+
         // Generate a new invoice number
-        $invoiceNumber = incrementInvoiceCode();
+        $invoiceNumber = incrementInvoiceCode($date);
 
         // Create the upload directory if it doesn't exist
         if (!is_dir($uploadDir)) {
@@ -109,21 +124,6 @@ return function (App $app) {
 
             // Get database connection
             $db = getDbConnection();
-
-            // Retrieve POST parameters from the form body
-            $postData = $request->getParsedBody();
-            $price_without_vat = $postData['price_without_vat'];
-            $amount_with_vat = $postData['amount_with_vat'];
-            $label = $postData['label'];
-            $info = $postData['info'] ?? "";
-            $paid = $postData['paid'];
-            $date = $postData['date'];
-            $statusId = $postData['statusId'];
-            $vatId = $postData['vatId'];
-            $creditDebitId = $postData['creditDebitId'];
-            $subcategoryId = $postData['subcategoryId'];
-            $commissionId = $postData['commissionId'];
-            $userId = $postData['userId'];
 
             try {
                 // Prepare the SQL statement
@@ -213,9 +213,11 @@ function moveUploadedFile($uploadedFile, $invoiceNumber)
 }
 
 // Generate new invoice number (format: YYYY_000001)
-function incrementInvoiceCode() {
+function incrementInvoiceCode($date) {
     // Get database connection
     $db = getDbConnection();
+
+    $year = date('Y', strtotime($date)); 
 
     // Get the last invoice number of the current year
     $sql = "SELECT \"invoiceNumber\" FROM invoice
@@ -225,7 +227,7 @@ function incrementInvoiceCode() {
 
     $query = $db->prepare($sql);
 
-    $query->execute([':year' => date("Y")]);
+    $query->execute([':year' => $year]);
 
     // Fetch the result
     $lastInvoiceNumber = $query->fetchColumn();
@@ -243,5 +245,5 @@ function incrementInvoiceCode() {
     $newNumber = str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
 
     // Combine the current year and the new number
-    return date("Y") . '_' . $newNumber;
+    return $year . '_' . $newNumber;
 }
