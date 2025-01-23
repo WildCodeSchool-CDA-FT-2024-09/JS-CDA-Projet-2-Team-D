@@ -235,7 +235,7 @@ function DetailInvoice() {
       }}
     >
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 4 }}>
-        Facture n°{invoice.id}
+        Facture n°{invoice.invoiceNumber}
       </Typography>
       <AddBankAccount
         invoiceId={invoice.id}
