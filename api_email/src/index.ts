@@ -58,10 +58,10 @@ app.post("/send-email-invoice", async (req: Request, res: Response) => {
 });
 
 app.post("/send-email-password", async (req: Request, res: Response) => {
-  const { recipient, subject, fullname, email, password } = req.body;
+  const { recipient, subject, fullname, password } = req.body;
 
   // Data for the template
-  const templateData = { fullname, email, password };
+  const templateData = { fullname, recipient, password };
 
   // Render the email template
   const emailHtml = await ejs.renderFile(
