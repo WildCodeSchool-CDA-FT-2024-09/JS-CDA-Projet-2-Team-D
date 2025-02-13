@@ -26,5 +26,28 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
+
+        // Database connection as a service
+        'db' => function (ContainerInterface $c) {
+            $settings = $c->get(SettingsInterface::class);
+            $dbSettings = $settings->get('db');
+
+            $dsn = sprintf(
+                'pgsql:host=%s;port=%s;dbname=%s;',
+                $dbSettings['host'],
+                $dbSettings['port'],
+                $dbSettings['database']
+            );
+
+            return new \PDO(
+                $dsn,
+                $dbSettings['username'],
+                $dbSettings['password'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+        }
     ]);
 };

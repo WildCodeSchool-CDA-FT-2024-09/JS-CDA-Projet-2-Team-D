@@ -11,9 +11,6 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-// Include the database connection file
-require_once __DIR__ . '/../config/database.php';
-
 return function (App $app) {
     // CORS Pre-Flight OPTIONS Request Handler
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
@@ -58,8 +55,7 @@ return function (App $app) {
     /**
      * POST Upload endpoint
      *
-     * By default, the uploaded file will be named that way: Facture-<random-hash>.<extension>
-     * Along with the file, you may pass a "description" parameter that will replace the string "Facture".
+     * By default, the uploaded file will be named that way: Facture_<year>_<incremental_number>.<extension>
      */
     $app->post('/upload', function (Request $request, Response $response) {
         // Some parameters
@@ -81,9 +77,6 @@ return function (App $app) {
         $subcategoryId = $postData['subcategoryId'];
         $commissionId = $postData['commissionId'];
         $userId = $postData['userId'];
-
-        // Generate a new invoice number
-        $invoiceNumber = incrementInvoiceCode($date);
 
         // Create the upload directory if it doesn't exist
         if (!is_dir($uploadDir)) {
@@ -119,11 +112,13 @@ return function (App $app) {
                 $response->getBody()->write(json_encode(['success' => false, 'error' => 'File size exceeds limit. Max: '.$maxFileSize]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400); // Payload Too Large
             }
+            // Get database connection
+            $db = $this->get('db');
+
+            // Generate a new invoice number
+            $invoiceNumber = incrementInvoiceCode($db, $date);
 
             $filename = moveUploadedFile($file, $invoiceNumber);
-
-            // Get database connection
-            $db = getDbConnection();
 
             try {
                 // Prepare the SQL statement
@@ -212,38 +207,45 @@ function moveUploadedFile($uploadedFile, $invoiceNumber)
     return $filename;
 }
 
-// Generate new invoice number (format: YYYY_000001)
-function incrementInvoiceCode($date) {
-    // Get database connection
-    $db = getDbConnection();
-
-    $year = date('Y', strtotime($date)); 
-
-    // Get the last invoice number of the current year
-    $sql = "SELECT \"invoiceNumber\" FROM invoice
-        WHERE date_part('year', \"date\") = :year
-        ORDER BY id DESC
-        LIMIT 1";
-
-    $query = $db->prepare($sql);
-
-    $query->execute([':year' => $year]);
-
-    // Fetch the result
-    $lastInvoiceNumber = $query->fetchColumn();
-
-    // If there is no invoice (ex. at the beginning of a new year)
-    if (!$lastInvoiceNumber) {
-        $lastInvoiceNumber = "0";
+/**
+ * Generate new invoice number (format: YYYY_000001)
+ *
+ * @param PDO $db Database connection
+ * @param string $date Date in Y-m-d format
+ * @return string New invoice number
+ * @throws InvalidArgumentException|RuntimeException If error occurs
+ */
+function incrementInvoiceCode(PDO $db, string $date): string {
+    if (!strtotime($date)) {
+        var_dump("ERROR in incrementInvoiceCode");
+        throw new InvalidArgumentException('Invalid date');
     }
 
-    // Split the invoice number
-    $parts = explode('_', $lastInvoiceNumber);
-    $number = end($parts);
+    $year = date('Y', strtotime($date));
 
-    // Increment the numeric part and keep it zero-padded to 6 digits
-    $newNumber = str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
+    // Get the last invoice number of the current year
+    try {
+        $stmt = $db->prepare("
+            SELECT \"invoiceNumber\"
+            FROM invoice
+            WHERE date_part('year', \"date\") = :year
+            ORDER BY id DESC
+            LIMIT 1
+        ");
 
-    // Combine the current year and the new number
-    return $year . '_' . $newNumber;
+        $stmt->bindValue(':year', (string)$year, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Get the last number checking if there is no invoice (ex. at the beginning of a new year)
+        $lastInvoiceNumber = $stmt->fetchColumn() ?: $year . '_000000';
+
+        // Split the invoice number
+        $parts = explode('_', $lastInvoiceNumber);
+        $number = end($parts);
+
+        //Increment the numeric part and keep it zero-padded to 6 digits
+        return $year . '_' . str_pad((string)((int) $number + 1), 6, '0', STR_PAD_LEFT);
+    } catch (PDOException $e) {
+        throw new RuntimeException('Database error: ' . $e->getMessage());
+    }
 }
