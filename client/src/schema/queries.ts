@@ -8,7 +8,6 @@ export const GET_USERS = gql`
         firstname
         lastname
         email
-        password
         deletedAt
         roles {
           id
