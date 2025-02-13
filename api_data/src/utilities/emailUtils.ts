@@ -65,6 +65,7 @@ export async function sendEmailToCommission(
   email: string,
   firstname: string,
   lastname: string,
+  invoiceNumber?: string,
   reason?: string
 ): Promise<boolean> {
   try {
@@ -77,6 +78,7 @@ export async function sendEmailToCommission(
           recipient: email,
           subject: "ClubCompta - Facture refusée",
           fullname: `${firstname} ${lastname}`,
+          invoiceNumber: `${invoiceNumber}`,
           reason: reason ? ` ${reason}` : "",
         }),
       }
