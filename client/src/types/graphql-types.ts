@@ -719,7 +719,6 @@ export type GetUsersQuery = {
       firstname: string;
       lastname: string;
       email: string;
-      password: string;
       deletedAt?: string | null;
       roles: Array<{ __typename?: "Role"; id: number; label: string }>;
       commissions?: Array<{
@@ -2172,7 +2171,6 @@ export const GetUsersDocument = gql`
         firstname
         lastname
         email
-        password
         deletedAt
         roles {
           id
