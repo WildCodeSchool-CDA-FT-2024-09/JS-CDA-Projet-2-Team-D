@@ -8,6 +8,7 @@ import {
   ManyToMany,
   JoinTable,
   DeleteDateColumn,
+  Index,
 } from "typeorm";
 import { Field, ObjectType, Int } from "type-graphql";
 import {
@@ -33,6 +34,7 @@ export class User extends BaseEntity {
   @IsNotEmpty()
   @Length(5, 150)
   @Column({ nullable: false, unique: true, type: "varchar", length: 150 })
+  @Index({ unique: true })
   email: string;
 
   @Field(() => String)
