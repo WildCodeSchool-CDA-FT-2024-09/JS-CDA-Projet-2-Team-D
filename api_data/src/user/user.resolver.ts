@@ -60,17 +60,22 @@ export default class UserResolver {
     @Arg("offset", () => Int, { defaultValue: 0 }) offset: number,
     @Arg("limit", () => Int, { defaultValue: 10 }) limit: number
   ): Promise<PaginatedUsers> {
-    const [users, totalCount] = await User.findAndCount({
-      withDeleted: true, // By default TypeORM excludes soft deleted records
-      relations: ["roles", "commissions"],
-      skip: offset,
-      take: limit,
-      order: {
-        lastname: "ASC",
-      },
-    });
+    try {
+      const [users, totalCount] = await User.findAndCount({
+        withDeleted: true, // By default TypeORM excludes soft deleted records
+        relations: ["roles", "commissions"],
+        skip: offset,
+        take: limit,
+        order: {
+          lastname: "ASC",
+        },
+      });
 
-    return { users, totalCount };
+      return { users, totalCount };
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw new Error("Impossible de récupérer les utilisateurs.");
+    }
   }
 
   @Authorized(["1", "2", "3"])
@@ -90,37 +95,46 @@ export default class UserResolver {
 
   @Authorized(["1"])
   @Mutation(() => User)
-  async createNewUser(@Arg("data") data: UserInput) {
+  async createNewUser(@Arg("data") data: UserInput): Promise<User> {
     try {
+      // Generate random (but strong) password
       const pwd = generatePassword(12);
 
+      // Get relations
+      const [roles, commissions] = await Promise.all([
+        Role.find(),
+        Commission.find(),
+      ]);
+
+      // Create user instance (without the hashed password for now)
       const user = new User();
       user.firstname = data.firstname;
       user.lastname = data.lastname;
       user.email = data.email;
-      user.password = await argon2.hash(pwd);
-
-      const error = await validate(user);
-
-      if (error.length > 0)
-        throw new Error(
-          `Erreur dans la validation des données utilisateur : ${error}`
-        );
-
-      // Attach roles
-      const roles = await Role.find();
+      user.password = pwd; // Temporary, only to pass validation
       user.roles = roles.filter((role) =>
         data.roles.some((el) => el.id === role.id)
       );
-
-      // Attach commissions
-      const commissions = await Commission.find();
       user.commissions = commissions.filter((commission) =>
         data.commissions.some((el) => el.id === commission.id)
       );
 
+      // Validate the object
+      const error = await validate(user);
+
+      if (error.length > 0) {
+        throw new Error(
+          `Erreur dans la validation des données utilisateur : ${error}`
+        );
+      }
+
+      // Validation passed, let's hash the password
+      user.password = await argon2.hash(pwd);
+
+      // Save the user
       const newUser = await user.save();
 
+      // Send success email
       const emailSuccess = await sendPasswordByEmail(
         user.email,
         pwd,
@@ -129,7 +143,8 @@ export default class UserResolver {
       );
 
       if (!emailSuccess) {
-        throw new Error("Problème avec l'envoi de l'email");
+        // A problem with the email sending should not block the user creation
+        console.error("Problème avec l'envoi de l'email");
       }
 
       return newUser;
