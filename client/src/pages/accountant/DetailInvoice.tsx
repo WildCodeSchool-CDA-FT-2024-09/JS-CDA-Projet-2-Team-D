@@ -225,6 +225,8 @@ function DetailInvoice() {
     setReason(e.target.value);
   };
 
+  const apiURL = import.meta.env.VITE_API_URL_UPLOAD;
+
   return (
     <Paper
       elevation={3}
@@ -398,7 +400,7 @@ function DetailInvoice() {
           <Grid size={12}>
             <Typography>Justificatif</Typography>
             <a
-              href={`http://localhost:7100/upload/get-file/${invoice.receipt}`}
+              href={`${apiURL}/upload/get-file/${invoice.receipt}`}
               download={invoice.receipt}
               style={{
                 display: "flex",

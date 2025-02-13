@@ -403,6 +403,7 @@ export default class InvoiceResolver {
           invoice.user.email,
           invoice.user.firstname,
           invoice.user.lastname,
+          invoice.invoiceNumber || "non défini",
           reason || "Aucune raison donnée."
         );
       } else {
