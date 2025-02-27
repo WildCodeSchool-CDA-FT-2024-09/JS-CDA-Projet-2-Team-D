@@ -4,5 +4,7 @@ test("has title", async ({ page }) => {
   await page.goto("https://predeploy.students-cda-js-4.wilders.dev/");
 
   // Check that the title is correct
-  await page.getByRole('heading', { name: 'Connexion ClubCompta' }).click();
+  await expect(
+    page.getByRole("heading", { name: "Connexion ClubCompta" }),
+  ).toBeVisible();
 });

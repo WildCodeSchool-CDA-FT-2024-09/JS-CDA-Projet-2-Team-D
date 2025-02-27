@@ -9,17 +9,20 @@ test("connect as Super Admin", async ({ page }) => {
     .getByRole("textbox", { name: "Mot de passe" })
     .fill("whS0@cqnuros");
 
-  // await page.on("request", (request) => {
-  //   console.log("Requête interceptée :", request.method(), request.url());
-  // });
+  page.on("request", (request) => {
+    console.log("Requête interceptée :", request.method(), request.url());
+  });
 
-  // // Surveillez également les réponses
-  // await page.on("response", (response) => {
-  //   console.log("Réponse reçue :", response.url(), response.status());
-  // });
+  // Surveillez également les réponses
+  page.on("response", (response) => {
+    console.log("Réponse reçue :", response.url(), response.status());
+  });
 
-  // await page.getByRole("button", { name: "Se connecter" }).click();
+  await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByLabel("Se connecter").click();
 
-  await page.waitForLoadState("networkidle");
+  // await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(5000);
+
+  await expect(page).toHaveURL(/administrator/);
 });
