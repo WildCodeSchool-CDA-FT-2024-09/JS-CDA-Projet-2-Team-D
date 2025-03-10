@@ -6,6 +6,8 @@ interface AddBankAccountProps {
   invoiceId: number;
   selectedBank: string;
   setSelectedBank: (value: string) => void;
+  setSelectedBankAccountId: (value: string) => void;
+  selectedBankAccountId: string;
   banks: Bank[];
 }
 
@@ -13,6 +15,8 @@ function AddBankAccount({
   selectedBank,
   setSelectedBank,
   banks,
+  setSelectedBankAccountId,
+  selectedBankAccountId,
 }: AddBankAccountProps) {
   return (
     <Grid
@@ -78,6 +82,8 @@ function AddBankAccount({
                 name="numéro de compte"
                 id="account"
                 aria-label="Sélectionnez le numéro de compte"
+                value={selectedBankAccountId}
+                onChange={(e) => setSelectedBankAccountId(e.target.value)}
                 style={{
                   width: "100%",
                   padding: "0.5rem",

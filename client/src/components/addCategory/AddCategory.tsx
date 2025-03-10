@@ -172,6 +172,7 @@ function AddCategory() {
                 display: "block",
                 margin: "0 auto",
                 marginTop: 2,
+                fontWeight: "bold",
               }}
               disabled={loading}
             >
