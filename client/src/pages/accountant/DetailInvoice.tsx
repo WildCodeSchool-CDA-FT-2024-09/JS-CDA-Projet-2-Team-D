@@ -47,6 +47,9 @@ function DetailInvoice() {
   });
 
   const [selectedBank, setSelectedBank] = useState<string | "">("");
+  const [selectedBankAccountId, setSelectedBankAccountId] = useState<
+    string | ""
+  >("");
   const [banks, setBanks] = useState<Bank[]>([]);
 
   const [
@@ -140,12 +143,18 @@ function DetailInvoice() {
   const invoice = data.getInvoiceById;
 
   const handleValidateInvoice = async () => {
-    const selectedBankAccount = banks?.find(
-      (bank) => String(bank.id) === selectedBank,
-    )?.bankAccounts?.[0];
+    if (!selectedBank) {
+      notifyError("Veuillez sélectionner une banque");
+      return;
+    }
 
-    const bankAccountId = selectedBankAccount?.id
-      ? Number(selectedBankAccount.id)
+    if (!selectedBankAccountId) {
+      notifyError("Veuillez sélectionner un compte bancaire");
+      return;
+    }
+
+    const bankAccountId = selectedBankAccountId
+      ? Number(selectedBankAccountId)
       : null;
 
     if (!bankAccountId) {
@@ -426,6 +435,8 @@ function DetailInvoice() {
               invoiceId={invoice.id}
               selectedBank={selectedBank}
               setSelectedBank={setSelectedBank}
+              selectedBankAccountId={selectedBankAccountId}
+              setSelectedBankAccountId={setSelectedBankAccountId}
               banks={banks}
             />
             <Grid
